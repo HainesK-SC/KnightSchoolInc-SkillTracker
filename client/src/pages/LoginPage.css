@@ -1,0 +1,204 @@
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-royal-court) 0%,
+      var(--color-royal-court) 54%,
+      var(--color-crusades-gold) 54%,
+      var(--color-crusades-gold) 57%,
+      var(--color-background) 57%,
+      var(--color-background) 100%
+    );
+}
+
+.auth-card {
+  width: min(100%, 960px);
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  overflow: hidden;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgb(6 36 62 / 25%);
+}
+
+.auth-brand-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px;
+  background: var(--color-background);
+  border-right: 1px solid var(--color-border);
+}
+
+.auth-logo {
+  display: block;
+  width: min(100%, 330px);
+  height: auto;
+  margin-bottom: 36px;
+}
+
+.auth-brand-message {
+  max-width: 32rem;
+  margin: 0;
+  color: var(--color-royal-court);
+  font-size: 1.125rem;
+}
+
+.auth-form-panel {
+  padding: 48px;
+}
+
+.auth-eyebrow {
+  margin: 0 0 8px;
+  color: var(--color-shield);
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.auth-title {
+  margin-bottom: 8px;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+}
+
+.auth-description {
+  margin: 0 0 32px;
+  color: #44515c;
+}
+
+.auth-form {
+  display: grid;
+  gap: 20px;
+}
+
+.form-group {
+  display: grid;
+  gap: 8px;
+}
+
+.form-label {
+  color: var(--color-royal-court);
+  font-weight: 700;
+}
+
+.form-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 14px;
+  color: var(--color-royal-court);
+  background: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.form-input:hover {
+  border-color: var(--color-shield);
+}
+
+.form-input:focus {
+  border-color: var(--color-royal-court);
+  outline: 3px solid rgb(217 187 97 / 45%);
+  outline-offset: 1px;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field .form-input {
+  padding-right: 70px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  padding: 6px 8px;
+  color: var(--color-royal-court);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.auth-submit {
+  min-height: 50px;
+  padding: 12px 18px;
+  color: var(--color-white);
+  background: var(--color-royal-court);
+  border: 2px solid var(--color-royal-court);
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-submit:hover {
+  color: var(--color-royal-court);
+  background: var(--color-crusades-gold);
+  border-color: var(--color-crusades-gold);
+}
+
+.auth-status {
+  margin: 0;
+  padding: 12px;
+  color: var(--color-royal-court);
+  background: rgb(217 187 97 / 25%);
+  border-left: 4px solid var(--color-crusades-gold);
+}
+
+.auth-register {
+  margin: 24px 0 0;
+  text-align: center;
+}
+
+.auth-register a {
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .auth-page {
+    padding: 16px;
+    background: var(--color-royal-court);
+  }
+
+  .auth-card {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-brand-panel {
+    padding: 28px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .auth-logo {
+    width: min(100%, 270px);
+    margin: 0 auto 20px;
+  }
+
+  .auth-brand-message {
+    text-align: center;
+  }
+
+  .auth-form-panel {
+    padding: 32px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

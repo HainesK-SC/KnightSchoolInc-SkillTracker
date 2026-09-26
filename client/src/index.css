@@ -1,0 +1,96 @@
+@font-face {
+  font-family: "STIX Two Text";
+  src: url("./assets/fonts/STIXTwoText.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Andine";
+  src: url("./assets/fonts/Andine.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  /* Official Knight School colours */
+  --color-royal-court: #06243e;
+  --color-crusades-gold: #d9bb61;
+  --color-shield: #86888a;
+
+  /* Supporting interface colours */
+  --color-white: #ffffff;
+  --color-background: #f7f7f5;
+  --color-border: #d9d9d6;
+  --color-error: #b42318;
+
+  --font-heading: "STIX Two Text", Georgia, serif;
+  --font-body: "Andine", Georgia, serif;
+
+  font-family: var(--font-body);
+  color: var(--color-royal-court);
+  background: var(--color-background);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  font-size: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-royal-court);
+  background: var(--color-background);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  color: var(--color-royal-court);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: var(--color-royal-court);
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-crusades-gold);
+  outline-offset: 3px;
+}
