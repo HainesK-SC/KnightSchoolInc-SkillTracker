@@ -1,0 +1,253 @@
+.admin-page {
+  min-height: 100vh;
+  background: var(--color-background);
+}
+
+.admin-header {
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-header-content {
+  width: min(100% - 32px, 1200px);
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 auto;
+}
+
+.admin-logo {
+  width: 210px;
+  height: auto;
+}
+
+.admin-navigation {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-navigation a {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-navigation a:hover {
+  text-decoration: underline;
+}
+
+.admin-main {
+  width: min(100% - 32px, 1200px);
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.admin-eyebrow {
+  margin: 0 0 6px;
+  color: var(--color-shield);
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-title {
+  margin-bottom: 8px;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+}
+
+.admin-description {
+  margin: 0 0 32px;
+  color: #44515c;
+}
+
+.admin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.admin-summary-card {
+  padding: 22px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-top: 5px solid var(--color-crusades-gold);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgb(6 36 62 / 7%);
+}
+
+.admin-summary-number {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-royal-court);
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.admin-summary-label {
+  color: #44515c;
+}
+
+.admin-content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.admin-panel {
+  padding: 26px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgb(6 36 62 / 8%);
+}
+
+.admin-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.admin-panel-heading h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.admin-button {
+  min-height: 42px;
+  padding: 9px 15px;
+  color: var(--color-white);
+  background: var(--color-royal-court);
+  border: 2px solid var(--color-royal-court);
+  border-radius: 7px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-button:hover {
+  color: var(--color-royal-court);
+  background: var(--color-crusades-gold);
+  border-color: var(--color-crusades-gold);
+}
+
+.admin-table-wrapper {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 13px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-table th {
+  color: var(--color-royal-court);
+  background: var(--color-background);
+  font-weight: 700;
+}
+
+.admin-table tbody tr:hover {
+  background: rgb(217 187 97 / 12%);
+}
+
+.admin-status {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.admin-status-active {
+  color: #155724;
+  background: #d4edda;
+}
+
+.admin-status-review {
+  color: #704d00;
+  background: #fff3cd;
+}
+
+.admin-actions-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-quick-action {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 14px;
+  color: var(--color-royal-court);
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: 7px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-quick-action:hover {
+  background: rgb(217 187 97 / 25%);
+  border-color: var(--color-crusades-gold);
+}
+
+@media (max-width: 900px) {
+  .admin-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-header-content {
+    min-height: auto;
+    flex-direction: column;
+    padding: 18px 0;
+  }
+
+  .admin-logo {
+    width: 180px;
+  }
+
+  .admin-navigation {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .admin-main {
+    padding: 24px 0;
+  }
+
+  .admin-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-panel {
+    padding: 20px;
+  }
+
+  .admin-panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
