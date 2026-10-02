@@ -1,3 +1,4 @@
+using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
