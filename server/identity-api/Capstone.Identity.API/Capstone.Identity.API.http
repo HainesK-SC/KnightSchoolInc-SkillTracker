@@ -1,0 +1,6 @@
+@Capstone.Identity.API_HostAddress = http://localhost:5241
+
+GET {{Capstone.Identity.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../Capstone.Identity.API.Tests/Capstone.Identity.API.Tests.csproj" />
+  <Project Path="Capstone.Identity.API.csproj" />
+</Solution>
