@@ -17,7 +17,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Register the DbContext class
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("DefaultConnection"));
+// Retrieve ConnectionString
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
 // Register & config Identity Framework
 var jwtSection = builder.Configuration.GetSection("Jwt");
