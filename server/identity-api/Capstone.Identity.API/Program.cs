@@ -87,6 +87,22 @@ namespace Capstone.Identity.API
                     .Build();
             });
 
+            // Defining CORS policy
+            const string FrontendCorsPolicy = "Frontend";
+
+            var allowedOrigins = builder.Configuration
+                .GetSection("Cors:AllowedOrigins")
+                .Get<string[]>() ?? [];
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(FrontendCorsPolicy, policy =>
+                policy.WithOrigins(allowedOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials());
+            });
+
             // Service registrations
             builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -101,7 +117,7 @@ namespace Capstone.Identity.API
 
             app.UseHttpsRedirection();
 
-            app.UseCors();
+            app.UseCors(FrontendCorsPolicy);
             app.UseAuthentication();
             app.UseAuthorization();
 
