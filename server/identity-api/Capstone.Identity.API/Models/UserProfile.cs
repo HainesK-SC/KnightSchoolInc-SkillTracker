@@ -13,6 +13,6 @@ namespace Capstone.Identity.API.Models
 
         // Navigational
         public Guid ApplicationUserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
+        // public ApplicationUser ApplicationUser { get; set; }
     }
 }
