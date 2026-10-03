@@ -12,9 +12,7 @@ namespace Capstone.Identity.API.Models
         // ICollection<ParticipantSkillProgress> - navigational
 
         // Navigational
-        public int ApplicationUserId { get; set; }
-
-        [ForeignKey(nameof(ApplicationUserId))]
+        public Guid ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
     }
 }
