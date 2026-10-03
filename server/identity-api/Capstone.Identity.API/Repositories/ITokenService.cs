@@ -1,9 +1,10 @@
-﻿using Capstone.Identity.API.Models;
+﻿using Capstone.Identity.API.Auth;
+using Capstone.Identity.API.Models;
 
 namespace Capstone.Identity.API.Repositories
 {
     public interface ITokenService
     {
-        Task<string> GenerateTokenAsync(ApplicationUser appUser);
+        Task<AccessToken> GenerateTokenAsync(ApplicationUser appUser);
     }
 }
