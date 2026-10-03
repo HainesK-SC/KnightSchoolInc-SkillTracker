@@ -10,5 +10,15 @@ namespace Capstone.Identity.API.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<ApplicationUser> AppUsers { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<UserProfile>()
+            .HasOne<ApplicationUser>()
+            .WithOne()
+            .HasForeignKey<UserProfile>(p => p.ApplicationUserId);
+        }
     }
 }
