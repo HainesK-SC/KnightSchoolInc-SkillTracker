@@ -10,6 +10,7 @@ namespace Capstone.Identity.API.Models
         [MaxLength(100)]
         public string DisplayName { get; set; }
         public string? AvatarImagePath { get; set; }
+        public DisplayNameSalutation DisplayNameSalutation { get; set; }
         public DisplayNameModifiers DisplayNameModifier { get; set; }
 
         // Props to add later 
