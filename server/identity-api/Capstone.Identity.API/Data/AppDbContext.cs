@@ -32,7 +32,13 @@ namespace Capstone.Identity.API.Data
             builder.Entity<UserProfile>()
                 .Property(p => p.DisplayNameModifier)
                 .HasConversion<string>()
-                .HasMaxLength(50); 
+                .HasMaxLength(50);
+
+            builder.Entity<ApplicationUser>()
+                .HasIndex(u => u.NormalizedEmail)
+                .HasDatabaseName("EmailIndex")
+                .IsUnique()
+                .HasFilter("[NormalizedEmail] IS NOT NULL");
         }
     }
 }
