@@ -13,6 +13,6 @@ namespace Capstone.Identity.API.Services
             Modifiers[Random.Shared.Next(Modifiers.Length)];
 
         public async Task<string> GenerateDisplayName(DisplayNameSalutations salutation, string firstName, DisplayNameModifiers modifier) =>
-            $"{salutation.ToDisplayText()} {firstName.Trim()} {modifier.ToDisplayText()}";
+            $"{salutation.ToDisplayText()}, {firstName.Trim()} {modifier.ToDisplayText()}";
     }
 }
