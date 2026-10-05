@@ -43,12 +43,12 @@ namespace Capstone.Identity.API.Tests.Enums
         }
 
         [TestMethod]
-        public void AllEnumValuesConvertToString()
+        [DataRow(DisplayNameSalutations.Knight, "Knight")]
+        [DataRow(DisplayNameSalutations.Sir, "Sir")]
+        [DataRow(DisplayNameSalutations.Madame, "Madame")]
+        public void AllEnumValuesConvertToString(DisplayNameSalutations salutation, string expected)
         {
-            foreach (var salutation in _salutations)
-            {
-                Assert.IsInstanceOfType<string>(salutation.ToDisplayText());
-            }
+            Assert.AreEqual(expected, salutation.ToDisplayText());
         }
     }
 }
