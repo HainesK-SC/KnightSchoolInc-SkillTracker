@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Moq" Version="4.21.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Capstone.Identity.API\Capstone.Identity.API.csproj" />
   </ItemGroup>
 
