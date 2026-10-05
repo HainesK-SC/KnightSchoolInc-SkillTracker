@@ -105,7 +105,7 @@ namespace Capstone.Identity.API
 
             // Service registrations
             builder.Services.AddScoped<ITokenService, TokenService>();
-
+            builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 
             var app = builder.Build();
 
