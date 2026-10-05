@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Capstone.Identity.API.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Capstone.Identity.API.Models
@@ -9,6 +10,7 @@ namespace Capstone.Identity.API.Models
         [MaxLength(100)]
         public string DisplayName { get; set; }
         public string? AvatarImagePath { get; set; }
+        public DisplayNameModifiers DisplayNameModifier { get; set; }
 
         // Props to add later 
         // ICollection<ParticipantSkillProgress> - navigational
