@@ -9,19 +9,6 @@ namespace Capstone.Identity.API.Tests.Enums
     [TestClass]
     public class DisplayNameSalutationsExtensionTests
     {
-        private DisplayNameSalutations[] _salutations = [];
-        private string[] _salutationValues = [];
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            _salutations = Enum.GetValues<DisplayNameSalutations>();
-
-            _salutationValues.Append<string>("Knight");
-            _salutationValues.Append<string>("Sir");
-            _salutationValues.Append<string>("Madame");
-        }
-
         [TestMethod]
         public void InvalidNumericEnumValueThrowsException()
         {
