@@ -16,9 +16,13 @@ namespace Capstone.Identity.API.Data
             base.OnModelCreating(builder);
 
             builder.Entity<UserProfile>()
+            .Property(p => p.DisplayName).HasMaxLength(100);
+
+            builder.Entity<UserProfile>()
             .HasOne<ApplicationUser>()
             .WithOne()
-            .HasForeignKey<UserProfile>(p => p.ApplicationUserId);
+            .HasForeignKey<UserProfile>(p => p.ApplicationUserId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
