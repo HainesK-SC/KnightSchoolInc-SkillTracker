@@ -42,7 +42,7 @@ namespace Capstone.Identity.API
             // Registering and Configuring Identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = true;
+                options.SignIn.RequireConfirmedAccount = false;
                 options.User.RequireUniqueEmail = false; // this is done for null dummy accounts not throwing errors
                 options.Lockout.MaxFailedAccessAttempts = 5;
             })
