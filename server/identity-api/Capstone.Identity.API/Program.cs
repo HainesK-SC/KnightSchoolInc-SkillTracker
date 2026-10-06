@@ -119,6 +119,10 @@ namespace Capstone.Identity.API
 
             var app = builder.Build();
 
+            // Applying database migrations
+            await DatabaseMigrator.MigrateIfEnabledAsync(app);
+            await IdentitySeeder.SeedAsync(app.Services);
+
             // Identity Seeding
             await IdentitySeeder.SeedAsync(app.Services);
 
