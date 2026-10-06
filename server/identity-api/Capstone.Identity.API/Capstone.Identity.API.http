@@ -1,5 +1,5 @@
 @host = http://localhost:5241
-
+@authCookie = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImExYmEyMzI1LWIzZWEtNGM1Yi1mODdmLTA4ZGYyM2JhN2JmOSIsImp0aSI6ImZiMmVlMjBiLWZmOTUtNDAyZC04MmRhLWFmMDRkN2JmZTk4YSIsIm5iZiI6MTc5MTMwMTkwMCwiZXhwIjoxNzkxMzMwNzAwLCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.y-y7uI8QN3g8R3XCVhJzxamEn-hvzKZi00y0I1uDsrs;
 ### Register: success (new random email each run)
 POST {{host}}/api/auth/register
 Content-Type: application/json
@@ -80,3 +80,14 @@ Content-Type: application/json
   "email": "nobody@test.com",
   "password": "Passw0rd!"
 }
+
+### Me: no cookie (expect 401 with an EMPTY body)
+GET {{host}}/api/auth/me
+
+### Me: with cookie (expect 200 with your user info)
+GET {{host}}/api/auth/me
+Cookie: ns_auth={{authCookie}}
+
+### Logout (expect 204, and a Set-Cookie that expires the cookie)
+POST {{host}}/api/auth/logout
+Cookie: ns_auth={{authCookie}}
