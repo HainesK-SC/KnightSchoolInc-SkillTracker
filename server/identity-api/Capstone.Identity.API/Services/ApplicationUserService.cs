@@ -74,7 +74,7 @@ namespace Capstone.Identity.API.Services
             var roles = await _userManager.GetRolesAsync(user);
 
             return Result<AuthResult>.Success(
-                new AuthResult(ToCurrentUserResponseDto(user, profile, roles), token);
+                new AuthResult(ToCurrentUserResponseDto(user, profile, roles), token));
         }
 
         private static CurrentUserResponseDto ToCurrentUserResponseDto(
