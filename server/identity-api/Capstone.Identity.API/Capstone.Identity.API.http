@@ -11,6 +11,17 @@ Content-Type: application/json
   "lastName": "Test"
 }
 
+### Register: success (fixed email to test login)
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "kyle@test.com",
+  "password": "Passw0rd!",
+  "firstName": "Kyle",
+  "lastName": "Test"
+}
+
 ### Register: fixed email (run twice; the second run should return 409)
 POST {{host}}/api/auth/register
 Content-Type: application/json
@@ -41,4 +52,31 @@ Content-Type: application/json
   "email": "missing@test.com",
   "password": "Passw0rd!",
   "lastName": "Test"
+}
+
+### Login: success
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "kyle@test.com",
+  "password": "Passw0rd!"
+}
+
+### Login: wrong password (expect 401, generic message)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "kyle@test.com",
+  "password": "WrongPass1!"
+}
+
+### Login: unknown email (expect 401, the SAME message as wrong password)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nobody@test.com",
+  "password": "Passw0rd!"
 }
