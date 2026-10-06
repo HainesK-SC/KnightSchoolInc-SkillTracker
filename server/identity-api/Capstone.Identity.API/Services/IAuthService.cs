@@ -7,5 +7,6 @@ namespace Capstone.Identity.API.Services
     {
         Task<Result<AuthResult>> RegisterAsync(RegisterRequestDto request);
         Task<Result<AuthResult>> LoginAsync(LoginRequestDto request);
+        Task<Result<CurrentUserResponseDto>> GetCurrentUserAsync(Guid userId);
     }
 }
