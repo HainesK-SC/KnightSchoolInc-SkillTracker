@@ -11,5 +11,6 @@ namespace Capstone.Identity.API.Services
         //Task<Result<AuthResult>> LoginAsync(LoginRequestDto request);
         Task<Result<ApplicationUser>> CreateUserWithProfileAsync(
     string? email, string? password, string firstName, string lastName);
+        Task<Result<CurrentUserResponseDto>> GetCurrentUserAsync(Guid userId);
     }
 }
