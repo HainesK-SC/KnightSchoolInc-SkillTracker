@@ -1,6 +1,5 @@
 ﻿using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Models;
-using Capstone.Identity.API.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

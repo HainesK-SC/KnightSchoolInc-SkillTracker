@@ -2,7 +2,6 @@
 using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Dtos.Auth;
 using Capstone.Identity.API.Models;
-using Capstone.Identity.API.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net.NetworkInformation;
@@ -39,12 +38,14 @@ namespace Capstone.Identity.API.Services
             var existing = await _userManager.FindByEmailAsync(registerRequest.Email);
             if (existing != null)
             {
+                _logger.LogWarning("Error registering account: Email:{UserId} already exists", registerRequest.Email);
                 return Result<AuthResult>
                     .Failure("An account with this email already exists.", ResultErrorType.Conflict);
             }
 
             var user = new ApplicationUser
             {
+                
                 UserName = registerRequest.Email,
                 Email = registerRequest.Email,
                 FirstName = registerRequest.FirstName.Trim(),

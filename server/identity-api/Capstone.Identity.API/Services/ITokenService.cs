@@ -1,7 +1,7 @@
 ﻿using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Models;
 
-namespace Capstone.Identity.API.Repositories
+namespace Capstone.Identity.API.Services
 {
     public interface ITokenService
     {

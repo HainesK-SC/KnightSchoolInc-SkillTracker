@@ -2,7 +2,7 @@
 using Capstone.Identity.API.Dtos.Auth;
 using Microsoft.AspNetCore.Identity.Data;
 
-namespace Capstone.Identity.API.Repositories
+namespace Capstone.Identity.API.Services
 {
     public interface IApplicationUserService
     {

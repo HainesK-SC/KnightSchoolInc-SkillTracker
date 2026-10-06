@@ -1,5 +1,4 @@
 ﻿using Capstone.Identity.API.Enums;
-using Capstone.Identity.API.Repositories;
 
 namespace Capstone.Identity.API.Services
 {

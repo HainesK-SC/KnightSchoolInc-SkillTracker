@@ -1,6 +1,6 @@
 ﻿using Capstone.Identity.API.Enums;
 
-namespace Capstone.Identity.API.Repositories
+namespace Capstone.Identity.API.Services
 {
     public interface IDisplayNameGenerator
     {
