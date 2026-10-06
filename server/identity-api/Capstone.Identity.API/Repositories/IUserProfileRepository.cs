@@ -4,7 +4,7 @@ namespace Capstone.Identity.API.Repositories
 {
     public interface IUserProfileRepository
     {
-        Task<UserProfile?> GetApplicationUserByIdAsync(Guid applicationUserId);
+        Task<UserProfile?> GetUserProfileByUserIdAsync(Guid applicationUserId);
         void AddUserProfile(UserProfile profile);
     }
 }

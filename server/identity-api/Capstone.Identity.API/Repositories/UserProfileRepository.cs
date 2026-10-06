@@ -13,7 +13,7 @@ namespace Capstone.Identity.API.Repositories
             _context = context;
         }
 
-        public async Task<UserProfile?> GetApplicationUserByIdAsync(Guid applicationUserId)
+        public async Task<UserProfile?> GetUserProfileByUserIdAsync(Guid applicationUserId)
         {
             var userProfile = _context.UserProfiles
                 .AsNoTracking()
