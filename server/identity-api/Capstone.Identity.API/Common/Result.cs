@@ -1,4 +1,4 @@
-﻿namespace Capstone.Identity.API
+﻿namespace Capstone.Identity.API.Common
 {
     // provides an error code if the request fails - provides more insight on failure
     public enum ResultErrorType

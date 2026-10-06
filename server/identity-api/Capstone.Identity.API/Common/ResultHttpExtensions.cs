@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Capstone.Identity.API
+namespace Capstone.Identity.API.Common
 {
     public static class ResultHttpExtensions
     {
