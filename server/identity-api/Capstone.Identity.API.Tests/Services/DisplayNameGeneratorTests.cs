@@ -28,7 +28,7 @@ namespace Capstone.Identity.API.Tests.Services
 
             var actualResult = _nameGenerator.GenerateDisplayName(API.Enums.DisplayNameSalutations.Sir, "Kyle", API.Enums.DisplayNameModifiers.TheBrave);
 
-            Assert.AreEqual<string>(expectedResult, actualResult.Result);
+            Assert.AreEqual<string>(expectedResult, actualResult);
         }
 
         [TestMethod]
@@ -38,7 +38,7 @@ namespace Capstone.Identity.API.Tests.Services
 
             var actualResult = _nameGenerator.GenerateDisplayName(API.Enums.DisplayNameSalutations.Sir, "    Kyle  ", API.Enums.DisplayNameModifiers.TheBrave);
 
-            Assert.AreEqual<string>(expectedResult, actualResult.Result);
+            Assert.AreEqual<string>(expectedResult, actualResult);
         }
 
         [TestMethod]
