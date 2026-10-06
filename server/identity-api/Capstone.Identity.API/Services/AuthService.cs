@@ -94,5 +94,21 @@ namespace Capstone.Identity.API.Services
 
             return Result<AuthResult>.Success(new AuthResult(currentUser.Data!, token));
         }
+
+        public async Task<Result<CurrentUserResponseDto>> GetCurrentUserAsync(Guid userId)
+        {
+            var result = await _applicationUserService.GetCurrentUserAsync(userId);
+
+            if (!result.Succeeded && result.ErrorType == ResultErrorType.NotFound)
+            {
+                _logger.LogWarning(
+                    "Valid token presented for user {UserId}, but the user no longer exists.", userId);
+
+                return Result<CurrentUserResponseDto>.Failure(
+                    "Your session is no longer valid. Please log in again.", ResultErrorType.Unauthorized);
+            }
+
+            return result;
+        }
     }
 }
