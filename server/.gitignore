@@ -17,6 +17,7 @@ bin/
 obj/
 .vs/
 *.user
+.env
 
 # Editor directories and files
 .vscode/*
