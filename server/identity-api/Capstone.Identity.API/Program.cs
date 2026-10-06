@@ -1,6 +1,7 @@
 using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Models;
+using Capstone.Identity.API.Repositories;
 using Capstone.Identity.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -101,6 +102,9 @@ namespace Capstone.Identity.API
                     .AllowAnyMethod()
                     .AllowCredentials());
             });
+
+            // Repository registrations
+            builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
             // Service registrations
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
