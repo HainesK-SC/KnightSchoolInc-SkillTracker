@@ -55,5 +55,23 @@ namespace Capstone.Identity.API.Controllers
             Response.ClearAuthCookie();
             return NoContent();
         }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> Me()
+        {
+            var result = await _authService.GetCurrentUserAsync(User.GetUserId());
+
+            if (!result.Succeeded)
+            {
+                if (result.ErrorType == ResultErrorType.Unauthorized)
+                {
+                    Response.ClearAuthCookie();
+                }
+
+                return result.ToProblemResult();
+            }
+
+            return Ok(result.Data);
+        }
     }
 }
