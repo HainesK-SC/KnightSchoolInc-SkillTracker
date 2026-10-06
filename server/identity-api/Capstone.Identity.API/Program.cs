@@ -1,4 +1,5 @@
 using Capstone.Identity.API.Auth;
+using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Repositories;
@@ -107,6 +108,8 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
             // Service registrations
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+            builder.Services.AddProblemDetails();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService,  AuthService>();
             builder.Services.AddSingleton<IDisplayNameGenerator, DisplayNameGenerator>();
@@ -123,6 +126,7 @@ namespace Capstone.Identity.API
 
             app.UseHttpsRedirection();
 
+            app.UseExceptionHandler();
             app.UseCors(FrontendCorsPolicy);
             app.UseAuthentication();
             app.UseAuthorization();
