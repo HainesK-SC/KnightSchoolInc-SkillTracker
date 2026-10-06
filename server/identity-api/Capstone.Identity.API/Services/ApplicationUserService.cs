@@ -92,19 +92,19 @@ namespace Capstone.Identity.API.Services
         //        new AuthResult(ToCurrentUserResponseDto(user, profile, roles), token));
         //}
 
-        //private static CurrentUserResponseDto ToCurrentUserResponseDto(
-        //    ApplicationUser user, 
-        //    UserProfile profile, 
-        //    IList<string> roles) => new()
-        //{
-        //    Id = user.Id,
-        //    Email = user.Email,
-        //    FirstName = user.FirstName,
-        //    LastName = user.LastName,
-        //    DisplayName = profile.DisplayName,
-        //    AvatarImagePath = profile.AvatarImagePath,
-        //    Roles = roles.ToList()
-        //};
+        private static CurrentUserResponseDto ToCurrentUserResponseDto(
+            ApplicationUser user,
+            UserProfile profile,
+            IList<string> roles) => new()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DisplayName = profile.DisplayName,
+                AvatarImagePath = profile.AvatarImagePath,
+                Roles = roles.ToList()
+            };
 
         //public async Task<Result<AuthResult>> LoginAsync(LoginRequestDto request)
         //{
@@ -164,7 +164,7 @@ namespace Capstone.Identity.API.Services
         //}
 
         public async Task<Result<ApplicationUser>> CreateUserWithProfileAsync(
-    string? email, string? password, string firstName, string lastName)
+            string? email, string? password, string firstName, string lastName)
         {
             // 1. A login needs an email, so a password without one makes no sense
             if (password is not null && email is null)
@@ -225,6 +225,28 @@ namespace Capstone.Identity.API.Services
                 "Created user {UserId} (placeholder: {IsPlaceholder}).", user.Id, password is null);
 
             return Result<ApplicationUser>.Success(user);
+        }
+
+        public async Task<Result<CurrentUserResponseDto>> GetCurrentUserAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null)
+            {
+                _logger.LogWarning("Current user lookup failed: user {UserId} not found.", userId);
+                return Result<CurrentUserResponseDto>.Failure("User not found.", ResultErrorType.NotFound);
+            }
+
+            var profile = await _userProfileRepository.GetUserProfileByUserIdAsync(user.Id);
+            if (profile is null)
+            {
+                _logger.LogError("User {UserId} has no UserProfile.", user.Id);
+                return Result<CurrentUserResponseDto>.Failure(
+                    "An unexpected error occurred.", ResultErrorType.Unexpected);
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Result<CurrentUserResponseDto>.Success(ToCurrentUserResponseDto(user, profile, roles));
         }
     }
 }
