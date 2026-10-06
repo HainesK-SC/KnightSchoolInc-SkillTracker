@@ -4,7 +4,7 @@ namespace Capstone.Identity.API.Auth
 {
     public static class AuthCookie
     {
-        public const string Name = "ns_auth";
+        public const string Name = "knightschool_auth";
 
         public static CookieOptions Options(DateTimeOffset expires) => new()
         {
