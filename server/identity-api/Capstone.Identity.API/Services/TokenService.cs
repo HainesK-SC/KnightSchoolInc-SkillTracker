@@ -26,12 +26,10 @@ namespace Capstone.Identity.API.Services
             var roles = await _userManager.GetRolesAsync(user);
 
             var appUserId = Convert.ToString(user.Id);
-            // var appUserEmail = user.Email; - causes conflict for null profile
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                // new Claim(ClaimTypes.Email, appUserEmail) - removed for null profile conflict
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -39,12 +37,6 @@ namespace Capstone.Identity.API.Services
 
             var now = DateTimeOffset.UtcNow;
             var expiresAt = now.AddMinutes(_jwt.ExpiryMinutes);
-
-            // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-
-            //var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            //var expiryMinutes = double.Parse(_configuration["Jwt:ExpiryMinutes"]!);
 
             var token = new JwtSecurityToken(
                 issuer: _jwt.Issuer,
