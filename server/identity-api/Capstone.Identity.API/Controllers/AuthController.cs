@@ -1,4 +1,5 @@
 ﻿using Capstone.Identity.API.Auth;
+using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Dtos.Auth;
 using Capstone.Identity.API.Services;
 using Microsoft.AspNetCore.Authorization;
