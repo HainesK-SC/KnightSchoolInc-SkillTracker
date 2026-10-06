@@ -108,6 +108,7 @@ namespace Capstone.Identity.API
 
             // Service registrations
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IAuthService,  AuthService>();
             builder.Services.AddSingleton<IDisplayNameGenerator, DisplayNameGenerator>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
