@@ -7,5 +7,6 @@ namespace Capstone.Identity.API.Repositories
     public interface IApplicationUserService
     {
         Task<Result<AuthResult>> RegisterAsync(RegisterRequestDto registerRequest);
+        Task<Result<AuthResult>> LoginAsync(LoginRequestDto request);
     }
 }
