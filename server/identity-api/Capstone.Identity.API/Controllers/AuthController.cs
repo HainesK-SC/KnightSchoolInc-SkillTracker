@@ -11,10 +11,12 @@ namespace Capstone.Identity.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IAuthService _authService;
         private readonly IApplicationUserService _userService;
 
-        public AuthController(IApplicationUserService userService)
+        public AuthController(IAuthService authService, IApplicationUserService userService)
         {
+            _authService = authService;
             _userService = userService;
         }
 
@@ -22,7 +24,7 @@ namespace Capstone.Identity.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
         {
-            var result = await _userService.RegisterAsync(registerRequest);
+            var result = await _authService.RegisterAsync(registerRequest);
             if (!result.Succeeded)
             {
                 return result.ToProblemResult();
@@ -36,7 +38,7 @@ namespace Capstone.Identity.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
-            var result = await _userService.LoginAsync(request);
+            var result = await _authService.LoginAsync(request);
             if (!result.Succeeded)
             {
                 return result.ToProblemResult();
