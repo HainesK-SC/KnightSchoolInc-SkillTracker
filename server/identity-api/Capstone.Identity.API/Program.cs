@@ -1,6 +1,7 @@
 using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Data;
+using Capstone.Identity.API.Data.Seeding;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Repositories;
 using Capstone.Identity.API.Services;
@@ -117,6 +118,9 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 
             var app = builder.Build();
+
+            // Identity Seeding
+            await IdentitySeeder.SeedAsync(app.Services);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
