@@ -47,5 +47,13 @@ namespace Capstone.Identity.API.Controllers
             Response.SetAuthCookie(result.Data!.Token);
             return Ok(result.Data.User);
         }
+
+        [HttpPost("logout")]
+        [AllowAnonymous]
+        public IActionResult Logout()
+        {
+            Response.ClearAuthCookie();
+            return NoContent();
+        }
     }
 }
