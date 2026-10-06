@@ -27,6 +27,7 @@ services:
       Jwt__Key: ${JWT_KEY}
       AdminSeed__Email: ${ADMIN_EMAIL}
       AdminSeed__Password: ${ADMIN_PASSWORD}
+      Database__ApplyMigrationsOnStartup: "true"
     depends_on:
       db:
         condition: service_healthy
