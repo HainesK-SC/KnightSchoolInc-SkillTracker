@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Capstone.Identity.API.Auth;
+using Capstone.Identity.API.Dtos.Auth;
+using Capstone.Identity.API.Repositories;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Capstone.Identity.API.Controllers
@@ -7,6 +11,25 @@ namespace Capstone.Identity.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IApplicationUserService _userService;
 
+        public AuthController(IApplicationUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
+        {
+            var result = await _userService.RegisterAsync(registerRequest);
+            if (!result.Succeeded)
+            {
+                return result.ToProblemResult();
+            }
+
+            Response.SetAuthCookie(result.Data!.Token);
+            return Ok(result.Data.User);
+        }
     }
 }
