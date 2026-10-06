@@ -180,7 +180,7 @@ namespace Capstone.Identity.API.Tests.Services
             Assert.AreEqual(BuiltDisplayName, _addedProfile.DisplayName);
 
             _displayNameGenerator.Verify(
-                g => g.GenerateDisplayName(DisplayNameSalutations.Knight, "Kyle", DisplayNameModifiers.TheBrave).ToString(), Times.Once);
+                g => g.GenerateDisplayName(DisplayNameSalutations.Knight, "Kyle", DisplayNameModifiers.TheBrave), Times.Once);
         }
 
         [TestMethod]
