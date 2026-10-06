@@ -17,7 +17,7 @@ Content-Type: application/json
 
 {
   "email": "kyle@test.com",
-  "password": "Passw0rd!",
+  "password": "MySuperSecretPassw0rd!",
   "firstName": "Kyle",
   "lastName": "Test"
 }
@@ -59,8 +59,8 @@ POST {{host}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "kyle@test.com",
-  "password": "Passw0rd!"
+  "email": "admin@test.com",
+  "password": "MySuperSecretPassw0rd!"
 }
 
 ### Login: wrong password (expect 401, generic message)
