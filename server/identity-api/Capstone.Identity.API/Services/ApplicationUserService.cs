@@ -12,33 +12,24 @@ namespace Capstone.Identity.API.Services
 {
     public class ApplicationUserService : IApplicationUserService
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<ApplicationUserService> _logger;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _appDbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDisplayNameGenerator _displayNameGenerator;
-        private readonly ITokenService _tokenService;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public ApplicationUserService(
-            SignInManager<ApplicationUser> signInManager,
-            ILogger<ApplicationUserService> logger,
             UserManager<ApplicationUser> userManager,
-            AppDbContext appDbContext,
             IDisplayNameGenerator displayNameGenerator,
-            ITokenService tokenService,
-            IUserProfileRepository userProfileRepistory,
-            IUnitOfWork unitOfWork)
+            IUserProfileRepository userProfileRepostory,
+            IUnitOfWork unitOfWork,
+            ILogger<ApplicationUserService> logger)
         {
-            _signInManager = signInManager;
-            _logger = logger;
             _userManager = userManager;
-            _appDbContext = appDbContext;
-            _displayNameGenerator = displayNameGenerator;
-            _tokenService = tokenService;
-            _userProfileRepository = userProfileRepistory;
-            _unitOfWork = unitOfWork;
+            _userProfileRepository = userProfileRepostory;
+            _displayNameGenerator = displayNameGenerator;            _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         private static CurrentUserResponseDto ToCurrentUserResponseDto(

@@ -6,6 +6,6 @@ namespace Capstone.Identity.API.Services
     {
         DisplayNameSalutations DefaultSalutation { get; }
         DisplayNameModifiers PickRandomModifier();
-        public Task<string> GenerateDisplayName(DisplayNameSalutations salutation, string firstName, DisplayNameModifiers modifier);
+        public string GenerateDisplayName(DisplayNameSalutations salutation, string firstName, DisplayNameModifiers modifier);
     }
 }
