@@ -1,5 +1,6 @@
 ﻿using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Common;
+using Capstone.Identity.API.Dtos.Admin;
 using Capstone.Identity.API.Dtos.Auth;
 using Capstone.Identity.API.Models;
 using Microsoft.AspNetCore.Identity.Data;
@@ -15,5 +16,8 @@ namespace Capstone.Identity.API.Services
             string lastName,
             IReadOnlyCollection<string>? additionalRoles = null);
         Task<Result<CurrentUserResponseDto>> GetCurrentUserAsync(Guid userId);
+        Task<Result<AdminUserDto>> CreateUserAsAdminAsync(CreateUserRequestDto request);
+        Task<Result<IReadOnlyList<AdminUserDto>>> GetUsersForAdminAsync();
+        Task<Result<AdminUserDto>> GetUserForAdminAsync(Guid userId);
     }
 }
