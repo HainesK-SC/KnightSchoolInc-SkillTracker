@@ -81,6 +81,10 @@ namespace Capstone.Identity.API.Tests.Services
                 _profileRepository.Object,
                 _unitOfWork.Object,
                 NullLogger<ApplicationUserService>.Instance);
+
+            _userManager
+                .Setup(m => m.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>()))
+                .ReturnsAsync(IdentityResult.Success);
         }
 
         // Simulates the database assigning an ID when the user is saved
