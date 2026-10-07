@@ -77,7 +77,7 @@ namespace Capstone.Identity.API.Services
                 FirstName = firstName.Trim(),
                 LastName = lastName.Trim()
             };
-
+            
             // User and profile succeed or fail together
             // Keeping this atomic has to happen to prevent orphaned UserProfiles
             await using var transaction = await _unitOfWork.BeginTransactionAsync();
@@ -91,6 +91,19 @@ namespace Capstone.Identity.API.Services
                 _logger.LogWarning(
                     "User creation failed with Identity errors: {ErrorCodes}",
                     createResult.Errors.Select(e => e.Code));
+
+                var errors = string.Join(" ", createResult.Errors.Select(e => e.Description));
+                return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(user, Roles.RegularUser);
+
+            if (!roleResult.Succeeded)
+            {
+                _logger.LogWarning(
+                    "Default role assignment failed: {ErrorCodes}",
+                    createResult.Errors.Select(e => e.Code)
+                    );
 
                 var errors = string.Join(" ", createResult.Errors.Select(e => e.Description));
                 return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
