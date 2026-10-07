@@ -9,7 +9,11 @@ namespace Capstone.Identity.API.Services
     public interface IApplicationUserService
     {
         Task<Result<ApplicationUser>> CreateUserWithProfileAsync(
-    string? email, string? password, string firstName, string lastName);
+            string? email, 
+            string? password,
+            string firstName,
+            string lastName,
+            IReadOnlyCollection<string>? additionalRoles = null);
         Task<Result<CurrentUserResponseDto>> GetCurrentUserAsync(Guid userId);
     }
 }
