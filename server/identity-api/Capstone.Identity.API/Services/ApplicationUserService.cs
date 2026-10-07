@@ -48,7 +48,11 @@ namespace Capstone.Identity.API.Services
             };
 
         public async Task<Result<ApplicationUser>> CreateUserWithProfileAsync(
-            string? email, string? password, string firstName, string lastName)
+            string? email,
+            string? password,
+            string firstName,
+            string lastName,
+            IReadOnlyCollection<string>? additionalRoles = null)
         {
             if (password is not null && email is null)
             {
@@ -77,7 +81,28 @@ namespace Capstone.Identity.API.Services
                 FirstName = firstName.Trim(),
                 LastName = lastName.Trim()
             };
-            
+
+            // This block checks the roles being sent in a request to create a new user
+            // It contains a validation that ensures no unknown roles are trying to be passed
+            // If all roles are valid, it simply adds the roles to the new user
+            var requestedRoles = additionalRoles ?? [];
+
+            var unknownRoles = requestedRoles
+                .Where(role => !Roles.GetAllRoles().Contains(role))
+                .ToList();
+
+            if (unknownRoles.Count > 0)
+            {
+                return Result<ApplicationUser>.Failure(
+                    $"Unknown role(s): {string.Join(", ", unknownRoles)}.",
+                    ResultErrorType.Validation);
+            }
+
+            var rolesToAssign = requestedRoles
+                .Append(Roles.RegularUser)
+                .Distinct()
+                .ToList();
+
             // User and profile succeed or fail together
             // Keeping this atomic has to happen to prevent orphaned UserProfiles
             await using var transaction = await _unitOfWork.BeginTransactionAsync();
@@ -96,17 +121,30 @@ namespace Capstone.Identity.API.Services
                 return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
             }
 
-            var roleResult = await _userManager.AddToRoleAsync(user, Roles.RegularUser);
+            //var roleResult = await _userManager.AddToRoleAsync(user, Roles.RegularUser);
+
+            //if (!roleResult.Succeeded)
+            //{
+            //    _logger.LogWarning(
+            //        "Default role assignment failed: {ErrorCodes}",
+            //        roleResult.Errors.Select(e => e.Code)
+            //        );
+
+            //    var errors = string.Join(" ", roleResult.Errors.Select(e => e.Description));
+            //    return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
+            //}
+
+            var roleResult = await _userManager.AddToRolesAsync(user, rolesToAssign);
 
             if (!roleResult.Succeeded)
             {
-                _logger.LogWarning(
-                    "Default role assignment failed: {ErrorCodes}",
-                    roleResult.Errors.Select(e => e.Code)
-                    );
+                _logger.LogError(
+                    "Role assignment failed for new user {UserId}: {ErrorCodes}",
+                    user.Id,
+                    roleResult.Errors.Select(e => e.Code));
 
-                var errors = string.Join(" ", roleResult.Errors.Select(e => e.Description));
-                return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
+                return Result<ApplicationUser>.Failure(
+                    "An unexpected error occurred.", ResultErrorType.Unexpected);
             }
 
             // Create the profile object, then save and commit
