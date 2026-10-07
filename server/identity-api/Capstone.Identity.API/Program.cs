@@ -37,7 +37,7 @@ namespace Capstone.Identity.API
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            // Configuring JwtBearer
+            // Reading JwtBearer
             var jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
                 ?? throw new InvalidOperationException("Jwt section is not configured");
 

@@ -49,14 +49,13 @@ namespace Capstone.Identity.API.Services
         public async Task<Result<ApplicationUser>> CreateUserWithProfileAsync(
             string? email, string? password, string firstName, string lastName)
         {
-            // 1. A login needs an email, so a password without one makes no sense
             if (password is not null && email is null)
             {
                 return Result<ApplicationUser>.Failure(
                     "An email is required when a password is provided.", ResultErrorType.Validation);
             }
 
-            // 2. Reject duplicate emails
+            // Reject duplicate emails
             if (email is not null && await _userManager.FindByEmailAsync(email) is not null)
             {
                 _logger.LogWarning("User creation rejected: email is already in use.");
@@ -72,7 +71,8 @@ namespace Capstone.Identity.API.Services
                 LastName = lastName.Trim()
             };
 
-            // 3. User and profile succeed or fail together
+            // User and profile succeed or fail together
+            // Keeping this atomic has to happen to prevent orphaned UserProfiles
             await using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             var createResult = password is null
@@ -89,7 +89,7 @@ namespace Capstone.Identity.API.Services
                 return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
             }
 
-            // 4. Stage the profile, then save and commit
+            // Create the profile object, then save and commit
             var salutation = _displayNameGenerator.DefaultSalutation;
             var modifier = _displayNameGenerator.PickRandomModifier();
 
