@@ -8,7 +8,7 @@
     /// <param name="profile"></param>
     /// <param name="Roles"></param>
     public sealed record UserWithProfile(
-        ApplicationUser user,
-        UserProfile profile,
+        ApplicationUser User,
+        UserProfile Profile,
         IReadOnlyList<string> Roles);
 }
