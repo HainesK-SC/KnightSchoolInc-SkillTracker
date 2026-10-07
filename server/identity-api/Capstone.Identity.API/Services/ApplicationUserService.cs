@@ -55,6 +55,12 @@ namespace Capstone.Identity.API.Services
                     "An email is required when a password is provided.", ResultErrorType.Validation);
             }
 
+            if (password is null && email is not null)
+            {
+                return Result<ApplicationUser>.Failure(
+                    "A password is required to login.", ResultErrorType.Validation);
+            }
+
             // Reject duplicate emails
             if (email is not null && await _userManager.FindByEmailAsync(email) is not null)
             {
