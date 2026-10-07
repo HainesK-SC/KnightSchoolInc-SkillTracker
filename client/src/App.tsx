@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
-
+import SkillTreePage from "./pages/SkillTreePage";
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +15,7 @@ function App() {
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/skill-tree" element={<SkillTreePage />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
