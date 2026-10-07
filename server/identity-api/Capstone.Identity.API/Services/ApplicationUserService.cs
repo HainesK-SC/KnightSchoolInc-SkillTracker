@@ -1,6 +1,7 @@
 ﻿using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Data;
+using Capstone.Identity.API.Dtos.Admin;
 using Capstone.Identity.API.Dtos.Auth;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Repositories;
@@ -18,6 +19,7 @@ namespace Capstone.Identity.API.Services
         private readonly IDisplayNameGenerator _displayNameGenerator;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserQueryRepository _userQueryRepository;
 
         public ApplicationUserService(
             UserManager<ApplicationUser> userManager,
@@ -188,6 +190,47 @@ namespace Capstone.Identity.API.Services
             var roles = await _userManager.GetRolesAsync(user);
 
             return Result<CurrentUserResponseDto>.Success(ToCurrentUserResponseDto(user, profile, roles));
+        }
+
+        // Admin related ApplicationUser methods
+        public async Task<Result<AdminUserDto>> CreateUserAsAdminAsync(CreateUserRequestDto request)
+        {
+            var createResult = await CreateUserWithProfileAsync(
+                request.Email,
+                null,
+                request.FirstName,
+                request.LastName,
+                request.Roles);
+
+            if (!createResult.Succeeded)
+            {
+                return Result<AdminUserDto>.Failure(createResult.Error!, createResult.ErrorType);
+            }
+
+            return await GetUserForAdminAsync(createResult.Data!.Id);
+        }
+
+        public async Task<Result<IReadOnlyList<AdminUserDto>>> GetUsersForAdminAsync()
+        {
+            var rows = await _userQueryRepository.GetAllWithProfilesAsync();
+
+            var users = rows
+                .Select(row => row.ToAdminUserDto())
+                .ToList();
+
+            return Result<IReadOnlyList<AdminUserDto>>.Success(users);
+        }
+
+        public async Task<Result<AdminUserDto>> GetUserForAdminAsync(Guid userId)
+        {
+            var row = await _userQueryRepository.GetByIdWithProfileAsync(userId);
+
+            if (row is null)
+            {
+                return Result<AdminUserDto>.Failure("User not found.", ResultErrorType.NotFound);
+            }
+
+            return Result<AdminUserDto>.Success(row.ToAdminUserDto());
         }
     }
 }
