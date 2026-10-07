@@ -102,10 +102,10 @@ namespace Capstone.Identity.API.Services
             {
                 _logger.LogWarning(
                     "Default role assignment failed: {ErrorCodes}",
-                    createResult.Errors.Select(e => e.Code)
+                    roleResult.Errors.Select(e => e.Code)
                     );
 
-                var errors = string.Join(" ", createResult.Errors.Select(e => e.Description));
+                var errors = string.Join(" ", roleResult.Errors.Select(e => e.Description));
                 return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
             }
 
