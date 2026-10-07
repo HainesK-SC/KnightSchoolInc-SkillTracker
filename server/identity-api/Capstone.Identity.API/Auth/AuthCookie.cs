@@ -9,7 +9,10 @@ namespace Capstone.Identity.API.Auth
         public static CookieOptions Options(DateTimeOffset expires) => new()
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = !string.Equals(
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+            "Development",
+            StringComparison.OrdinalIgnoreCase),
             SameSite = SameSiteMode.Lax,
             Path = "/",
             Expires = expires
