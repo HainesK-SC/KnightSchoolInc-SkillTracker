@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Capstone.Identity.API
 { 
@@ -21,8 +22,13 @@ namespace Capstone.Identity.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            // This forces enums to display their given values, 
+            // and not the underlying int they are associated with
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => 
+                    options.JsonSerializerOptions.Converters.Add(
+                        new JsonStringEnumConverter(allowIntegerValues: false)));
 
-            builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
