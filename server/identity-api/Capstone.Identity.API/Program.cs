@@ -81,6 +81,15 @@ namespace Capstone.Identity.API
                 {
                     OnMessageReceived = context =>
                     {
+                        var logger = context.HttpContext.RequestServices
+                            .GetRequiredService<ILoggerFactory>()
+                            .CreateLogger("AuthCookieDebug");
+
+                        logger.LogInformation(
+                            "Looking for cookie {ExpectedName}. Cookies received: [{ReceivedNames}]",
+                            AuthCookie.Name,
+                            string.Join(", ", context.Request.Cookies.Keys));
+
                         context.Token = context.Request.Cookies[AuthCookie.Name];
                         return Task.CompletedTask;
                     }
