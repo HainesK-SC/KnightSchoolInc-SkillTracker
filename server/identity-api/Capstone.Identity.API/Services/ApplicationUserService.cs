@@ -27,8 +27,9 @@ namespace Capstone.Identity.API.Services
             ILogger<ApplicationUserService> logger)
         {
             _userManager = userManager;
-            _userProfileRepository = userProfileRepostory;
-            _displayNameGenerator = displayNameGenerator;            _unitOfWork = unitOfWork;
+            _displayNameGenerator = displayNameGenerator;
+            _userProfileRepository = userProfileRepostory; 
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
