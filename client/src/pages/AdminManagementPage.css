@@ -1,0 +1,224 @@
+.admin-back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-back-link:hover {
+  text-decoration: underline;
+}
+
+.admin-form-panel {
+  max-width: 760px;
+}
+
+.admin-form-panel h2 {
+  margin: 0 0 24px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 22px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admin-form-group {
+  display: grid;
+  gap: 7px;
+}
+
+.admin-form-group label,
+.admin-role-group legend {
+  color: var(--color-royal-court);
+  font-weight: 700;
+}
+
+.admin-form-group input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  background: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: 7px;
+  font: inherit;
+}
+
+.admin-form-group input:focus {
+  border-color: var(--color-royal-court);
+  outline: 3px solid rgb(217 187 97 / 35%);
+}
+
+.admin-field-help {
+  margin: 0;
+  color: #56636e;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.admin-role-group {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 20px;
+  border: 2px solid var(--color-border);
+  border-radius: 9px;
+}
+
+.admin-role-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.admin-role-option input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.admin-role-option span {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-role-option small {
+  color: #56636e;
+}
+
+.admin-form-error,
+.admin-form-status {
+  margin: 0;
+  padding: 13px 15px;
+  border-radius: 6px;
+}
+
+.admin-form-error {
+  color: #741c1c;
+  background: #fff0f0;
+  border-left: 4px solid #9e2828;
+}
+
+.admin-form-status {
+  color: #155724;
+  background: #e8f5e9;
+  border-left: 4px solid #2f7d32;
+}
+
+.admin-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-secondary-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 15px;
+  color: var(--color-royal-court);
+  background: transparent;
+  border: 2px solid var(--color-royal-court);
+  border-radius: 7px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-secondary-button:hover {
+  background: rgb(217 187 97 / 25%);
+}
+
+@media (max-width: 600px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-role-group {
+    padding: 14px;
+  }
+}
+
+.admin-search-panel,
+.admin-user-result {
+  max-width: 850px;
+  margin-bottom: 24px;
+}
+
+.admin-search-panel h2,
+.admin-user-result h2 {
+  margin: 0 0 22px;
+}
+
+.admin-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+}
+
+.admin-search-form .admin-form-actions {
+  padding-bottom: 1px;
+}
+
+button.admin-secondary-button {
+  cursor: pointer;
+  font: inherit;
+}
+
+.admin-search-panel .admin-form-status {
+  margin-top: 20px;
+}
+
+.admin-empty-result {
+  display: grid;
+  justify-items: center;
+  padding: 40px 20px;
+  text-align: center;
+  border: 2px dashed var(--color-border);
+  border-radius: 9px;
+}
+
+.admin-empty-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  color: var(--color-royal-court);
+  background: rgb(217 187 97 / 25%);
+  border: 2px solid var(--color-crusades-gold);
+  border-radius: 50%;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.admin-empty-result h3 {
+  margin: 0 0 8px;
+}
+
+.admin-empty-result p {
+  max-width: 560px;
+  margin: 0;
+  color: #56636e;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .admin-search-form {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}

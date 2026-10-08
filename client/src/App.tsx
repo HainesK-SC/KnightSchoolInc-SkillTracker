@@ -6,6 +6,8 @@ import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegistrationPage from "./pages/RegistrationPage";
 import SkillTreePage from "./pages/SkillTreePage";
+import AdminCreateUserPage from "./pages/AdminCreateUserPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 
 function App() {
   return (
@@ -25,6 +27,9 @@ function App() {
           element={<ProtectedRoute requiredRole="ADMINISTRATOR" />}
         >
           <Route path="/admin" element={<AdminDashboardPage />} />
+
+          <Route path="/admin/users/new"element={<AdminCreateUserPage />}/>
+          <Route path="/admin/users" element={<AdminUsersPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />

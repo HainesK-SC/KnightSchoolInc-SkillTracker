@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-
+import DeleteProfileSection from "../components/DeleteProfileSection";
 import { ApiError } from "../api/apiClient";
 import {
   getCurrentUser,
@@ -222,6 +222,7 @@ function ProfilePage() {
                 </Link>
               </section>
             </div>
+            <DeleteProfileSection />
           </>
         )}
       </main>
