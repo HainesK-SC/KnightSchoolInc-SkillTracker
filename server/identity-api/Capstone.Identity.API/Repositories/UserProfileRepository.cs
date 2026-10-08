@@ -26,5 +26,11 @@ namespace Capstone.Identity.API.Repositories
         {
             _context.UserProfiles.Add(profile);
         }
+
+        public Task<UserProfile?> GetByApplicationUserIdForUpdateAsync(Guid applicationUserId)
+        {
+            return _context.UserProfiles
+                .SingleOrDefaultAsync(p => p.ApplicationUserId == applicationUserId);
+        }
     }
 }

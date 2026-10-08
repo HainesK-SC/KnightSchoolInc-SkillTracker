@@ -17,5 +17,17 @@
 
             return roles;
         }
+
+        public static List<string> GetAllRoles()
+        {
+            var roles = new List<string>
+            {
+                Admin,
+                RegularUser,
+                Instructor
+            };
+
+            return roles;
+        }
     }
 }

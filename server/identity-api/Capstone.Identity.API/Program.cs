@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Capstone.Identity.API
 { 
@@ -21,8 +22,13 @@ namespace Capstone.Identity.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            // This forces enums to display their given values, 
+            // and not the underlying int they are associated with
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => 
+                    options.JsonSerializerOptions.Converters.Add(
+                        new JsonStringEnumConverter(allowIntegerValues: false)));
 
-            builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -75,6 +81,15 @@ namespace Capstone.Identity.API
                 {
                     OnMessageReceived = context =>
                     {
+                        var logger = context.HttpContext.RequestServices
+                            .GetRequiredService<ILoggerFactory>()
+                            .CreateLogger("AuthCookieDebug");
+
+                        logger.LogInformation(
+                            "Looking for cookie {ExpectedName}. Cookies received: [{ReceivedNames}]",
+                            AuthCookie.Name,
+                            string.Join(", ", context.Request.Cookies.Keys));
+
                         context.Token = context.Request.Cookies[AuthCookie.Name];
                         return Task.CompletedTask;
                     }
@@ -107,6 +122,7 @@ namespace Capstone.Identity.API
 
             // Repository registrations
             builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+            builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
 
             // Service registrations
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
