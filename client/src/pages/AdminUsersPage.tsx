@@ -3,6 +3,7 @@ import { Link } from "react-router";
 
 import { ApiError } from "../api/apiClient";
 import {
+  deleteAdminUser,
   getAdminUsers,
   type AdminUser,
 } from "../api/adminUsersApi";
@@ -17,6 +18,9 @@ function AdminUsersPage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] =
+    useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   async function handleSearch(event: FormEvent<HTMLFormElement>) {
@@ -27,6 +31,7 @@ function AdminUsersPage() {
     setSelectedUser(null);
     setStatusMessage("");
     setErrorMessage("");
+    setIsConfirmingDelete(false);
     setHasSearched(true);
     setIsSearching(true);
 
@@ -34,7 +39,8 @@ function AdminUsersPage() {
       const users = await getAdminUsers();
 
       const matchingUser = users.find(
-        (user) => user.email?.trim().toLowerCase() === normalizedEmail,
+        (user) =>
+          user.email?.trim().toLowerCase() === normalizedEmail,
       );
 
       if (!matchingUser) {
@@ -59,11 +65,46 @@ function AdminUsersPage() {
     }
   }
 
+  async function handleDeleteUser() {
+    if (!selectedUser) {
+      return;
+    }
+
+    const deletedDisplayName = selectedUser.displayName;
+
+    setErrorMessage("");
+    setStatusMessage("");
+    setIsDeleting(true);
+
+    try {
+      await deleteAdminUser(selectedUser.id);
+
+      setSelectedUser(null);
+      setEmail("");
+      setHasSearched(false);
+      setIsConfirmingDelete(false);
+      setStatusMessage(
+        `${deletedDisplayName} was deleted successfully.`,
+      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "The user account could not be deleted. Please try again.",
+        );
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   function clearSearch() {
     setEmail("");
     setSelectedUser(null);
     setStatusMessage("");
     setErrorMessage("");
+    setIsConfirmingDelete(false);
     setHasSearched(false);
   }
 
@@ -126,7 +167,7 @@ function AdminUsersPage() {
               <button
                 className="admin-button"
                 type="submit"
-                disabled={isSearching}
+                disabled={isSearching || isDeleting}
               >
                 {isSearching ? "Searching…" : "Search"}
               </button>
@@ -135,6 +176,7 @@ function AdminUsersPage() {
                 className="admin-secondary-button"
                 type="button"
                 onClick={clearSearch}
+                disabled={isDeleting}
               >
                 Clear
               </button>
@@ -160,91 +202,148 @@ function AdminUsersPage() {
         >
           <h2 id="user-result-heading">User account</h2>
 
-         {selectedUser ? (
-  <article className="admin-user-card">
-    <header className="admin-user-card-header">
-      <div className="admin-user-avatar" aria-hidden="true">
-        {selectedUser.firstName.charAt(0)}
-        {selectedUser.lastName.charAt(0)}
-      </div>
+          {selectedUser ? (
+            <article className="admin-user-card">
+              <header className="admin-user-card-header">
+                <div
+                  className="admin-user-avatar"
+                  aria-hidden="true"
+                >
+                  {selectedUser.firstName.charAt(0)}
+                  {selectedUser.lastName.charAt(0)}
+                </div>
 
-      <div className="admin-user-identity">
-        <p className="admin-user-label">Knight School account</p>
-        <h3>{selectedUser.displayName}</h3>
-        <p>{selectedUser.email ?? "No email provided"}</p>
-      </div>
+                <div className="admin-user-identity">
+                  <p className="admin-user-label">
+                    Knight School account
+                  </p>
 
-      <span className="admin-account-status">
-        {String(selectedUser.status)}
-      </span>
-    </header>
+                  <h3>{selectedUser.displayName}</h3>
 
-    <div className="admin-user-information">
-      <div className="admin-user-information-item">
-        <span className="admin-user-information-label">
-          First name
-        </span>
-        <strong>{selectedUser.firstName}</strong>
-      </div>
+                  <p>
+                    {selectedUser.email ?? "No email provided"}
+                  </p>
+                </div>
 
-      <div className="admin-user-information-item">
-        <span className="admin-user-information-label">
-          Last name
-        </span>
-        <strong>{selectedUser.lastName}</strong>
-      </div>
+                <span className="admin-account-status">
+                  {String(selectedUser.status)}
+                </span>
+              </header>
 
-      <div className="admin-user-information-item admin-user-role-item">
-        <span className="admin-user-information-label">
-          Assigned roles
-        </span>
+              <div className="admin-user-information">
+                <div className="admin-user-information-item">
+                  <span className="admin-user-information-label">
+                    First name
+                  </span>
 
-        <div className="admin-role-badges">
-          {selectedUser.roles.length > 0 ? (
-            selectedUser.roles.map((role) => (
-              <span className="admin-role-badge" key={role}>
-                {role.replaceAll("_", " ")}
-              </span>
-            ))
+                  <strong>{selectedUser.firstName}</strong>
+                </div>
+
+                <div className="admin-user-information-item">
+                  <span className="admin-user-information-label">
+                    Last name
+                  </span>
+
+                  <strong>{selectedUser.lastName}</strong>
+                </div>
+
+                <div className="admin-user-information-item admin-user-role-item">
+                  <span className="admin-user-information-label">
+                    Assigned roles
+                  </span>
+
+                  <div className="admin-role-badges">
+                    {selectedUser.roles.length > 0 ? (
+                      selectedUser.roles.map((role) => (
+                        <span
+                          className="admin-role-badge"
+                          key={role}
+                        >
+                          {role.replaceAll("_", " ")}
+                        </span>
+                      ))
+                    ) : (
+                      <span>No roles assigned</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <footer className="admin-user-card-footer">
+                {!isConfirmingDelete ? (
+                  <div className="admin-form-actions">
+                    <Link
+                      className="admin-button admin-action-link"
+                      to={`/admin/users/${selectedUser.id}/edit`}
+                    >
+                      Edit user
+                    </Link>
+
+                    <button
+                      className="admin-danger-button"
+                      type="button"
+                      onClick={() => setIsConfirmingDelete(true)}
+                    >
+                      Delete user
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="admin-delete-confirmation"
+                    role="alertdialog"
+                    aria-labelledby="delete-confirmation-heading"
+                    aria-describedby="delete-confirmation-description"
+                  >
+                    <div>
+                      <h3 id="delete-confirmation-heading">
+                        Delete this account?
+                      </h3>
+
+                      <p id="delete-confirmation-description">
+                        This will permanently delete{" "}
+                        <strong>{selectedUser.displayName}</strong>{" "}
+                        and all associated account data. This action
+                        cannot be undone.
+                      </p>
+                    </div>
+
+                    <div className="admin-form-actions">
+                      <button
+                        className="admin-danger-confirm-button"
+                        type="button"
+                        onClick={() => void handleDeleteUser()}
+                        disabled={isDeleting}
+                      >
+                        {isDeleting
+                          ? "Deleting account…"
+                          : "Confirm deletion"}
+                      </button>
+
+                      <button
+                        className="admin-secondary-button"
+                        type="button"
+                        onClick={() =>
+                          setIsConfirmingDelete(false)
+                        }
+                        disabled={isDeleting}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </footer>
+            </article>
           ) : (
-            <span>No roles assigned</span>
-          )}
-        </div>
-      </div>
-    </div>
-
-    <footer className="admin-user-card-footer">
-      <div className="admin-form-actions">
-        <Link
-          className="admin-button admin-action-link"
-          to={`/admin/users/${selectedUser.id}/edit`}
-        >
-          Edit user
-        </Link>
-
-        <button
-          className="admin-danger-button"
-          type="button"
-          disabled
-          title="The delete endpoint is not available yet."
-        >
-          Delete user
-        </button>
-      </div>
-
-      <p className="admin-endpoint-note">
-        Delete will become available when the backend endpoint is ready.
-      </p>
-    </footer>
-  </article>
-) : (
             <div className="admin-empty-result">
               <span className="admin-empty-icon" aria-hidden="true">
                 ?
               </span>
 
               <h3>
-                {hasSearched ? "No matching user" : "No user selected"}
+                {hasSearched
+                  ? "No matching user"
+                  : "No user selected"}
               </h3>
 
               <p>

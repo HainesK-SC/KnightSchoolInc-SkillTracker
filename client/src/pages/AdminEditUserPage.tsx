@@ -9,23 +9,14 @@ import { ApiError } from "../api/apiClient";
 import {
   getAdminRoles,
   getAdminUser,
+  getDisplayNameOptions,
   updateAdminUser,
   type AdminUser,
+  type DisplayNameOption,
 } from "../api/adminUsersApi";
 import mainLogo from "../assets/branding/main-logo.svg";
 import "./AdminDashboardPage.css";
 import "./AdminManagementPage.css";
-
-const salutations = ["Knight", "Sir", "Madame"];
-
-const modifiers = [
-  "TheBrave",
-  "TheBold",
-  "TheWise",
-  "TheSwift",
-  "TheSteadfast",
-  "TheValiant",
-];
 
 const roleLabels: Record<string, string> = {
   REGULAR_USER: "Participant",
@@ -33,15 +24,17 @@ const roleLabels: Record<string, string> = {
   ADMINISTRATOR: "Administrator",
 };
 
-function formatModifier(modifier: string) {
-  return modifier.replace(/([a-z])([A-Z])/g, "$1 $2");
-}
-
 function AdminEditUserPage() {
   const { userId } = useParams<{ userId: string }>();
 
   const [user, setUser] = useState<AdminUser | null>(null);
   const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+  const [salutationOptions, setSalutationOptions] = useState<
+    DisplayNameOption[]
+  >([]);
+  const [modifierOptions, setModifierOptions] = useState<
+    DisplayNameOption[]
+  >([]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -66,10 +59,12 @@ function AdminEditUserPage() {
       }
 
       try {
-        const [loadedUser, roles] = await Promise.all([
-          getAdminUser(userId),
-          getAdminRoles(),
-        ]);
+        const [loadedUser, roles, displayNameOptions] =
+          await Promise.all([
+            getAdminUser(userId),
+            getAdminRoles(),
+            getDisplayNameOptions(),
+          ]);
 
         if (!isCurrent) {
           return;
@@ -77,11 +72,14 @@ function AdminEditUserPage() {
 
         setUser(loadedUser);
         setAvailableRoles(roles);
+        setSalutationOptions(displayNameOptions.salutations);
+        setModifierOptions(displayNameOptions.modifiers);
+
         setFirstName(loadedUser.firstName);
         setLastName(loadedUser.lastName);
         setEmail(loadedUser.email ?? "");
-        setSalutation(loadedUser.salutation ?? "");
-        setModifier(loadedUser.modifier ?? "");
+        setSalutation(loadedUser.salutation);
+        setModifier(loadedUser.modifier);
         setSelectedRoles(loadedUser.roles);
       } catch (error) {
         if (!isCurrent) {
@@ -141,7 +139,7 @@ function AdminEditUserPage() {
 
     if (!salutation || !modifier) {
       setErrorMessage(
-        "The backend must provide the user’s current salutation and modifier before this account can be updated.",
+        "Select a salutation and display-name modifier.",
       );
       return;
     }
@@ -167,8 +165,8 @@ function AdminEditUserPage() {
       setFirstName(updatedUser.firstName);
       setLastName(updatedUser.lastName);
       setEmail(updatedUser.email ?? "");
-      setSalutation(updatedUser.salutation ?? salutation);
-      setModifier(updatedUser.modifier ?? modifier);
+      setSalutation(updatedUser.salutation);
+      setModifier(updatedUser.modifier);
       setSelectedRoles(updatedUser.roles);
 
       setStatusMessage(
@@ -186,9 +184,6 @@ function AdminEditUserPage() {
       setIsSubmitting(false);
     }
   }
-
-  const backendFieldsAvailable =
-    Boolean(user?.salutation) && Boolean(user?.modifier);
 
   return (
     <div className="admin-page">
@@ -241,19 +236,6 @@ function AdminEditUserPage() {
           >
             <h2 id="edit-user-heading">{user.displayName}</h2>
 
-            {!backendFieldsAvailable && (
-              <div className="admin-contract-warning" role="status">
-                <strong>Update temporarily unavailable</strong>
-
-                <p>
-                  The account was loaded successfully, but the backend
-                  response does not yet include the user’s salutation and
-                  modifier. The form will become editable when those fields
-                  are added.
-                </p>
-              </div>
-            )}
-
             <form className="admin-form" onSubmit={handleSubmit}>
               <div className="admin-form-grid">
                 <div className="admin-form-group">
@@ -268,7 +250,7 @@ function AdminEditUserPage() {
                     }
                     maxLength={50}
                     required
-                    disabled={!backendFieldsAvailable}
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -284,7 +266,7 @@ function AdminEditUserPage() {
                     }
                     maxLength={50}
                     required
-                    disabled={!backendFieldsAvailable}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -298,7 +280,7 @@ function AdminEditUserPage() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   maxLength={256}
-                  disabled={!backendFieldsAvailable}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -313,20 +295,25 @@ function AdminEditUserPage() {
                       setSalutation(event.target.value)
                     }
                     required
-                    disabled={!backendFieldsAvailable}
+                    disabled={isSubmitting}
                   >
                     <option value="">Select a salutation</option>
 
-                    {salutations.map((option) => (
-                      <option value={option} key={option}>
-                        {option}
+                    {salutationOptions.map((option) => (
+                      <option
+                        value={option.value}
+                        key={option.value}
+                      >
+                        {option.text}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div className="admin-form-group">
-                  <label htmlFor="editModifier">Name modifier</label>
+                  <label htmlFor="editModifier">
+                    Display-name modifier
+                  </label>
 
                   <select
                     id="editModifier"
@@ -335,13 +322,16 @@ function AdminEditUserPage() {
                       setModifier(event.target.value)
                     }
                     required
-                    disabled={!backendFieldsAvailable}
+                    disabled={isSubmitting}
                   >
                     <option value="">Select a modifier</option>
 
-                    {modifiers.map((option) => (
-                      <option value={option} key={option}>
-                        {formatModifier(option)}
+                    {modifierOptions.map((option) => (
+                      <option
+                        value={option.value}
+                        key={option.value}
+                      >
+                        {option.text}
                       </option>
                     ))}
                   </select>
@@ -350,9 +340,13 @@ function AdminEditUserPage() {
 
               <fieldset
                 className="admin-role-group"
-                disabled={!backendFieldsAvailable}
+                disabled={isSubmitting}
               >
                 <legend>Account roles</legend>
+
+                <p className="admin-field-help">
+                  Select one or more roles for this account.
+                </p>
 
                 {availableRoles.map((role) => (
                   <label className="admin-role-option" key={role}>
@@ -388,7 +382,9 @@ function AdminEditUserPage() {
                   className="admin-button"
                   type="submit"
                   disabled={
-                    isSubmitting || !backendFieldsAvailable
+                    isSubmitting ||
+                    salutationOptions.length === 0 ||
+                    modifierOptions.length === 0
                   }
                 >
                   {isSubmitting ? "Updating user…" : "Update user"}

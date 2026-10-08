@@ -408,3 +408,43 @@ button.admin-secondary-button {
     text-align: left;
   }
 }
+.admin-delete-confirmation {
+  width: 100%;
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  background: #fff5f5;
+  border: 2px solid #b73838;
+  border-radius: 10px;
+}
+
+.admin-delete-confirmation h3 {
+  margin: 0 0 6px;
+  color: #8c1c1c;
+}
+
+.admin-delete-confirmation p {
+  margin: 0;
+  color: #532121;
+}
+
+.admin-danger-confirm-button {
+  min-height: 42px;
+  padding: 9px 15px;
+  color: white;
+  background: #a82626;
+  border: 2px solid #a82626;
+  border-radius: 7px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-danger-confirm-button:hover:not(:disabled) {
+  background: #7f1717;
+  border-color: #7f1717;
+}
+
+.admin-danger-confirm-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
