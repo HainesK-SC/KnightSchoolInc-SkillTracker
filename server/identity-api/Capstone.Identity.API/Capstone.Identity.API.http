@@ -3,7 +3,9 @@
 @authCookie = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6IjM1NDRlYWQ0LWJjMzMtNGYxNS04MWJlLWE4N2I1ODAwMzVkNiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQwNjIxNiwiZXhwIjoxNzkxNDM1MDE2LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.2y8GeHfMD8KNZ7bFJmd6CvLpYN7kEJifm8jjlljnf8s
 @adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6IjM1NDRlYWQ0LWJjMzMtNGYxNS04MWJlLWE4N2I1ODAwMzVkNiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQwNjIxNiwiZXhwIjoxNzkxNDM1MDE2LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.2y8GeHfMD8KNZ7bFJmd6CvLpYN7kEJifm8jjlljnf8s
 @userToken  = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImE4ZjI2ZjA3LTgzNTktNDRiOS0yNjk4LTA4ZGYyNDdiZmFmNiIsImp0aSI6Ijk1MzM2NzNlLTM5OGMtNDVjMS1hOGZiLTQwMDJhZTVmZGRlZCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlJFR1VMQVJfVVNFUiIsIm5iZiI6MTc5MTQxNzE1NCwiZXhwIjoxNzkxNDQ1OTU0LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.ZHWPSxbALt8c_k7oH6yZIlLtfloGbnw_aj6WhuYQC0g
-
+@walkUpId = 69329885-2fbd-4fdc-6d86-08df24d16fab
+@pendingId = 2c95c36c-4621-44ad-6d87-08df24d16fab
+@adminId = 868b055e-b41e-4638-2695-08df247bfaf6
 ### Register: success (new random email each run)
 POST {{host}}/api/auth/register
 Content-Type: application/json
@@ -109,7 +111,7 @@ Authorization: Bearer {{authCookie}}
 POST {{host}}/api/auth/logout
 Cookie: knightschool_auth={{authCookie}}
 
-  ### Roles (admin → 200 with the role list)
+### Roles (admin → 200 with the role list)
 GET {{host}}/api/admin/roles
 Authorization: Bearer {{adminToken}}
 
@@ -171,3 +173,98 @@ Content-Type: application/json
 ### Get one user: unknown id → 404
 GET {{host}}/api/admin/users/00000000-0000-0000-0000-000000000001
 Authorization: Bearer {{adminToken}}
+
+### Edit walk-up: rename + new salutation/modifier → 200, displayName rebuilt
+PUT {{host}}/api/admin/users/{{walkUpId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Robin",
+  "lastName": "Walker",
+  "salutation": "Sir",
+  "modifier": "TheValiant",
+  "email": null,
+  "roles": ["REGULAR_USER"]
+}
+
+### Attach email to walk-up → 200, status PendingActivation
+PUT {{host}}/api/admin/users/{{walkUpId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Robin",
+  "lastName": "Walker",
+  "salutation": "Sir",
+  "modifier": "TheValiant",
+  "email": "robin-{{$guid}}@test.com",
+  "roles": ["REGULAR_USER"]
+}
+
+### Try to change the now-attached email → 400
+PUT {{host}}/api/admin/users/{{walkUpId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Robin",
+  "lastName": "Walker",
+  "salutation": "Sir",
+  "modifier": "TheValiant",
+  "email": "different@test.com",
+  "roles": ["REGULAR_USER"]
+}
+
+### Remove your OWN admin role → 400
+PUT {{host}}/api/admin/users/{{adminId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Admin",
+  "lastName": "User",
+  "salutation": "Knight",
+  "modifier": "TheBrave",
+  "email": "PASTE_ADMIN_EMAIL",
+  "roles": ["REGULAR_USER"]
+}
+
+### Missing salutation → 400 (validation)
+PUT {{host}}/api/admin/users/{{pendingId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Pending",
+  "lastName": "Instructor",
+  "modifier": "TheBrave",
+  "email": "PASTE_PENDING_EMAIL",
+  "roles": ["REGULAR_USER"]
+}
+
+### Unknown user → 404
+PUT {{host}}/api/admin/users/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "No",
+  "lastName": "One",
+  "salutation": "Knight",
+  "modifier": "TheBrave",
+  "roles": []
+}
+
+### Regular user tries to edit → 403
+PUT {{host}}/api/admin/users/{{walkUpId}}
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Hack",
+  "lastName": "Attempt",
+  "salutation": "Knight",
+  "modifier": "TheBrave",
+  "roles": ["ADMINISTRATOR"]
+}
