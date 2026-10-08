@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { ApiError } from "../api/apiClient";
 import { logoutUser } from "../api/authApi";
+import { getAdminUsers } from "../api/adminUsersApi";
 import mainLogo from "../assets/branding/main-logo.svg";
 import "./AdminDashboardPage.css";
 
@@ -11,7 +12,62 @@ function AdminDashboardPage() {
 
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [summary, setSummary] = useState<{
+  total: number;
+  participants: number;
+  instructors: number;
+  administrators: number;
+    } | null>(null);
 
+  const [isLoadingSummary, setIsLoadingSummary] = useState(true);
+  useEffect(() => {
+  let isCurrent = true;
+
+  async function loadDashboardSummary() {
+    try {
+      const users = await getAdminUsers();
+
+      if (!isCurrent) {
+        return;
+      }
+
+      setSummary({
+        total: users.length,
+        participants: users.filter((user) =>
+          user.roles.includes("REGULAR_USER"),
+        ).length,
+        instructors: users.filter((user) =>
+          user.roles.includes("INSTRUCTOR"),
+        ).length,
+        administrators: users.filter((user) =>
+          user.roles.includes("ADMINISTRATOR"),
+        ).length,
+      });
+    } catch (error) {
+      if (!isCurrent) {
+        return;
+      }
+
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "The dashboard summary could not be loaded.",
+        );
+      }
+    } finally {
+      if (isCurrent) {
+        setIsLoadingSummary(false);
+      }
+    }
+  }
+
+  void loadDashboardSummary();
+
+  return () => {
+    isCurrent = false;
+  };
+}, []);
   async function handleSignOut() {
     setIsSigningOut(true);
     setErrorMessage("");
@@ -163,20 +219,63 @@ function AdminDashboardPage() {
           </article>
         </section>
 
-        <section
-          className="admin-panel admin-empty-summary"
-          aria-labelledby="summary-heading"
-        >
-          <div>
-            <p className="admin-card-category">Dashboard summary</p>
-            <h2 id="summary-heading">No summary information available</h2>
+       <section aria-labelledby="summary-heading">
+  <p className="admin-card-category">Dashboard summary</p>
 
-            <p>
-              Account totals and recent administrative activity will appear
-              here when summary information becomes available.
-            </p>
-          </div>
-        </section>
+  <h2 className="admin-section-title" id="summary-heading">
+    Account overview
+  </h2>
+
+  {isLoadingSummary && (
+    <p className="admin-form-status" role="status">
+      Loading account summary…
+    </p>
+  )}
+
+  {!isLoadingSummary && summary && (
+    <div className="admin-summary-grid">
+      <article className="admin-summary-card">
+        <span className="admin-summary-number">
+          {summary.total}
+        </span>
+
+        <span className="admin-summary-label">
+          Total accounts
+        </span>
+      </article>
+
+      <article className="admin-summary-card">
+        <span className="admin-summary-number">
+          {summary.participants}
+        </span>
+
+        <span className="admin-summary-label">
+          Participants
+        </span>
+      </article>
+
+      <article className="admin-summary-card">
+        <span className="admin-summary-number">
+          {summary.instructors}
+        </span>
+
+        <span className="admin-summary-label">
+          Instructors
+        </span>
+      </article>
+
+      <article className="admin-summary-card">
+        <span className="admin-summary-number">
+          {summary.administrators}
+        </span>
+
+        <span className="admin-summary-label">
+          Administrators
+        </span>
+      </article>
+    </div>
+  )}
+</section>
       </main>
     </div>
   );

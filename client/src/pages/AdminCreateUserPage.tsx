@@ -1,46 +1,126 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router";
 
+import { ApiError } from "../api/apiClient";
+import {
+  createAdminUser,
+  getAdminRoles,
+} from "../api/adminUsersApi";
 import mainLogo from "../assets/branding/main-logo.svg";
 import "./AdminDashboardPage.css";
 import "./AdminManagementPage.css";
 
+const roleInformation: Record<
+  string,
+  { label: string; description: string }
+> = {
+  REGULAR_USER: {
+    label: "Participant",
+    description: "Can access their profile and skill tree.",
+  },
+  INSTRUCTOR: {
+    label: "Instructor",
+    description: "Can review and approve participant progress.",
+  },
+  ADMINISTRATOR: {
+    label: "Administrator",
+    description: "Can access administrative management features.",
+  },
+};
+
 function AdminCreateUserPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(true);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    let isCurrent = true;
+
+    async function loadRoles() {
+      try {
+        const roles = await getAdminRoles();
+
+        if (isCurrent) {
+          setAvailableRoles(roles);
+        }
+      } catch (error) {
+        if (!isCurrent) {
+          return;
+        }
+
+        if (error instanceof ApiError) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage(
+            "The available account roles could not be loaded.",
+          );
+        }
+      } finally {
+        if (isCurrent) {
+          setIsLoadingRoles(false);
+        }
+      }
+    }
+
+    void loadRoles();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const form = new FormData(event.currentTarget);
-    const password = String(form.get("password") ?? "");
-    const roles = form.getAll("roles");
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+
+    const firstName = String(form.get("firstName") ?? "").trim();
+    const lastName = String(form.get("lastName") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim();
+    const roles = form.getAll("roles").map(String);
 
     setErrorMessage("");
     setStatusMessage("");
+
+    if (!firstName || !lastName) {
+      setErrorMessage("Enter the user’s first and last name.");
+      return;
+    }
 
     if (roles.length === 0) {
       setErrorMessage("Select at least one account role.");
       return;
     }
 
-    const validPassword =
-      password.length >= 8 &&
-      /[a-z]/.test(password) &&
-      /[A-Z]/.test(password) &&
-      /\d/.test(password) &&
-      /[^A-Za-z0-9]/.test(password);
+    setIsSubmitting(true);
 
-    if (!validPassword) {
-      setErrorMessage(
-        "The temporary password must contain at least 8 characters, including uppercase, lowercase, number and symbol.",
+    try {
+      const createdUser = await createAdminUser({
+        firstName,
+        lastName,
+        email: email || null,
+        roles,
+      });
+
+      setStatusMessage(
+        `${createdUser.displayName} was created successfully.`,
       );
-      return;
-    }
 
-    setStatusMessage(
-      "The form is valid. No account was created because the administrator user-creation endpoint is not connected yet.",
-    );
+      formElement.reset();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "The user could not be created. Please try again.",
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -85,6 +165,7 @@ function AdminCreateUserPage() {
             <div className="admin-form-grid">
               <div className="admin-form-group">
                 <label htmlFor="adminFirstName">First name</label>
+
                 <input
                   id="adminFirstName"
                   name="firstName"
@@ -97,6 +178,7 @@ function AdminCreateUserPage() {
 
               <div className="admin-form-group">
                 <label htmlFor="adminLastName">Last name</label>
+
                 <input
                   id="adminLastName"
                   name="lastName"
@@ -110,6 +192,7 @@ function AdminCreateUserPage() {
 
             <div className="admin-form-group">
               <label htmlFor="adminEmail">Email address</label>
+
               <input
                 id="adminEmail"
                 name="email"
@@ -120,73 +203,57 @@ function AdminCreateUserPage() {
               />
             </div>
 
-            <div className="admin-form-group">
-              <label htmlFor="temporaryPassword">
-                Temporary password
-              </label>
-
-              <input
-                id="temporaryPassword"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                aria-describedby="password-help"
-                required
-              />
-
-              <p className="admin-field-help" id="password-help">
-                Use at least 8 characters with uppercase, lowercase,
-                number and symbol.
-              </p>
-            </div>
-
-            <fieldset className="admin-role-group">
+            <fieldset
+              className="admin-role-group"
+              disabled={isLoadingRoles}
+            >
               <legend>Account roles</legend>
 
               <p className="admin-field-help">
                 Select one or more roles for this account.
               </p>
 
-              <label className="admin-role-option">
-                <input
-                  name="roles"
-                  type="checkbox"
-                  value="REGULAR_USER"
-                />
-                <span>
-                  <strong>Participant</strong>
-                  <small>Can access their profile and skill tree.</small>
-                </span>
-              </label>
+              {isLoadingRoles && (
+                <p className="admin-form-status" role="status">
+                  Loading account roles…
+                </p>
+              )}
 
-              <label className="admin-role-option">
-                <input
-                  name="roles"
-                  type="checkbox"
-                  value="INSTRUCTOR"
-                />
-                <span>
-                  <strong>Instructor</strong>
-                  <small>
-                    Can review and approve participant progress.
-                  </small>
-                </span>
-              </label>
+              {!isLoadingRoles &&
+                availableRoles.map((role) => {
+                  const information = roleInformation[role];
 
-              <label className="admin-role-option">
-                <input
-                  name="roles"
-                  type="checkbox"
-                  value="ADMINISTRATOR"
-                />
-                <span>
-                  <strong>Administrator</strong>
-                  <small>
-                    Can access administrative management features.
-                  </small>
-                </span>
-              </label>
+                  return (
+                    <label
+                      className="admin-role-option"
+                      key={role}
+                    >
+                      <input
+                        name="roles"
+                        type="checkbox"
+                        value={role}
+                      />
+
+                      <span>
+                        <strong>
+                          {information?.label ??
+                            role.replaceAll("_", " ")}
+                        </strong>
+
+                        <small>
+                          {information?.description ??
+                            "Application account role."}
+                        </small>
+                      </span>
+                    </label>
+                  );
+                })}
+
+              {!isLoadingRoles && availableRoles.length === 0 && (
+                <p className="admin-form-error" role="alert">
+                  No account roles are currently available.
+                </p>
+              )}
             </fieldset>
 
             {errorMessage && (
@@ -202,8 +269,16 @@ function AdminCreateUserPage() {
             )}
 
             <div className="admin-form-actions">
-              <button className="admin-button" type="submit">
-                Validate account form
+              <button
+                className="admin-button"
+                type="submit"
+                disabled={
+                  isSubmitting ||
+                  isLoadingRoles ||
+                  availableRoles.length === 0
+                }
+              >
+                {isSubmitting ? "Creating user…" : "Create user"}
               </button>
 
               <Link className="admin-secondary-button" to="/admin">

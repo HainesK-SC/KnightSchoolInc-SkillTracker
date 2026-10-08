@@ -235,3 +235,72 @@
     padding: 20px;
   }
 }
+.admin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.admin-summary-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 145px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-top: 5px solid var(--color-crusades-gold);
+  border-radius: 12px;
+  box-shadow: 0 8px 22px rgb(6 36 62 / 9%);
+}
+
+.admin-summary-card::after {
+  content: "";
+  position: absolute;
+  right: -25px;
+  bottom: -35px;
+  width: 100px;
+  height: 100px;
+  background: rgb(217 187 97 / 12%);
+  border-radius: 50%;
+}
+
+.admin-summary-number {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-royal-court);
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.admin-summary-label {
+  position: relative;
+  z-index: 1;
+  display: block;
+  color: #4a5762;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .admin-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-summary-card {
+    min-height: 120px;
+  }
+}
