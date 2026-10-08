@@ -1,11 +1,14 @@
 #@host = http://localhost:5241
 @host = http://localhost:8080
-@authCookie = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6IjM1NDRlYWQ0LWJjMzMtNGYxNS04MWJlLWE4N2I1ODAwMzVkNiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQwNjIxNiwiZXhwIjoxNzkxNDM1MDE2LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.2y8GeHfMD8KNZ7bFJmd6CvLpYN7kEJifm8jjlljnf8s
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6IjM1NDRlYWQ0LWJjMzMtNGYxNS04MWJlLWE4N2I1ODAwMzVkNiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQwNjIxNiwiZXhwIjoxNzkxNDM1MDE2LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.2y8GeHfMD8KNZ7bFJmd6CvLpYN7kEJifm8jjlljnf8s
+@authCookie = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6ImI3ZTc5M2Y4LTAzNWYtNGI5Mi05MzY3LTBkZTEwYTI0ZmFkMCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQ2NDg5MSwiZXhwIjoxNzkxNDkzNjkxLCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.UzriPrmfsm4nN0-w5gYi38psRGfuFsAeKy2DhqlLF14
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6ImI3ZTc5M2Y4LTAzNWYtNGI5Mi05MzY3LTBkZTEwYTI0ZmFkMCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQ2NDg5MSwiZXhwIjoxNzkxNDkzNjkxLCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.UzriPrmfsm4nN0-w5gYi38psRGfuFsAeKy2DhqlLF14
 @userToken  = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImE4ZjI2ZjA3LTgzNTktNDRiOS0yNjk4LTA4ZGYyNDdiZmFmNiIsImp0aSI6Ijk1MzM2NzNlLTM5OGMtNDVjMS1hOGZiLTQwMDJhZTVmZGRlZCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlJFR1VMQVJfVVNFUiIsIm5iZiI6MTc5MTQxNzE1NCwiZXhwIjoxNzkxNDQ1OTU0LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.ZHWPSxbALt8c_k7oH6yZIlLtfloGbnw_aj6WhuYQC0g
+@userId = d990ddb3-3948-43db-5eb1-08df2544104a
 @walkUpId = 69329885-2fbd-4fdc-6d86-08df24d16fab
 @pendingId = 2c95c36c-4621-44ad-6d87-08df24d16fab
 @adminId = 868b055e-b41e-4638-2695-08df247bfaf6
+@deleteId = 925f747a-77ee-476a-0ba4-08df253ce11f
+
 ### Register: success (new random email each run)
 POST {{host}}/api/auth/register
 Content-Type: application/json
@@ -268,3 +271,27 @@ Content-Type: application/json
   "modifier": "TheBrave",
   "roles": ["ADMINISTRATOR"]
 }
+
+### Delete a user → 204
+DELETE {{host}}/api/admin/users/{{deleteId}}
+Authorization: Bearer {{adminToken}}
+
+### Same user again → 404
+DELETE {{host}}/api/admin/users/{{deleteId}}
+Authorization: Bearer {{adminToken}}
+
+### Delete yourself → 400
+DELETE {{host}}/api/admin/users/{{adminId}}
+Authorization: Bearer {{adminToken}}
+
+### Regular user tries → 403
+DELETE {{host}}/api/admin/users/{{walkUpId}}
+Authorization: Bearer {{userToken}}
+
+###
+GET {{host}}/api/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+###
+GET {{host}}/api/admin/display-name-options
+Authorization: Bearer {{adminToken}}
