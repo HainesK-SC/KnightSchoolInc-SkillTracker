@@ -63,12 +63,6 @@ namespace Capstone.Identity.API.Services
                     "An email is required when a password is provided.", ResultErrorType.Validation);
             }
 
-            //if (password is null && email is not null)
-            //{
-            //    return Result<ApplicationUser>.Failure(
-            //        "A password is required to login.", ResultErrorType.Validation);
-            //}
-
             // Reject duplicate emails
             if (email is not null && await _userManager.FindByEmailAsync(email) is not null)
             {
@@ -119,18 +113,6 @@ namespace Capstone.Identity.API.Services
                 return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
             }
 
-            //var roleResult = await _userManager.AddToRoleAsync(user, Roles.RegularUser);
-
-            //if (!roleResult.Succeeded)
-            //{
-            //    _logger.LogWarning(
-            //        "Default role assignment failed: {ErrorCodes}",
-            //        roleResult.Errors.Select(e => e.Code)
-            //        );
-
-            //    var errors = string.Join(" ", roleResult.Errors.Select(e => e.Description));
-            //    return Result<ApplicationUser>.Failure(errors, ResultErrorType.Validation);
-            //}
 
             var roleResult = await _userManager.AddToRolesAsync(user, rolesToAssign);
 
@@ -232,14 +214,14 @@ namespace Capstone.Identity.API.Services
         public async Task<Result<AdminUserDto>> UpdateUserAsAdminAsync(
             Guid userId, UpdateUserRequestDto request, Guid actingAdminId)
         {
-            // ---------- 1. Load the user ----------
+            // Load the user 
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user is null)
             {
                 return Result<AdminUserDto>.Failure("User not found.", ResultErrorType.NotFound);
             }
 
-            // ---------- 2. Roles: validate and work out the changes ----------
+            // Roles: validate and work out the changes 
             var unknownRoles = FindUnknownRoles(request.Roles);
             if (unknownRoles.Count > 0)
             {
@@ -254,7 +236,7 @@ namespace Capstone.Identity.API.Services
             var rolesToAdd = desiredRoles.Except(currentRoles).ToList();
             var rolesToRemove = currentRoles.Except(desiredRoles).ToList();
 
-            // ---------- 3. Admin guards ----------
+            // Admin guards 
             if (rolesToRemove.Contains(Roles.Admin))
             {
                 if (userId == actingAdminId)
@@ -273,7 +255,7 @@ namespace Capstone.Identity.API.Services
                 }
             }
 
-            // ---------- 4. Email rules ----------
+            // Email rules
             var attachEmail = false;
 
             if (user.Email is null)
@@ -303,7 +285,7 @@ namespace Capstone.Identity.API.Services
                 }
             }
 
-            // ---------- 5. Load the profile (tracked) ----------
+            // Load the profile
             var profile = await _userProfileRepository.GetByApplicationUserIdForUpdateAsync(user.Id);
             if (profile is null)
             {
@@ -312,7 +294,7 @@ namespace Capstone.Identity.API.Services
                     "An unexpected error occurred.", ResultErrorType.Unexpected);
             }
 
-            // ---------- 6. Apply everything in one transaction ----------
+            // Apply everything in one transaction
             await using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             user.FirstName = request.FirstName.Trim();
