@@ -1,6 +1,7 @@
 ﻿using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Dtos.Admin;
+using Capstone.Identity.API.Enums;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -86,6 +87,21 @@ namespace Capstone.Identity.API.Controllers
             }
 
             return NoContent();
+        }
+
+        // this is needed to populate dropdown menus that
+        // have the selectabel values for the display name
+        // salutations and modifiers, respectively
+        [HttpGet("display-name-options")]
+        public IActionResult GetDisplayNameOptions()
+        {
+            var salutations = Enum.GetValues<DisplayNameSalutations>()
+                .Select(s => new { value = s.ToString(), text = s.ToDisplayText() });
+
+            var modifiers = Enum.GetValues<DisplayNameModifiers>()
+                .Select(m => new { value = m.ToString(), text = m.ToDisplayText() });
+
+            return Ok(new { salutations, modifiers });
         }
     }
 }
