@@ -13,6 +13,8 @@ namespace Capstone.Identity.API.Models
                 FirstName = row.User.FirstName,
                 LastName = row.User.LastName,
                 Email = row.User.Email,
+                Salutation = row.Profile.DisplayNameSalutation,
+                Modifier = row.Profile.DisplayNameModifier,
                 DisplayName = row.Profile.DisplayName,
                 AvatarImagePath = row.Profile.AvatarImagePath,
                 Status = row.User.GetAccountStatus(),
