@@ -2,6 +2,7 @@
 using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Enums;
 using Capstone.Identity.API.Models;
+using Capstone.Identity.API.Models.ReadModels;
 using Capstone.Identity.API.Repositories;
 using Capstone.Identity.API.Services;
 using Capstone.Identity.API.Tests.TestHelpers;
@@ -31,12 +32,27 @@ namespace Capstone.Identity.API.Tests.Services
 
         private ApplicationUser? _createdUser;
         private UserProfile? _addedProfile;
+        private Mock<IUserQueryRepository> _userQueryRepository = null!;
+        private List<string> _assignedRoles = [];
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _createdUser = null;
-            _addedProfile = null;
+            _userQueryRepository = new Mock<IUserQueryRepository>();
+            _userQueryRepository
+                .Setup(r => r.GetAllWithProfilesAsync())
+                .ReturnsAsync(new List<UserWithProfile>());
+            _userQueryRepository
+                .Setup(r => r.GetByIdWithProfileAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Guid id) => FindCreatedRow(id));
+
+            // Roles: assignment succeeds (2a switched to the plural AddToRolesAsync) _ DELETE
+            //_userManager
+            //    .Setup(m => m.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>()))
+            //    .Callback<ApplicationUser, IEnumerable<string>>((_, roles) => _assignedRoles = roles.ToList())
+            //    .ReturnsAsync(IdentityResult.Success);
+            //_createdUser = null;
+            //_addedProfile = null;
 
             // UserManager: no existing user, and creation succeeds
             _userManager = IdentityMocks.CreateUserManager();
@@ -54,6 +70,11 @@ namespace Capstone.Identity.API.Tests.Services
             _userManager
                 .Setup(m => m.GetRolesAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(new List<string>());
+
+            _userManager
+                .Setup(m => m.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>()))
+                .Callback<ApplicationUser, IEnumerable<string>>((_, roles) => _assignedRoles = roles.ToList())
+                .ReturnsAsync(IdentityResult.Success);
 
             // Repository: remember whatever profile gets staged
             _profileRepository = new Mock<IUserProfileRepository>();
@@ -76,15 +97,16 @@ namespace Capstone.Identity.API.Tests.Services
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
             _service = new ApplicationUserService(
+                NullLogger<ApplicationUserService>.Instance,
                 _userManager.Object,
                 _displayNameGenerator.Object,
                 _profileRepository.Object,
                 _unitOfWork.Object,
-                NullLogger<ApplicationUserService>.Instance);
+                _userQueryRepository.Object);
 
-            _userManager
-                .Setup(m => m.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>()))
-                .ReturnsAsync(IdentityResult.Success);
+            //_userManager
+            //    .Setup(m => m.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>()))
+            //    .ReturnsAsync(IdentityResult.Success);
         }
 
         // Simulates the database assigning an ID when the user is saved
@@ -99,8 +121,6 @@ namespace Capstone.Identity.API.Tests.Services
             _userManager.Verify(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()), Times.Never);
             _userManager.Verify(m => m.CreateAsync(It.IsAny<ApplicationUser>()), Times.Never);
         }
-
-        // ================= CreateUserWithProfileAsync =================
 
         [TestMethod]
         public async Task Create_PasswordWithoutEmail_ReturnsValidation_AndDoesNotCreate()
@@ -217,8 +237,6 @@ namespace Capstone.Identity.API.Tests.Services
             Assert.AreSame(_createdUser, result.Data);
         }
 
-        // ================= GetCurrentUserAsync =================
-
         [TestMethod]
         public async Task GetCurrentUser_UserNotFound_ReturnsNotFound()
         {
@@ -274,6 +292,22 @@ namespace Capstone.Identity.API.Tests.Services
             Assert.AreEqual(BuiltDisplayName, dto.DisplayName);
             Assert.AreEqual("/avatars/kyle.png", dto.AvatarImagePath);
             CollectionAssert.AreEqual(new[] { "Learner" }, dto.Roles.ToList());
+        }
+
+        // Simulates reading back the user + profile that the service just created
+        private UserWithProfile? FindCreatedRow(Guid id)
+        {
+            if (_createdUser is null || _addedProfile is null)
+            {
+                return null;
+            }
+
+            if (_createdUser.Id != id)
+            {
+                return null;
+            }
+
+            return new UserWithProfile(_createdUser, _addedProfile, _assignedRoles);
         }
     }
 }
