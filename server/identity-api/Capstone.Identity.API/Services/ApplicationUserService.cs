@@ -14,7 +14,6 @@ namespace Capstone.Identity.API.Services
     public class ApplicationUserService : IApplicationUserService
     {
         private readonly ILogger<ApplicationUserService> _logger;
-        private readonly AppDbContext _appDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDisplayNameGenerator _displayNameGenerator;
         private readonly IUserProfileRepository _userProfileRepository;
@@ -22,17 +21,19 @@ namespace Capstone.Identity.API.Services
         private readonly IUserQueryRepository _userQueryRepository;
 
         public ApplicationUserService(
+            ILogger<ApplicationUserService> logger,
             UserManager<ApplicationUser> userManager,
             IDisplayNameGenerator displayNameGenerator,
             IUserProfileRepository userProfileRepostory,
             IUnitOfWork unitOfWork,
-            ILogger<ApplicationUserService> logger)
+            IUserQueryRepository userQueryRepository)
         {
+            _logger = logger;
             _userManager = userManager;
             _displayNameGenerator = displayNameGenerator;
             _userProfileRepository = userProfileRepostory; 
             _unitOfWork = unitOfWork;
-            _logger = logger;
+            _userQueryRepository = userQueryRepository;
         }
 
         private static CurrentUserResponseDto ToCurrentUserResponseDto(
@@ -62,11 +63,11 @@ namespace Capstone.Identity.API.Services
                     "An email is required when a password is provided.", ResultErrorType.Validation);
             }
 
-            if (password is null && email is not null)
-            {
-                return Result<ApplicationUser>.Failure(
-                    "A password is required to login.", ResultErrorType.Validation);
-            }
+            //if (password is null && email is not null)
+            //{
+            //    return Result<ApplicationUser>.Failure(
+            //        "A password is required to login.", ResultErrorType.Validation);
+            //}
 
             // Reject duplicate emails
             if (email is not null && await _userManager.FindByEmailAsync(email) is not null)
