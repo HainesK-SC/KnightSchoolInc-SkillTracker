@@ -378,6 +378,47 @@ namespace Capstone.Identity.API.Services
             return await GetUserForAdminAsync(user.Id);
         }
 
+        public async Task<Result<bool>> DeleteUserAsAdminAsync(Guid userId, Guid actingAdminId)
+        {
+            if (userId == actingAdminId)
+            {
+                return Result<bool>.Failure(
+                    "You can't delete your own account.", ResultErrorType.Validation);
+            }
+
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null)
+            {
+                return Result<bool>.Failure("User not found.", ResultErrorType.NotFound);
+            }
+
+            if (await _userManager.IsInRoleAsync(user, Roles.Admin))
+            {
+                var admins = await _userManager.GetUsersInRoleAsync(Roles.Admin);
+                if (admins.Count <= 1)
+                {
+                    return Result<bool>.Failure(
+                        "The last administrator can't be deleted.", ResultErrorType.Conflict);
+                }
+            }
+
+            var deleteResult = await _userManager.DeleteAsync(user);
+            if (!deleteResult.Succeeded)
+            {
+                _logger.LogError(
+                    "Deleting user {UserId} failed: {ErrorCodes}",
+                    user.Id,
+                    deleteResult.Errors.Select(e => e.Code));
+
+                return Result<bool>.Failure(
+                    "An unexpected error occurred.", ResultErrorType.Unexpected);
+            }
+
+            _logger.LogInformation("Admin {AdminId} deleted user {UserId}.", actingAdminId, user.Id);
+
+            return Result<bool>.Success(true);
+        }
+
         // HELPER METHODS
         private static List<string> FindUnknownRoles(IEnumerable<string> roles)
         {
