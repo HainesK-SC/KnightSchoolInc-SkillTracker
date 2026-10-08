@@ -1,6 +1,9 @@
 #@host = http://localhost:5241
 @host = http://localhost:8080
 @authCookie = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6IjM1NDRlYWQ0LWJjMzMtNGYxNS04MWJlLWE4N2I1ODAwMzVkNiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQwNjIxNiwiZXhwIjoxNzkxNDM1MDE2LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.2y8GeHfMD8KNZ7bFJmd6CvLpYN7kEJifm8jjlljnf8s
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg2OGIwNTVlLWI0MWUtNDYzOC0yNjk1LTA4ZGYyNDdiZmFmNiIsImp0aSI6IjM1NDRlYWQ0LWJjMzMtNGYxNS04MWJlLWE4N2I1ODAwMzVkNiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBRE1JTklTVFJBVE9SIiwiUkVHVUxBUl9VU0VSIl0sIm5iZiI6MTc5MTQwNjIxNiwiZXhwIjoxNzkxNDM1MDE2LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.2y8GeHfMD8KNZ7bFJmd6CvLpYN7kEJifm8jjlljnf8s
+@userToken  = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImE4ZjI2ZjA3LTgzNTktNDRiOS0yNjk4LTA4ZGYyNDdiZmFmNiIsImp0aSI6Ijk1MzM2NzNlLTM5OGMtNDVjMS1hOGZiLTQwMDJhZTVmZGRlZCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlJFR1VMQVJfVVNFUiIsIm5iZiI6MTc5MTQxNzE1NCwiZXhwIjoxNzkxNDQ1OTU0LCJpc3MiOiJLbmlnaHRTY2hvb2wuQXBpIiwiYXVkIjoiS25pZ2h0U2Nob29sLkNsaWVudCJ9.ZHWPSxbALt8c_k7oH6yZIlLtfloGbnw_aj6WhuYQC0g
+
 ### Register: success (new random email each run)
 POST {{host}}/api/auth/register
 Content-Type: application/json
@@ -105,3 +108,66 @@ Authorization: Bearer {{authCookie}}
 ### Logout (expect 204, and a Set-Cookie that expires the cookie)
 POST {{host}}/api/auth/logout
 Cookie: knightschool_auth={{authCookie}}
+
+  ### Roles (admin → 200 with the role list)
+GET {{host}}/api/admin/roles
+Authorization: Bearer {{adminToken}}
+
+### List users: no token (expect 401, empty body)
+GET {{host}}/api/admin/users
+
+### List users: regular user (expect 403, empty body)
+GET {{host}}/api/admin/users
+Authorization: Bearer {{userToken}}
+
+### List users: admin (expect 200)
+GET {{host}}/api/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Create walk-up (no email) → 201, status WalkUp
+POST {{host}}/api/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Walk",
+  "lastName": "Up"
+}
+
+### Create pending account with an extra role → 201, status PendingActivation
+POST {{host}}/api/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Pending",
+  "lastName": "Instructor",
+  "email": "pending-{{$guid}}@test.com",
+  "roles": ["ADMINISTRATOR"]
+}
+
+### Create with unknown role → 400
+POST {{host}}/api/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Bad",
+  "lastName": "Role",
+  "roles": ["WIZARD"]
+}
+
+### Create with empty-string email → 400 (validation)
+POST {{host}}/api/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Empty",
+  "lastName": "Email",
+  "email": ""
+}
+
+### Get one user: unknown id → 404
+GET {{host}}/api/admin/users/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{adminToken}}
