@@ -75,5 +75,17 @@ namespace Capstone.Identity.API.Controllers
 
             return Ok(result.Data);
         }
+
+        [HttpDelete("users/{id:guid}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var result = await _userService.DeleteUserAsAdminAsync(id, User.GetUserId());
+            if (!result.Succeeded)
+            {
+                return result.ToProblemResult();
+            }
+
+            return NoContent();
+        }
     }
 }
