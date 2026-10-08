@@ -90,9 +90,7 @@ namespace Capstone.Identity.API.Services
             // If all roles are valid, it simply adds the roles to the new user
             var requestedRoles = additionalRoles ?? [];
 
-            var unknownRoles = requestedRoles
-                .Where(role => !Roles.GetAllRoles().Contains(role))
-                .ToList();
+            var unknownRoles = FindUnknownRoles(requestedRoles);
 
             if (unknownRoles.Count > 0)
             {
@@ -101,10 +99,7 @@ namespace Capstone.Identity.API.Services
                     ResultErrorType.Validation);
             }
 
-            var rolesToAssign = requestedRoles
-                .Append(Roles.RegularUser)
-                .Distinct()
-                .ToList();
+            var rolesToAssign = WithRegularUser(requestedRoles);
 
             // User and profile succeed or fail together
             // Keeping this atomic has to happen to prevent orphaned UserProfiles
@@ -232,6 +227,171 @@ namespace Capstone.Identity.API.Services
             }
 
             return Result<AdminUserDto>.Success(row.ToAdminUserDto());
+        }
+
+        public async Task<Result<AdminUserDto>> UpdateUserAsAdminAsync(
+            Guid userId, UpdateUserRequestDto request, Guid actingAdminId)
+        {
+            // ---------- 1. Load the user ----------
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null)
+            {
+                return Result<AdminUserDto>.Failure("User not found.", ResultErrorType.NotFound);
+            }
+
+            // ---------- 2. Roles: validate and work out the changes ----------
+            var unknownRoles = FindUnknownRoles(request.Roles);
+            if (unknownRoles.Count > 0)
+            {
+                return Result<AdminUserDto>.Failure(
+                    $"Unknown role(s): {string.Join(", ", unknownRoles)}.",
+                    ResultErrorType.Validation);
+            }
+
+            var desiredRoles = WithRegularUser(request.Roles);
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            var rolesToAdd = desiredRoles.Except(currentRoles).ToList();
+            var rolesToRemove = currentRoles.Except(desiredRoles).ToList();
+
+            // ---------- 3. Admin guards ----------
+            if (rolesToRemove.Contains(Roles.Admin))
+            {
+                if (userId == actingAdminId)
+                {
+                    return Result<AdminUserDto>.Failure(
+                        "You can't remove your own administrator role.",
+                        ResultErrorType.Validation);
+                }
+
+                var admins = await _userManager.GetUsersInRoleAsync(Roles.Admin);
+                if (admins.Count <= 1)
+                {
+                    return Result<AdminUserDto>.Failure(
+                        "The last administrator can't lose the administrator role.",
+                        ResultErrorType.Conflict);
+                }
+            }
+
+            // ---------- 4. Email rules ----------
+            var attachEmail = false;
+
+            if (user.Email is null)
+            {
+                if (request.Email is not null)
+                {
+                    if (await _userManager.FindByEmailAsync(request.Email) is not null)
+                    {
+                        return Result<AdminUserDto>.Failure(
+                            "An account with this email already exists.",
+                            ResultErrorType.Conflict);
+                    }
+
+                    attachEmail = true;
+                }
+            }
+            else
+            {
+                var sameEmail = string.Equals(
+                    user.Email, request.Email, StringComparison.OrdinalIgnoreCase);
+
+                if (!sameEmail)
+                {
+                    return Result<AdminUserDto>.Failure(
+                        "An existing email can't be changed or removed.",
+                        ResultErrorType.Validation);
+                }
+            }
+
+            // ---------- 5. Load the profile (tracked) ----------
+            var profile = await _userProfileRepository.GetByApplicationUserIdForUpdateAsync(user.Id);
+            if (profile is null)
+            {
+                _logger.LogError("User {UserId} has no UserProfile.", user.Id);
+                return Result<AdminUserDto>.Failure(
+                    "An unexpected error occurred.", ResultErrorType.Unexpected);
+            }
+
+            // ---------- 6. Apply everything in one transaction ----------
+            await using var transaction = await _unitOfWork.BeginTransactionAsync();
+
+            user.FirstName = request.FirstName.Trim();
+            user.LastName = request.LastName.Trim();
+
+            if (attachEmail)
+            {
+                user.Email = request.Email;
+                user.UserName = request.Email;
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                _logger.LogWarning(
+                    "Admin update of user {UserId} rejected by Identity: {ErrorCodes}",
+                    user.Id,
+                    updateResult.Errors.Select(e => e.Code));
+
+                var errors = string.Join(" ", updateResult.Errors.Select(e => e.Description));
+                return Result<AdminUserDto>.Failure(errors, ResultErrorType.Validation);
+            }
+
+            if (rolesToRemove.Count > 0)
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+                if (!removeResult.Succeeded)
+                {
+                    _logger.LogError(
+                        "Removing roles from user {UserId} failed: {ErrorCodes}",
+                        user.Id,
+                        removeResult.Errors.Select(e => e.Code));
+                    return Result<AdminUserDto>.Failure(
+                        "An unexpected error occurred.", ResultErrorType.Unexpected);
+                }
+            }
+
+            if (rolesToAdd.Count > 0)
+            {
+                var addResult = await _userManager.AddToRolesAsync(user, rolesToAdd);
+                if (!addResult.Succeeded)
+                {
+                    _logger.LogError(
+                        "Adding roles to user {UserId} failed: {ErrorCodes}",
+                        user.Id,
+                        addResult.Errors.Select(e => e.Code));
+                    return Result<AdminUserDto>.Failure(
+                        "An unexpected error occurred.", ResultErrorType.Unexpected);
+                }
+            }
+
+            profile.DisplayNameSalutation = request.Salutation!.Value;
+            profile.DisplayNameModifier = request.Modifier!.Value;
+            profile.DisplayName = _displayNameGenerator.GenerateDisplayName(
+                profile.DisplayNameSalutation, user.FirstName, profile.DisplayNameModifier);
+
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            _logger.LogInformation(
+                "Admin {AdminId} updated user {UserId}.", actingAdminId, user.Id);
+
+            return await GetUserForAdminAsync(user.Id);
+        }
+
+        // HELPER METHODS
+        private static List<string> FindUnknownRoles(IEnumerable<string> roles)
+        {
+            return roles
+                .Where(role => !Roles.GetAllRoles().Contains(role))
+                .ToList();
+        }
+
+        private static List<string> WithRegularUser(IEnumerable<string> roles)
+        {
+            return roles
+                .Append(Roles.RegularUser)
+                .Distinct()
+                .ToList();
         }
     }
 }

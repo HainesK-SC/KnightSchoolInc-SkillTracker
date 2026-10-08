@@ -19,5 +19,6 @@ namespace Capstone.Identity.API.Services
         Task<Result<AdminUserDto>> CreateUserAsAdminAsync(CreateUserRequestDto request);
         Task<Result<IReadOnlyList<AdminUserDto>>> GetUsersForAdminAsync();
         Task<Result<AdminUserDto>> GetUserForAdminAsync(Guid userId);
+        Task<Result<AdminUserDto>> UpdateUserAsAdminAsync(Guid userId, UpdateUserRequestDto request, Guid actingAdminId);
     }
 }
