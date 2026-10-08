@@ -102,6 +102,9 @@ function ProfilePage() {
           </Link>
 
           <nav className="profile-navigation" aria-label="Main navigation">
+            {user?.roles.includes("ADMINISTRATOR") && (
+              <Link to="/admin">Admin dashboard</Link>)}
+
             <Link to="/profile" aria-current="page">
               My profile
             </Link>

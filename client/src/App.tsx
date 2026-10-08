@@ -8,6 +8,7 @@ import RegistrationPage from "./pages/RegistrationPage";
 import SkillTreePage from "./pages/SkillTreePage";
 import AdminCreateUserPage from "./pages/AdminCreateUserPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminProgressPage from "./pages/AdminProgressPage";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
 
           <Route path="/admin/users/new"element={<AdminCreateUserPage />}/>
           <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/progress"element={<AdminProgressPage />}/>
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />
