@@ -8,6 +8,8 @@ export type AdminUser = {
   displayName: string;
   avatarImagePath: string | null;
   status: string | number;
+  salutation?: string | null;
+  modifier?: string | null;
   roles: string[];
 };
 
