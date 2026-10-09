@@ -1,0 +1,53 @@
+.ks-empty-tree {
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  border: 1px solid rgba(190, 151, 70, 0.35);
+  border-radius: 1rem;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(190, 151, 70, 0.12),
+      transparent 55%
+    ),
+    rgba(255, 255, 255, 0.03);
+}
+
+.ks-empty-content {
+  width: min(100%, 38rem);
+  text-align: center;
+}
+
+.ks-empty-medallion {
+  width: 7rem;
+  height: 7rem;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 1.5rem;
+  border: 3px solid #be9746;
+  border-radius: 50%;
+  background: #7e282d;
+  color: #f6dfac;
+  font-size: 3rem;
+  box-shadow:
+    0 0 0 0.5rem rgba(190, 151, 70, 0.12),
+    0 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+.ks-empty-content h3 {
+  margin: 0.5rem 0 1rem;
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+}
+
+.ks-empty-content > p:not(.ks-eyebrow) {
+  max-width: 34rem;
+  margin-right: auto;
+  margin-left: auto;
+  line-height: 1.7;
+}
+
+.ks-empty-content .ks-read-only {
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}

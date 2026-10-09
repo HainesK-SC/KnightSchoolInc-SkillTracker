@@ -1,9 +1,94 @@
-import { Link } from "react-router";
-
+import { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import DeleteProfileSection from "../components/DeleteProfileSection";
+import { ApiError } from "../api/apiClient";
+import {
+  getCurrentUser,
+  logoutUser,
+  type CurrentUser,
+} from "../api/authApi";
 import mainLogo from "../assets/branding/main-logo.svg";
 import "./ProfilePage.css";
 
+function formatRole(role: string) {
+  return role
+    .toLowerCase()
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 function ProfilePage() {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const loadProfile = useCallback(async () => {
+    setIsLoading(true);
+    setErrorMessage("");
+
+    try {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "Something unexpected happened while loading your profile.",
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    void loadProfile();
+  }, [loadProfile]);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    setErrorMessage("");
+
+    try {
+      await logoutUser();
+      navigate("/login", { replace: true });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "Something unexpected happened while signing out.",
+        );
+      }
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
+
+  const initials = user
+    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+    : "KS";
+
+  const roleDisplay =
+    user && user.roles.length > 0
+      ? user.roles.map(formatRole).join(", ")
+      : "Role not assigned";
+
   return (
     <div className="profile-page">
       <header className="profile-header">
@@ -17,103 +102,132 @@ function ProfilePage() {
           </Link>
 
           <nav className="profile-navigation" aria-label="Main navigation">
+            {user?.roles.includes("ADMINISTRATOR") && (
+              <Link to="/admin">Admin dashboard</Link>)}
+
             <Link to="/profile" aria-current="page">
               My profile
             </Link>
-            <Link to="/login">Sign out</Link>
+
+            <Link to="/skill-tree">Skill tree</Link>
+
+            <button
+              className="profile-sign-out"
+              type="button"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+            >
+              {isSigningOut ? "Signing out..." : "Sign out"}
+            </button>
           </nav>
         </div>
       </header>
 
       <main className="profile-main">
-        <section className="profile-hero" aria-labelledby="profile-title">
-          <p className="profile-avatar" aria-hidden="true">
-            AM
-          </p>
+        {isLoading && (
+          <section className="profile-card profile-state" role="status">
+            <h1>Loading your profile...</h1>
+            <p>Please wait while we retrieve your account information.</p>
+          </section>
+        )}
 
-          <div>
-            <h1 id="profile-title">Alex Morgan</h1>
-            <p className="profile-role">Knight in Training · Level 2</p>
+        {!isLoading && !user && (
+          <section className="profile-card profile-state" role="alert">
+            <h1>Profile unavailable</h1>
 
-            <div className="profile-progress-label">
-              <span>Progress to Level 3</span>
-              <span>65%</span>
-            </div>
+            <p>
+              {errorMessage ||
+                "Your profile information could not be loaded."}
+            </p>
 
-            <progress
-              className="profile-progress"
-              value="65"
-              max="100"
-              aria-label="65 percent progress toward Level 3"
+            <button
+              className="profile-action"
+              type="button"
+              onClick={() => void loadProfile()}
             >
-              65%
-            </progress>
-          </div>
-        </section>
-
-        <div className="profile-grid">
-          <section className="profile-card" aria-labelledby="account-heading">
-            <h2 id="account-heading">Account details</h2>
-
-            <dl className="profile-details">
-              <div className="profile-detail">
-                <dt>Email address</dt>
-                <dd>alex.morgan@example.com</dd>
-              </div>
-
-              <div className="profile-detail">
-                <dt>Membership status</dt>
-                <dd>Active participant</dd>
-              </div>
-
-              <div className="profile-detail">
-                <dt>Primary instructor</dt>
-                <dd>Instructor Taylor</dd>
-              </div>
-
-              <div className="profile-detail">
-                <dt>Training program</dt>
-                <dd>Foundations of Stage Combat</dd>
-              </div>
-            </dl>
-
-            <button className="profile-action" type="button">
-              Edit profile
+              Try again
             </button>
           </section>
+        )}
 
-          <section className="profile-card" aria-labelledby="skills-heading">
-            <h2 id="skills-heading">Recent skills</h2>
+        {!isLoading && user && (
+          <>
+            {errorMessage && (
+              <p className="profile-error" role="alert">
+                {errorMessage}
+              </p>
+            )}
 
-            <ul className="skill-list">
-              <li className="skill-item">
-                <span className="skill-name">Mid Strike</span>
-                <span className="skill-status">Completed</span>
-              </li>
+            <section
+              className="profile-hero"
+              aria-labelledby="profile-title"
+            >
+              <p className="profile-avatar" aria-hidden="true">
+                {initials}
+              </p>
 
-              <li className="skill-item">
-                <span className="skill-name">High Block</span>
-                <span className="skill-status">Completed</span>
-              </li>
+              <div>
+                <h1 id="profile-title">
+                  {user.displayName ||
+                    `${user.firstName} ${user.lastName}`}
+                </h1>
 
-              <li className="skill-item">
-                <span className="skill-name">
-                  Introduction to War Horses
-                </span>
-                <span className="skill-status">In progress</span>
-              </li>
+                <p className="profile-role">{roleDisplay}</p>
+              </div>
+            </section>
 
-              <li className="skill-item">
-                <span className="skill-name">Level 1 Knight Test</span>
-                <span className="skill-status">Completed</span>
-              </li>
-            </ul>
+            <div className="profile-grid">
+              <section
+                className="profile-card"
+                aria-labelledby="account-heading"
+              >
+                <h2 id="account-heading">Account details</h2>
 
-            <button className="profile-action" type="button">
-              View skill tree
-            </button>
-          </section>
-        </div>
+                <dl className="profile-details">
+                  <div className="profile-detail">
+                    <dt>First name</dt>
+                    <dd>{user.firstName}</dd>
+                  </div>
+
+                  <div className="profile-detail">
+                    <dt>Last name</dt>
+                    <dd>{user.lastName}</dd>
+                  </div>
+
+                  <div className="profile-detail">
+                    <dt>Email address</dt>
+                    <dd>{user.email}</dd>
+                  </div>
+
+                  <div className="profile-detail">
+                    <dt>Account role</dt>
+                    <dd>{roleDisplay}</dd>
+                  </div>
+                </dl>
+              </section>
+
+              <section
+                className="profile-card"
+                aria-labelledby="training-heading"
+              >
+                <h2 id="training-heading">Training progress</h2>
+
+                <p className="profile-empty-message">
+                  Your training progress will appear here when it becomes
+                  available.
+                </p>
+
+                <Link
+                  className="profile-action profile-action-link"
+                  to="/skill-tree"
+                >
+                  View skill tree
+                </Link>
+              </section>
+            </div>
+            <DeleteProfileSection />
+          </>
+        )}
       </main>
     </div>
   );

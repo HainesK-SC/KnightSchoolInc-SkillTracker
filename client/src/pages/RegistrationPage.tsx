@@ -1,30 +1,73 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
+import { ApiError } from "../api/apiClient";
+import { registerUser } from "../api/authApi";
 import mainLogo from "../assets/branding/main-logo.svg";
 import "./LoginPage.css";
 
 function RegistrationPage() {
-  const [statusMessage, setStatusMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const form = new FormData(event.currentTarget);
-    const password = form.get("password");
-    const confirmPassword = form.get("confirmPassword");
+
+    const firstName = String(form.get("firstName") ?? "").trim();
+    const lastName = String(form.get("lastName") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim();
+    const password = String(form.get("password") ?? "");
+    const confirmPassword = String(form.get("confirmPassword") ?? "");
+
+    setErrorMessage("");
 
     if (password !== confirmPassword) {
-      setStatusMessage("");
       setErrorMessage("The passwords do not match.");
       return;
     }
 
-    setErrorMessage("");
-    setStatusMessage(
-      "The registration form works. Account creation will be connected to the backend later."
-    );
+    const hasValidPassword =
+      password.length >= 8 &&
+      /[a-z]/.test(password) &&
+      /[A-Z]/.test(password) &&
+      /\d/.test(password) &&
+      /[^A-Za-z0-9]/.test(password);
+
+    if (!hasValidPassword) {
+      setErrorMessage(
+        "Use at least 8 characters with an uppercase letter, lowercase letter, number, and symbol.",
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await registerUser({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
+      navigate("/profile", {
+        replace: true,
+      });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "Something unexpected happened. Please try again.",
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -66,6 +109,8 @@ function RegistrationPage() {
                 name="firstName"
                 type="text"
                 autoComplete="given-name"
+                maxLength={50}
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -81,6 +126,8 @@ function RegistrationPage() {
                 name="lastName"
                 type="text"
                 autoComplete="family-name"
+                maxLength={50}
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -96,6 +143,8 @@ function RegistrationPage() {
                 name="email"
                 type="email"
                 autoComplete="email"
+                maxLength={256}
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -112,6 +161,7 @@ function RegistrationPage() {
                 type="password"
                 autoComplete="new-password"
                 minLength={8}
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -128,23 +178,22 @@ function RegistrationPage() {
                 type="password"
                 autoComplete="new-password"
                 minLength={8}
+                disabled={isSubmitting}
                 required
               />
             </div>
 
-            <button className="auth-submit" type="submit">
-              Create account
+            <button
+              className="auth-submit"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating account..." : "Create account"}
             </button>
 
             {errorMessage && (
               <p className="auth-status" role="alert">
                 {errorMessage}
-              </p>
-            )}
-
-            {statusMessage && (
-              <p className="auth-status" role="status">
-                {statusMessage}
               </p>
             )}
           </form>

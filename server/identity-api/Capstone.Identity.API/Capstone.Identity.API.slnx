@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".env.example" />
+    <File Path="compose.yaml" />
+  </Folder>
+  <Project Path="../Capstone.Identity.API.Tests/Capstone.Identity.API.Tests.csproj" />
+  <Project Path="Capstone.Identity.API.csproj" />
+</Solution>
