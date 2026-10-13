@@ -56,4 +56,4 @@ jobs:
         run: dotnet build server/identity-api/Capstone.Identity.API/Capstone.Identity.API.csproj --no-restore --configuration Release
 
       - name: Run backend tests
-        run: dotnet test server/identity-api/Capstone.Identity.API.Tests --configuration Release
+        run: dotnet test --project tests/Foo.Tests.csproj
