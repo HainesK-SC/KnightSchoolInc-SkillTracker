@@ -53,7 +53,9 @@ jobs:
         run: dotnet restore server/identity-api/Capstone.Identity.API/Capstone.Identity.API.csproj
 
       - name: Build backend
-        run: dotnet build server/identity-api/Capstone.Identity.API/Capstone.Identity.API.csproj --no-restore --configuration Release
+        working-directory: server/identity-api/Capstone.Identity.API
+        run: dotnet build --configuration Release
 
       - name: Run backend tests
-        run: dotnet test --project tests/Foo.Tests.csproj
+        working-directory: server/identity-api/Capstone.Identity.API
+        run: dotnet test --solution Capstone.Identity.API.slnx --no-build -c Release
