@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import DeleteProfileSection from "../components/DeleteProfileSection";
+
 import { ApiError } from "../api/apiClient";
 import {
   getCurrentUser,
@@ -8,6 +8,7 @@ import {
   type CurrentUser,
 } from "../api/authApi";
 import mainLogo from "../assets/branding/main-logo.svg";
+import DeleteProfileSection from "../components/DeleteProfileSection";
 import "./ProfilePage.css";
 
 function formatRole(role: string) {
@@ -103,7 +104,8 @@ function ProfilePage() {
 
           <nav className="profile-navigation" aria-label="Main navigation">
             {user?.roles.includes("ADMINISTRATOR") && (
-              <Link to="/admin">Admin dashboard</Link>)}
+              <Link to="/admin">Admin dashboard</Link>
+            )}
 
             <Link to="/profile" aria-current="page">
               My profile
@@ -126,14 +128,22 @@ function ProfilePage() {
       <main className="profile-main">
         {isLoading && (
           <section className="profile-card profile-state" role="status">
-            <h1>Loading your profile...</h1>
-            <p>Please wait while we retrieve your account information.</p>
+            <div className="profile-state-symbol" aria-hidden="true">
+              ⚔
+            </div>
+
+            <h1>Retrieving your record…</h1>
+            <p>Please wait while we open the Knight School archives.</p>
           </section>
         )}
 
         {!isLoading && !user && (
           <section className="profile-card profile-state" role="alert">
-            <h1>Profile unavailable</h1>
+            <div className="profile-state-symbol" aria-hidden="true">
+              !
+            </div>
+
+            <h1>Record unavailable</h1>
 
             <p>
               {errorMessage ||
@@ -162,69 +172,131 @@ function ProfilePage() {
               className="profile-hero"
               aria-labelledby="profile-title"
             >
-              <p className="profile-avatar" aria-hidden="true">
-                {initials}
-              </p>
+              <div className="profile-avatar-frame">
+                <p className="profile-avatar" aria-hidden="true">
+                  {initials}
+                </p>
+              </div>
 
-              <div>
+              <div className="profile-hero-copy">
+                <p className="profile-hero-eyebrow">
+                  Knight School heraldic record
+                </p>
+
                 <h1 id="profile-title">
                   {user.displayName ||
                     `${user.firstName} ${user.lastName}`}
                 </h1>
 
-                <p className="profile-role">{roleDisplay}</p>
+                <div
+                  className="profile-role-badges"
+                  aria-label={`Account roles: ${roleDisplay}`}
+                >
+                  {user.roles.length > 0 ? (
+                    user.roles.map((role) => (
+                      <span className="profile-role-badge" key={role}>
+                        {formatRole(role)}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="profile-role-badge">
+                      Role not assigned
+                    </span>
+                  )}
+                </div>
               </div>
             </section>
 
+            <div className="profile-ornament" aria-hidden="true">
+              <span />
+              <strong>✦</strong>
+              <span />
+            </div>
+
             <div className="profile-grid">
               <section
-                className="profile-card"
+                className="profile-card profile-record-card"
                 aria-labelledby="account-heading"
               >
-                <h2 id="account-heading">Account details</h2>
+                <div className="profile-card-heading">
+                  <span className="profile-card-icon" aria-hidden="true">
+                    ⚜
+                  </span>
+
+                  <div>
+                    <p className="profile-card-eyebrow">
+                      Personal registry
+                    </p>
+
+                    <h2 id="account-heading">Knight’s Record</h2>
+                  </div>
+                </div>
 
                 <dl className="profile-details">
                   <div className="profile-detail">
-                    <dt>First name</dt>
+                    <dt>Given name</dt>
                     <dd>{user.firstName}</dd>
                   </div>
 
                   <div className="profile-detail">
-                    <dt>Last name</dt>
+                    <dt>Family name</dt>
                     <dd>{user.lastName}</dd>
                   </div>
 
                   <div className="profile-detail">
                     <dt>Email address</dt>
-                    <dd>{user.email}</dd>
+                    <dd>{user.email ?? "No email provided"}</dd>
                   </div>
 
                   <div className="profile-detail">
-                    <dt>Account role</dt>
+                    <dt>Standing within Knight School</dt>
                     <dd>{roleDisplay}</dd>
                   </div>
                 </dl>
               </section>
 
               <section
-                className="profile-card"
+                className="profile-card profile-training-card"
                 aria-labelledby="training-heading"
               >
-                <h2 id="training-heading">Training progress</h2>
+                <div className="profile-card-heading">
+                  <span className="profile-card-icon" aria-hidden="true">
+                    ⚔
+                  </span>
 
-                <p className="profile-empty-message">
-                  Your training progress will appear here when it becomes
-                  available.
-                </p>
+                  <div>
+                    <p className="profile-card-eyebrow">
+                      Training record
+                    </p>
+
+                    <h2 id="training-heading">
+                      Training Chronicle
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="profile-scroll-empty">
+                  <div className="profile-wax-seal" aria-hidden="true">
+                    KS
+                  </div>
+
+                  <h3>Awaiting your first recorded achievement</h3>
+
+                  <p>
+                    Your training progress will appear in this chronicle
+                    when skill information becomes available.
+                  </p>
+                </div>
 
                 <Link
                   className="profile-action profile-action-link"
                   to="/skill-tree"
                 >
-                  View skill tree
+                  Open skill map
                 </Link>
               </section>
             </div>
+
             <DeleteProfileSection />
           </>
         )}
