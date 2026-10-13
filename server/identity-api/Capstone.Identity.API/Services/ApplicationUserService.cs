@@ -88,6 +88,7 @@ namespace Capstone.Identity.API.Services
 
             if (unknownRoles.Count > 0)
             {
+                // log error
                 return Result<ApplicationUser>.Failure(
                     $"Unknown role(s): {string.Join(", ", unknownRoles)}.",
                     ResultErrorType.Validation);
