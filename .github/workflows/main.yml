@@ -2,7 +2,7 @@ name: Knight School CI
 
 on:
   push:
-    branches: [main]
+    branches: [development]
   pull_request:
     branches: [main]
   workflow_dispatch:
