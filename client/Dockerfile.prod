@@ -1,0 +1,23 @@
+# Production image for the React app: build with Node, serve with Caddy.
+# Lives at: <repo>/client/Dockerfile.prod
+# The existing client/Dockerfile (Vite dev server) is unchanged and still
+# used for local development.
+
+# ---- Stage 1: build the static site ----
+FROM node:24-alpine AS build
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+# Vite bakes VITE_* variables into the bundle at build time
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+RUN npm run build
+
+# ---- Stage 2: Caddy serving the build output ----
+FROM caddy:2
+COPY --from=build /app/dist /srv

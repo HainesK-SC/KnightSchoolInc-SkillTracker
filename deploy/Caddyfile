@@ -1,0 +1,20 @@
+# Knight School - dev server Caddy config
+# {$DOMAIN} is read from the container's DOMAIN environment variable.
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# API requests -> .NET container (path is passed through unchanged)
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# Everything else -> the built React app
+	handle {
+		root * /srv
+		# Unknown paths fall back to index.html so React Router can handle
+		# them (otherwise refreshing on /profile returns a 404)
+		try_files {path} /index.html
+		file_server
+	}
+}
