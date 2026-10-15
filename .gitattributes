@@ -1,0 +1,6 @@
+# Linux scripts and config must keep LF line endings, even when edited on
+# Windows. CRLF endings make bash fail with "$'\r': command not found".
+*.sh        text eol=lf
+*.service   text eol=lf
+Caddyfile   text eol=lf
+*.yml       text eol=lf

@@ -1,0 +1,26 @@
+# Knight School - update the stack every time the server boots.
+#
+# Install (once, on the server):
+#   sudo cp ~/knightschool/deploy/knightschool-deploy.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable knightschool-deploy
+#
+# Check what it did:   journalctl -u knightschool-deploy -n 60
+#
+# If this fails, the site still comes up: Docker restarts the previous
+# containers on its own (restart: unless-stopped). This only updates them.
+
+[Unit]
+Description=Knight School - pull latest images and update the stack
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/home/ubuntu/knightschool/deploy/deploy.sh
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target
