@@ -26,7 +26,7 @@ export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
-  if (!API_URL) {
+  if (API_URL === undefined) {
     throw new Error("VITE_API_URL has not been configured.");
   }
 
