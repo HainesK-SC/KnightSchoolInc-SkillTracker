@@ -18,6 +18,7 @@ obj/
 .vs/
 *.user
 .env
+*.http
 
 # Editor directories and files
 .vscode/*

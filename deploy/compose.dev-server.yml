@@ -1,0 +1,76 @@
+# Knight School - dev server stack (EC2)
+#
+# Lives at:  <repo>/deploy/compose.dev-server.yml
+# Images are built by GitHub Actions and pulled from GHCR; nothing is built here.
+#
+# Run from the deploy/ folder:
+#   docker compose -f compose.dev-server.yml pull
+#   docker compose -f compose.dev-server.yml up -d
+#
+# Values like ${SA_PASSWORD} come from deploy/.env on the server
+# (never committed - see env.example). The ":?" form makes Compose stop
+# with a clear message if a required value is missing.
+#
+# This is NOT the local development setup. Local dev still uses
+# server/identity-api/Capstone.Identity.API/compose.yml.
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"          # free, dev/test only - production must use Express or paid
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:?Set SA_PASSWORD in deploy/.env}
+      MSSQL_MEMORY_LIMIT_MB: "2048"   # leave room for the API on a 4 GB t3.medium
+    # No "ports:" - only reachable by other containers on this stack's network
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\" -b -o /dev/null"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  api:
+    image: ${IMAGE_PREFIX:?Set IMAGE_PREFIX in deploy/.env}-api:${IMAGE_TAG:-dev}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"   # trust Caddy's X-Forwarded-Proto (https)
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=KnightSchool;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY in deploy/.env}
+      AdminSeed__Email: ${ADMIN_EMAIL:?Set ADMIN_EMAIL in deploy/.env}
+      AdminSeed__Password: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in deploy/.env}
+      Database__ApplyMigrationsOnStartup: "true"    # dev server only - see hosting guide
+    # No "ports:" - Caddy reaches it at api:8080 inside the network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Caddy = HTTPS + serves the built React app + proxies /api to the API
+  web:
+    image: ${IMAGE_PREFIX:?Set IMAGE_PREFIX in deploy/.env}-web:${IMAGE_TAG:-dev}
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in deploy/.env}  # read by the Caddyfile
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data                    # TLS certificates - do not delete
+      - caddy_config:/config
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  sqldata:
+  caddy_data:
+    name: caddy_data    # keep the existing certificate
+  caddy_config:
