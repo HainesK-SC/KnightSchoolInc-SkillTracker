@@ -1,4 +1,3 @@
-# =============================================================================
 # Knight School - dev server stack (EC2)
 #
 # Lives at:  <repo>/deploy/compose.dev-server.yml
@@ -14,7 +13,6 @@
 #
 # This is NOT the local development setup. Local dev still uses
 # server/identity-api/Capstone.Identity.API/compose.yml.
-# =============================================================================
 
 services:
   db:

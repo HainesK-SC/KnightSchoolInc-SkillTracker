@@ -1,26 +1,11 @@
 #!/usr/bin/env bash
-# =============================================================================
 # Knight School - deploy / update the stack on this server
 #
-# Lives at:  <repo>/deploy/deploy.sh   (run as the 'ubuntu' user)
+# Lives at:  /deploy/deploy.sh
 #
-# Called by:
-#   - the knightschool-deploy systemd service, on every boot
-#   - GitHub Actions over SSH, after CI publishes new images
-#   - you, by hand:  ~/knightschool/deploy/deploy.sh
-#
-# Steps:
-#   1. git pull       - latest compose file / Caddyfile from the repo
-#   2. compose pull   - latest images from GHCR
-#   3. compose up -d  - recreate only containers whose image/config changed
-#   4. health check   - site and API must answer, or this script fails
-#   5. image prune    - delete old untagged images so the disk doesn't fill
-#
-# Any failure stops the script with a non-zero exit code ("fail loudly").
-# The previous containers keep running if a step before step 3 fails.
-# =============================================================================
 
-set -euo pipefail
+
+set -euo pipefail # force stop execution if any command fails, invalid variable, or conditional failure on either side
 
 DEPLOY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$DEPLOY_DIR")"
