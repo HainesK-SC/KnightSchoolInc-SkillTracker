@@ -101,6 +101,97 @@ namespace Capstone.Identity.API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Capstone.Identity.API.Models.Discipline", b =>
+                {
+                    b.Property<int>("DisciplineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DisciplineId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("DisciplineId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Discipline");
+                });
+
+            modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
+                {
+                    b.Property<int>("ParticipantSkillProgressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParticipantSkillProgressId"));
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ParticipantSkillProgressId");
+
+                    b.HasIndex("SkillId");
+
+                    b.HasIndex("UserProfileId", "SkillId")
+                        .IsUnique();
+
+                    b.ToTable("ParticipantSkillProgress");
+                });
+
+            modelBuilder.Entity("Capstone.Identity.API.Models.Skill", b =>
+                {
+                    b.Property<int>("SkillId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkillId"));
+
+                    b.Property<string>("Benefits")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("DisciplineId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("SkillId");
+
+                    b.HasIndex("DisciplineId");
+
+                    b.ToTable("Skill");
+                });
+
             modelBuilder.Entity("Capstone.Identity.API.Models.UserProfile", b =>
                 {
                     b.Property<int>("UserProfileId")
@@ -135,7 +226,7 @@ namespace Capstone.Identity.API.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -267,6 +358,30 @@ namespace Capstone.Identity.API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
+                {
+                    b.HasOne("Capstone.Identity.API.Models.Skill", null)
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Capstone.Identity.API.Models.UserProfile", null)
+                        .WithMany()
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Capstone.Identity.API.Models.Skill", b =>
+                {
+                    b.HasOne("Capstone.Identity.API.Models.Discipline", null)
+                        .WithMany()
+                        .HasForeignKey("DisciplineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.UserProfile", b =>
