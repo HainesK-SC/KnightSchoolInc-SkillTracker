@@ -11,13 +11,13 @@ namespace Capstone.Identity.API.Dtos.Request
     {
         [Required]
         [MaxLength(50)]
-        public string Name { get; set; } = default!;
+        public string Name { get; init; } = default!;
         [Required]
         [MaxLength(200)]
-        public string Description { get; set; } = default!;
+        public string Description { get; init; } = default!;
         [MaxLength(150)]
-        public string? Benefits { get; set; } = null;
+        public string? Benefits { get; init; } = null;
         [Required]
-        public int? DisciplineId { get; set; } = default!;
+        public int? DisciplineId { get; init; } = null;
     }
 }

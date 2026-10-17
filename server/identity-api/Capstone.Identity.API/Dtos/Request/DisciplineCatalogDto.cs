@@ -10,9 +10,9 @@ namespace Capstone.Identity.API.Dtos.Request
     /// embedding business logic; keep properties simple and serializable.</remarks>
     public class DisciplineCatalogDto
     {
-        public int DisciplineId { get; set; } = default;
+        public int DisciplineId { get; init; }
         [MaxLength(50)]
-        public string Name { get; set; } = default!;
-        public List<Skill> Skills { get; set; } = new();
+        public string Name { get; init; } = default!;
+        public List<Skill> Skills { get; init; } = new();
     }
 }

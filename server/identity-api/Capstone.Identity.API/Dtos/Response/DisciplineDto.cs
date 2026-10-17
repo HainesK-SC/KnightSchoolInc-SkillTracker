@@ -4,7 +4,7 @@ namespace Capstone.Identity.API.Dtos.Response
 {
     public class DisciplineDto
     {
-        public int DisciplineId { get; set; } = default!;
-        public string Name { get; set; } = default!;
+        public int DisciplineId { get; init; } = default!;
+        public string Name { get; init; } = default!;
     }
 }

@@ -10,6 +10,6 @@ namespace Capstone.Identity.API.Dtos.Request
     {
         [Required]
         [MaxLength(50)]
-        public string Name { get; set; } = default!;
+        public string Name { get; init; } = default!;
     }
 }

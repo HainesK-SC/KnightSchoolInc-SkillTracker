@@ -4,12 +4,12 @@ namespace Capstone.Identity.API.Dtos.Response
 {
     public class SkillDto
     {
-        public int SkillId { get; set; } = default;
-        public string Name { get; set; } = default!;
-        public string Description { get; set; } = default!;
-        public string? Benefits { get; set; } = default;
-        public bool IsArchived { get; set; } = false;
+        public int SkillId { get; init; }
+        public string Name { get; init; } = default!;
+        public string Description { get; init; } = default!;
+        public string? Benefits { get; init; } = default;
+        public bool IsArchived { get; init; } = false;
         // FK to Discipline parent
-        public int DisciplineId { get; set; } = default!;
+        public int DisciplineId { get; init; }
     }
 }
