@@ -13,9 +13,9 @@ namespace Capstone.Identity.API.Repositories
             _appDbContext = context;
         }
 
-        public async Task AddNewDiscipline(Discipline discipline)
+        public void AddNewDiscipline(Discipline discipline)
         { 
-            await _appDbContext.Disciplines.AddAsync(discipline);
+            _appDbContext.Disciplines.Add(discipline);
 
         }
         public async Task<bool> DisciplineExistsByName(string name, int? excludingId = null)
@@ -31,16 +31,17 @@ namespace Capstone.Identity.API.Repositories
 
             return await query.AnyAsync();
         }
-        public async Task<ICollection<Discipline>> GetAllDisciplinesAsync() 
+        public async Task<IReadOnlyList<Discipline>> GetAllDisciplinesAsync() 
         {
             var disciplines = await _appDbContext.Disciplines
                 .AsNoTracking()
+                .OrderBy(d => d.Name)
                 .ToListAsync<Discipline>();
 
             return disciplines;
         }
 
-        public async Task<Discipline> GetDisciplineByIdAsync(int id) 
+        public async Task<Discipline?> GetDisciplineByIdAsync(int id) 
         {
             var discipline = await _appDbContext.Disciplines
                 .AsNoTracking()
@@ -49,7 +50,7 @@ namespace Capstone.Identity.API.Repositories
             return discipline;
         }
 
-        public async Task<Discipline> GetDisciplineByIdForUpdate(int id) 
+        public async Task<Discipline?> GetDisciplineByIdForUpdate(int id) 
         {
             var discipline = await _appDbContext.Disciplines.FirstOrDefaultAsync(d => d.DisciplineId == id);
 
