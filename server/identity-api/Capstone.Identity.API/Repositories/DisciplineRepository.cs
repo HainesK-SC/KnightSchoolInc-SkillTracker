@@ -51,7 +51,7 @@ namespace Capstone.Identity.API.Repositories
 
         public async Task<Discipline> GetDisciplineByIdForUpdate(int id) 
         {
-            var discipline = await GetDisciplineByIdAsync(id);
+            var discipline = await _appDbContext.Disciplines.FirstOrDefaultAsync(d => d.DisciplineId == id);
 
             return discipline;
         }
