@@ -123,6 +123,9 @@ namespace Capstone.Identity.API
             // Repository registrations
             builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+            builder.Services.AddScoped<IDisciplineRepository, DisciplineRepository>();
+            builder.Services.AddScoped<ISkillRepository, SkillRepository>();
+            builder.Services.AddScoped<IParticipantSkillProgressRepository, ParticipantSkillProgressRepository>();
 
             // Service registrations
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
