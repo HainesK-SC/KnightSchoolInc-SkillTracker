@@ -12,7 +12,7 @@ namespace Capstone.Identity.API.Dtos.Admin
     {
         public int DisciplineId { get; set; } = default;
         [MaxLength(50)]
-        public string DisciplineName { get; set; } = default!;
+        public string Name { get; set; } = default!;
         public List<SkillDto> Skills { get; set; } = new();
     }
 }
