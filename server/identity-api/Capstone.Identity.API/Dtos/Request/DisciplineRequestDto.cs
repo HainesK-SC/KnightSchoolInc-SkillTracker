@@ -9,6 +9,7 @@ namespace Capstone.Identity.API.Dtos.Request
     public class DisciplineRequestDto
     {
         [Required]
+        [MaxLength(50)]
         public string Name { get; set; } = default!;
     }
 }
