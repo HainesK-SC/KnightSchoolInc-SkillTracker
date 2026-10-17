@@ -3,6 +3,7 @@ using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Dtos.Admin;
 using Capstone.Identity.API.Dtos.Auth;
+using Capstone.Identity.API.Mappings;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Repositories;
 using Microsoft.AspNetCore.Identity;
