@@ -1,4 +1,4 @@
-﻿using Capstone.Identity.API.Dtos.Response;
+﻿using Capstone.Identity.API.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Capstone.Identity.API.Dtos.Request
@@ -13,6 +13,6 @@ namespace Capstone.Identity.API.Dtos.Request
         public int DisciplineId { get; set; } = default;
         [MaxLength(50)]
         public string Name { get; set; } = default!;
-        public List<SkillDto> Skills { get; set; } = new();
+        public List<Skill> Skills { get; set; } = new();
     }
 }
