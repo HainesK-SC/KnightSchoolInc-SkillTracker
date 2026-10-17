@@ -3,6 +3,7 @@ using Capstone.Identity.API.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace Capstone.Identity.API.Data
 {
@@ -11,6 +12,9 @@ namespace Capstone.Identity.API.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Discipline> Disciplines { get; set; }
+        public DbSet<Skill> Skills { get; set; }
+        public DbSet<ParticipantSkillProgress> ParticipantSkillProgresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
