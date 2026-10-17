@@ -1,7 +1,7 @@
 ﻿using Capstone.Identity.API.Dtos.Response;
 using System.ComponentModel.DataAnnotations;
 
-namespace Capstone.Identity.API.Dtos.Admin
+namespace Capstone.Identity.API.Dtos.Request
 {
     /// <summary>
     /// Represents a discipline catalog used to transfer discipline metadata between application layers.

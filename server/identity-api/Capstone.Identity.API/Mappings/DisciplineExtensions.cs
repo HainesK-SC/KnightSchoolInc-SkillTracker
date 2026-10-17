@@ -1,5 +1,5 @@
 ﻿using Capstone.Identity.API.Data;
-using Capstone.Identity.API.Dtos.Admin;
+using Capstone.Identity.API.Dtos.Request;
 using Capstone.Identity.API.Dtos.Response;
 using Capstone.Identity.API.Models;
 using System.Runtime.CompilerServices;

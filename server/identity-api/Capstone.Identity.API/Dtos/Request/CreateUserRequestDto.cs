@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Capstone.Identity.API.Dtos.Admin
+namespace Capstone.Identity.API.Dtos.Request
 {
     public sealed class CreateUserRequestDto
     {
