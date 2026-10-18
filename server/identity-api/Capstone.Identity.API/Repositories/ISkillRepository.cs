@@ -12,6 +12,7 @@ namespace Capstone.Identity.API.Repositories
         public Task<Skill?> GetSkillByIdForUpdate(int id);
         public Task<IReadOnlyList<Skill>> GetAllSkillsInDisciplineAsync(int disciplineId);
         public void AddNewSkill(Skill skill);
-        
+        public Task<bool> ExistsByNameInDisciplineAsync(int disciplineId, string name, int? excludingId = null);
+
     }
 }
