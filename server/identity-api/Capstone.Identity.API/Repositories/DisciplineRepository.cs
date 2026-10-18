@@ -61,5 +61,10 @@ namespace Capstone.Identity.API.Repositories
         {
             _appDbContext.Disciplines.Remove(discipline);
         }
+
+        public async Task<bool> AnyInDisciplineAsync(int disciplineId)
+        {
+            return await _appDbContext.Skills.AnyAsync(s => s.DisciplineId == disciplineId);
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace Capstone.Identity.API.Repositories
         public void AddNewDiscipline(Discipline discipline);
         public Task<Discipline?> GetDisciplineByIdForUpdate(int id);
         public void RemoveDiscipline(Discipline discipline);
+        public Task<bool> AnyInDisciplineAsync(int disciplineId);
     }
 }
