@@ -70,9 +70,6 @@ namespace Capstone.Identity.API.Repositories
             return skillForUpdate;
         }
 
-        public async Task<bool> AnyInDisciplineAsync(int disciplineId)
-        {
-            return await _appDbContext.Skills.AnyAsync(s => s.DisciplineId == disciplineId);
-        }
+        
     }
 }
