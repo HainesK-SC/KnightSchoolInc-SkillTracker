@@ -70,6 +70,17 @@ namespace Capstone.Identity.API.Repositories
             return skillForUpdate;
         }
 
-        
+        public async Task<bool> ExistsByNameInDisciplineAsync(int disciplineId, string name, int? excludingId = null)
+        {
+            var query = _appDbContext.Skills
+                .Where(s => s.DisciplineId == disciplineId && s.Name == name);
+
+            if (excludingId is not null)
+            {
+                query = query.Where(s => s.SkillId != excludingId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
     }
 }
