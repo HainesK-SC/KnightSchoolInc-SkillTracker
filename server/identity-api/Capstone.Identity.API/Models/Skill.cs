@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Capstone.Identity.API.Models
 {
+    [Index(nameof(Name), nameof(DisciplineId), IsUnique = true)]
     public class Skill
     {
         public int SkillId { get; set; } = default;
