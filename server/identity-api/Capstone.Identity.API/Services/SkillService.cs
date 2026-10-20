@@ -150,7 +150,7 @@ namespace Capstone.Identity.API.Services
             if (doSkillsExist == true)
             {
                 _logger.LogWarning("[SkillService]: This discipline has skills (including archived ones) and can't be deleted. Archive its skills to hide it from skill trees.");
-                return Result<bool>.Failure("Cannot delete a discipline that has skills associated with it. Skills must be deleted first.", ResultErrorType.Conflict);
+                return Result<bool>.Failure("Cannot delete a discipline that has skills associated with it. Skills must be archived first.", ResultErrorType.Conflict);
             }
 
             _disciplineRepository.RemoveDiscipline(discipline);
@@ -163,10 +163,132 @@ namespace Capstone.Identity.API.Services
         }
 
         // Skills
-        public async Task<Result<IReadOnlyList<DisciplineCatalogDto>>> GetCatalogAsync();
-        public async Task<Result<SkillDto>> GetSkillAsync(int skillId);
-        public async Task<Result<SkillDto>> CreateSkillAsync(SkillRequestDto request, Guid actingAdminId);
-        public async Task<Result<SkillDto>> UpdateSkillAsync(int skillId, SkillRequestDto request, Guid actingAdminId);
+        public async Task<Result<IReadOnlyList<DisciplineCatalogDto>>> GetCatalogAsync()
+        {
+            var allDisciplines = await _disciplineRepository.GetAllDisciplinesAsync();
+
+            if (allDisciplines.Count() == 0)
+            {
+                _logger.LogWarning("No disciplines found.");
+                return Result<IReadOnlyList<DisciplineCatalogDto>>.Success(new List<DisciplineCatalogDto>());
+            }
+
+            var allSkills = await _skillRepository.GetAllSkillsAsync();
+
+            if (allSkills.Count() == 0)
+            {
+                _logger.LogWarning("No skills found.");
+                return Result<IReadOnlyList<DisciplineCatalogDto>>.Success(new List<DisciplineCatalogDto>());
+            }
+
+            var catalogDtos = new List<DisciplineCatalogDto>();
+
+            foreach (var discipline in allDisciplines)
+            {
+                if (discipline == null)
+                {
+                    _logger.LogWarning("Cannot create DisciplineCatalogDto. Discipline object is null.");
+                    return Result<IReadOnlyList<DisciplineCatalogDto>>.Failure("Unexpected error.", ResultErrorType.Unexpected);
+                }
+
+                var catalogDto = new DisciplineCatalogDto
+                {
+                    DisciplineId = discipline.DisciplineId,
+                    Name = discipline.Name,
+                    Skills = allSkills.Where(s => s.DisciplineId == discipline.DisciplineId).ToList()
+                };
+
+                catalogDtos.Add(catalogDto);
+            }
+
+            return Result<IReadOnlyList<DisciplineCatalogDto>>.Success(catalogDtos);
+        }
+
+        public async Task<Result<SkillDto>> GetSkillAsync(int skillId)
+        {
+            var skill = await _skillRepository.GetSkillByIdAsync(skillId);
+
+            if (skill == null)
+            {
+                _logger.LogWarning("No skill with ID: {SkillId} found.", skillId);
+                return Result<SkillDto>.Failure("No skill found.", ResultErrorType.NotFound);
+            }
+
+            var skillDto = skill.ToSkillDto();
+
+            return Result<SkillDto>.Success(skillDto);
+        }
+
+        public async Task<Result<SkillDto>> CreateSkillAsync(SkillRequestDto request, Guid actingAdminId)
+        {
+            var name = request.Name.Trim();
+            var disciplineIsExist = await _disciplineRepository.DisciplineExistsByName(name);
+
+            if (disciplineIsExist == false)
+            {
+                _logger.LogWarning("The discipline {DisciplineName} does not exist. ", name);
+                return Result<SkillDto>.Failure("Failed to create skill. Discipline does not exist.", ResultErrorType.NotFound);
+            }
+
+            if (await _skillRepository.ExistsByNameInDisciplineAsync((int) request.DisciplineId, name) == true)
+            {
+                _logger.LogWarning("Skill with the name {SkillName} already exists.", name);
+                return Result<SkillDto>.Failure("Failed to add skill. Name already in use.", ResultErrorType.Conflict);
+            }
+
+            var skill = new Skill
+            {
+                Name = name,
+                Description = request.Description,
+                Benefits = request.Benefits,
+                IsArchived = false,
+                DisciplineId = (int) request.DisciplineId
+            };
+
+            _skillRepository.AddNewSkill(skill);
+
+            var saveResult = await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("New skill: {SkillId} added by Admin: {AdminId}", skill.SkillId, actingAdminId);
+
+            var skillDto = skill.ToSkillDto();
+
+            return Result<SkillDto>.Success(skillDto);
+        }
+
+        public async Task<Result<SkillDto>> UpdateSkillAsync(int skillId, SkillRequestDto request, Guid actingAdminId)
+        {
+            var skillToUpdate = await _skillRepository.GetSkillByIdForUpdate(skillId);
+
+            if (skillToUpdate == null)
+            {
+                _logger.LogWarning("Skill not found. Check the ID: {SkillId}", skillId);
+                return Result<SkillDto>.Failure("Skill not found for update.", ResultErrorType.NotFound);
+            }
+            
+            var name = request.Name;
+
+            var isInDiscipline = await _skillRepository.ExistsByNameInDisciplineAsync((int) request.DisciplineId, name, skillToUpdate.SkillId);
+            if (isInDiscipline == true)
+            {
+                _logger.LogWarning("Unable to udpate. Skill name: {SkillName} already in use.", name);
+                return Result<SkillDto>.Failure("Failed to update skill. Name already in use.", ResultErrorType.Conflict);
+            }
+
+            skillToUpdate.Name = name;
+            skillToUpdate.Description = request.Description;
+            skillToUpdate.Benefits = request.Benefits;
+            skillToUpdate.IsArchived = false;
+            skillToUpdate.DisciplineId = (int) request.DisciplineId;
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Skill {SkillId} has been updated by Admin: {AdminId}", skillToUpdate.SkillId, actingAdminId);
+            
+            var skillDto = skillToUpdate.ToSkillDto();
+
+            return Result<SkillDto>.Success(skillDto);
+        }
         public async Task<Result<SkillDto>> ArchiveSkillAsync(int skillId, Guid actingAdminId);
         public async Task<Result<SkillDto>> UnarchiveSkillAsync(int skillId, Guid actingAdminId);
     }
