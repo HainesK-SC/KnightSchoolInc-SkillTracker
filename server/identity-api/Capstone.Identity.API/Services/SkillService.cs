@@ -352,7 +352,8 @@ namespace Capstone.Identity.API.Services
             if (skill.IsArchived == false)
             {
                 _logger.LogWarning("The skill: {SkillName} is not archived.", skill.Name);
-                return Result<SkillDto>.Failure($"Skill: {skill.Name} is not archived.", ResultErrorType.Conflict);
+                return Result<SkillDto>.Success(skill.ToSkillDto());
+                // return Result<SkillDto>.Failure($"Skill: {skill.Name} is not archived.", ResultErrorType.Conflict);
             }
 
             skill.IsArchived = false;
