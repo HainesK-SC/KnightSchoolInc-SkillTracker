@@ -119,7 +119,7 @@ namespace Capstone.Identity.API.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Discipline");
+                    b.ToTable("Disciplines");
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
@@ -154,7 +154,7 @@ namespace Capstone.Identity.API.Migrations
                     b.HasIndex("UserProfileId", "SkillId")
                         .IsUnique();
 
-                    b.ToTable("ParticipantSkillProgress");
+                    b.ToTable("ParticipantSkillProgresses");
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.Skill", b =>
@@ -189,7 +189,10 @@ namespace Capstone.Identity.API.Migrations
 
                     b.HasIndex("DisciplineId");
 
-                    b.ToTable("Skill");
+                    b.HasIndex("Name", "DisciplineId")
+                        .IsUnique();
+
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.UserProfile", b =>
