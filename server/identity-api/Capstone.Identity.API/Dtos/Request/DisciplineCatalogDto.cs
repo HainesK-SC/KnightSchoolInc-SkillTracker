@@ -1,4 +1,5 @@
-﻿using Capstone.Identity.API.Models;
+﻿using Capstone.Identity.API.Dtos.Response;
+using Capstone.Identity.API.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Capstone.Identity.API.Dtos.Request
@@ -13,6 +14,6 @@ namespace Capstone.Identity.API.Dtos.Request
         public int DisciplineId { get; init; }
         [MaxLength(50)]
         public string Name { get; init; } = default!;
-        public List<Skill> Skills { get; init; } = new();
+        public List<SkillDto> Skills { get; init; } = new();
     }
 }
