@@ -185,17 +185,11 @@ namespace Capstone.Identity.API.Services
 
             foreach (var discipline in allDisciplines)
             {
-                if (discipline == null)
-                {
-                    _logger.LogWarning("Cannot create DisciplineCatalogDto. Discipline object is null.");
-                    return Result<IReadOnlyList<DisciplineCatalogDto>>.Failure("Unexpected error.", ResultErrorType.Unexpected);
-                }
-
                 var catalogDto = new DisciplineCatalogDto
                 {
                     DisciplineId = discipline.DisciplineId,
                     Name = discipline.Name,
-                    Skills = allSkills.Where(s => s.DisciplineId == discipline.DisciplineId).ToList()
+                    Skills = allSkills.Where(s => s.DisciplineId == discipline.DisciplineId).Select(s => s.ToSkillDto()).ToList()
                 };
 
                 catalogDtos.Add(catalogDto);
@@ -221,7 +215,16 @@ namespace Capstone.Identity.API.Services
 
         public async Task<Result<SkillDto>> CreateSkillAsync(SkillRequestDto request, Guid actingAdminId)
         {
-            var name = request.Name.Trim();
+            var discipline = await _disciplineRepository.GetDisciplineByIdAsync((int) request.DisciplineId);
+
+            if (discipline is null)
+            {
+                return Result<SkillDto>.Failure(
+                    $"Discipline {request.DisciplineId} does not exist.", ResultErrorType.Validation);
+            }
+
+            var name = discipline.Name.Trim();
+            
             var disciplineIsExist = await _disciplineRepository.DisciplineExistsByName(name);
 
             if (disciplineIsExist == false)
@@ -236,11 +239,19 @@ namespace Capstone.Identity.API.Services
                 return Result<SkillDto>.Failure("Failed to add skill. Name already in use.", ResultErrorType.Conflict);
             }
 
+            // This prevents empty strings being sent in API calls
+            // Forces null
+            string? benefits = null;
+            if (!string.IsNullOrWhiteSpace(request.Benefits))
+            {
+                benefits = request.Benefits.Trim();
+            }
+
             var skill = new Skill
             {
                 Name = name,
-                Description = request.Description,
-                Benefits = request.Benefits,
+                Description = request.Description.Trim(),
+                Benefits = benefits,
                 IsArchived = false,
                 DisciplineId = (int) request.DisciplineId
             };
@@ -265,8 +276,16 @@ namespace Capstone.Identity.API.Services
                 _logger.LogWarning("Skill not found. Check the ID: {SkillId}", skillId);
                 return Result<SkillDto>.Failure("Skill not found for update.", ResultErrorType.NotFound);
             }
-            
-            var name = request.Name;
+
+            var discipline = await _disciplineRepository.GetDisciplineByIdAsync(request.DisciplineId!.Value);
+
+            if (discipline is null)
+            {
+                return Result<SkillDto>.Failure(
+                    $"Discipline {request.DisciplineId} does not exist.", ResultErrorType.Validation);
+            }
+
+            var name = request.Name.Trim();
 
             var isInDiscipline = await _skillRepository.ExistsByNameInDisciplineAsync((int) request.DisciplineId, name, skillToUpdate.SkillId);
             if (isInDiscipline == true)
@@ -275,10 +294,15 @@ namespace Capstone.Identity.API.Services
                 return Result<SkillDto>.Failure("Failed to update skill. Name already in use.", ResultErrorType.Conflict);
             }
 
+            string? benefits = null;
+            if (!string.IsNullOrWhiteSpace(request.Benefits))
+            {
+                benefits = request.Benefits.Trim();
+            }
+
             skillToUpdate.Name = name;
-            skillToUpdate.Description = request.Description;
-            skillToUpdate.Benefits = request.Benefits;
-            skillToUpdate.IsArchived = false;
+            skillToUpdate.Description = request.Description.Trim();
+            skillToUpdate.Benefits = benefits;
             skillToUpdate.DisciplineId = (int) request.DisciplineId;
 
             await _unitOfWork.SaveChangesAsync();
@@ -289,7 +313,57 @@ namespace Capstone.Identity.API.Services
 
             return Result<SkillDto>.Success(skillDto);
         }
-        public async Task<Result<SkillDto>> ArchiveSkillAsync(int skillId, Guid actingAdminId);
-        public async Task<Result<SkillDto>> UnarchiveSkillAsync(int skillId, Guid actingAdminId);
+        public async Task<Result<SkillDto>> ArchiveSkillAsync(int skillId, Guid actingAdminId)
+        {
+            var skill = await _skillRepository.GetSkillByIdForUpdate(skillId);
+
+            if (skill == null)
+            {
+                _logger.LogWarning("Skill: {SkillId} not found.", skillId);
+                return Result<SkillDto>.Failure("Skill not found.", ResultErrorType.NotFound);
+            }
+
+            if (skill.IsArchived == true)
+            {
+                _logger.LogWarning("The skill: {SkillName} is already archived.", skill.Name);
+                return Result<SkillDto>.Failure("Skill is already archived.", ResultErrorType.Conflict);
+            }
+
+            skill.IsArchived = true;
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Skill: {SkillId} has been archived by Admin: {AdminId}", skillId, actingAdminId);
+
+            var skillDto = skill.ToSkillDto();
+            
+            return Result<SkillDto>.Success(skillDto);
+        }
+        public async Task<Result<SkillDto>> UnarchiveSkillAsync(int skillId, Guid actingAdminId)
+        {
+            var skill = await _skillRepository.GetSkillByIdForUpdate(skillId);
+
+            if (skill == null)
+            {
+                _logger.LogWarning("Skill: {SkillId} not found.", skillId);
+                return Result<SkillDto>.Failure("Skill not found.", ResultErrorType.NotFound);
+            }
+
+            if (skill.IsArchived == false)
+            {
+                _logger.LogWarning("The skill: {SkillName} is not archived.", skill.Name);
+                return Result<SkillDto>.Failure($"Skill: {skill.Name} is not archived.", ResultErrorType.Conflict);
+            }
+
+            skill.IsArchived = false;
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Skill: {SkillId} has been retrieved from archive by Admin: {AdminId}", skillId, actingAdminId);
+
+            var skillDto = skill.ToSkillDto();
+
+            return Result<SkillDto>.Success(skillDto);
+        }
     }
 }
