@@ -136,6 +136,8 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
             builder.Services.AddScoped<ISkillService, SkillService>();
+            builder.Services.AddScoped<ISkillProgressService, SkillProgressService>();
+            builder.Services.AddSingleton(TimeProvider.System);
 
             var app = builder.Build();
 
