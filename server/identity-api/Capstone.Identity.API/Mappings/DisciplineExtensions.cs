@@ -17,13 +17,13 @@ namespace Capstone.Identity.API.Mappings
             return disciplineDto;
         }
 
-        public static DisciplineCatalogDto ToDisciplineCatalogDto(this Discipline discipline, List<Skill> skills)
+        public static DisciplineCatalogDto ToDisciplineCatalogDto(this Discipline discipline, List<SkillDto> skillDtos)
         {
             var disciplineCatalogDto = new DisciplineCatalogDto
             {
                 DisciplineId = discipline.DisciplineId,
                 Name = discipline.Name,
-                Skills = skills
+                Skills = skillDtos
             };
 
             return disciplineCatalogDto;
