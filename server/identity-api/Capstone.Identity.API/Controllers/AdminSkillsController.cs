@@ -191,5 +191,20 @@ namespace Capstone.Identity.API.Controllers
 
             return Ok(updatedSkill);
         }
+
+        [HttpDelete("skills/{id:int}")]
+        public async Task<IActionResult> DeleteSkill(int id)
+        {
+            var adminId = User.GetUserId();
+
+            var deleteResult = await _skillService.DeleteSkillAsync(id, adminId);
+
+            if (!deleteResult.Succeeded)
+            {
+                return deleteResult.ToProblemResult();
+            }
+
+            return NoContent();
+        }
     }
 }
