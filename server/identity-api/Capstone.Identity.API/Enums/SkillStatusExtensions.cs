@@ -8,6 +8,7 @@ namespace Capstone.Identity.API.Enums
         {
             SkillStatus.InProgress => "In Progress",
             SkillStatus.Completed => "Completed",
+            SkillStatus.Locked => "Locked",
             _ => throw new ArgumentOutOfRangeException(nameof(skillStatus), skillStatus, null)
         };
     }
