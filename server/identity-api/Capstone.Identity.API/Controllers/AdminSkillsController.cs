@@ -34,7 +34,7 @@ namespace Capstone.Identity.API.Controllers
             return Ok(disciplinesResult.Data);
         }
 
-        [HttpGet("disciplines/{id:int")]
+        [HttpGet("disciplines/{id:int}")]
         public async Task<IActionResult> GetDisiplineById(int id)
         {
             var disciplineResult = await _skillService.GetDisciplineAsync(id);
