@@ -14,13 +14,15 @@ namespace Capstone.Identity.API.Services
         private readonly ISkillRepository _skillRepository;
         private readonly IDisciplineRepository _disciplineRepository;
         private IUnitOfWork _unitOfWork;
+        private readonly IParticipantSkillProgressRepository _participantSkillProgressRepository;
 
-        public SkillService(ILogger<SkillService> logger, ISkillRepository skillRepo, IDisciplineRepository disciplineRepo, IUnitOfWork unitOfWork)
+        public SkillService(ILogger<SkillService> logger, ISkillRepository skillRepo, IDisciplineRepository disciplineRepo, IUnitOfWork unitOfWork, IParticipantSkillProgressRepository participantSkillProgressRepository)
         {
             _logger = logger;
             _skillRepository = skillRepo;
             _disciplineRepository = disciplineRepo;
             _unitOfWork = unitOfWork;
+            _participantSkillProgressRepository = participantSkillProgressRepository;
         }
 
         // Disciplines
@@ -135,7 +137,7 @@ namespace Capstone.Identity.API.Services
 
         public async Task<Result<bool>> DeleteDisciplineAsync(int disciplineId, Guid actingAdminId)
         {
-            var discipline = await _disciplineRepository.GetDisciplineByIdAsync(disciplineId);
+            var discipline = await _disciplineRepository.GetDisciplineByIdForUpdate(disciplineId);
 
             if (discipline == null)
             {
@@ -143,21 +145,22 @@ namespace Capstone.Identity.API.Services
                 return Result<bool>.Failure("No discipline found.", ResultErrorType.NotFound);
             }
 
-            // Checking if skills exist under this Discipline
-            // If so, the discipline cannot be delted - skills must be deleted first
-            var doSkillsExist = await _disciplineRepository.AnyInDisciplineAsync(disciplineId);
+            var isProgress = await _participantSkillProgressRepository.AnyProgressInDisciplineAsync(disciplineId);
 
-            if (doSkillsExist == true)
+            if (isProgress)
             {
-                _logger.LogWarning("[SkillService]: This discipline has skills (including archived ones) and can't be deleted. Archive its skills to hide it from skill trees.");
-                return Result<bool>.Failure("Cannot delete a discipline that has skills associated with it. Skills must be archived first.", ResultErrorType.Conflict);
+                return Result<bool>.Failure("This discipline can’t be deleted because participants have progress on its skills. Archive its skills instead to hide it from skill trees.", ResultErrorType.Conflict);
             }
 
+            var skillsInDiscipline = await _skillRepository.GetAllSkillsInDisciplineAsync(disciplineId);
+
+            _skillRepository.RemoveSkills(skillsInDiscipline);
             _disciplineRepository.RemoveDiscipline(discipline);
 
             await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("[SkillService]: DisciplineId: {DisciplineId} has been successfully deleted by AdminId: {AdminId}", disciplineId, actingAdminId);
+            _logger.LogInformation("Discipline: {DisciplineId} has been deleted. There were {SkillsCount} deleted along with the discipline. Performed by Admin: {AdminId}",
+                disciplineId, skillsInDiscipline.Count(), actingAdminId);
 
             return Result<bool>.Success(true);
         }
@@ -365,6 +368,31 @@ namespace Capstone.Identity.API.Services
             var skillDto = skill.ToSkillDto();
 
             return Result<SkillDto>.Success(skillDto);
+        }
+
+        public async Task<Result<bool>> DeleteSkillAsync(int skillId, Guid actingAdminId)
+        {
+            var skill =await _skillRepository.GetSkillByIdForUpdate(skillId);
+
+            if (skill == null)
+            {
+                return Result<bool>.Failure("No skill found.", ResultErrorType.NotFound);
+            }
+
+            var anyProgress = await _participantSkillProgressRepository.AnyProgressForSkillAsync(skillId);
+
+            if (anyProgress)
+            {
+                return Result<bool>.Failure("Cannot delete skill. Users have progress. Archive instead.", ResultErrorType.Conflict);
+            }
+
+            _skillRepository.RemoveSkill(skill);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Skill: {SkillId} deleted. Performed by Admin: {AdminId}", skillId, actingAdminId);
+
+            return Result<bool>.Success(true);
         }
     }
 }
