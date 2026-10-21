@@ -13,9 +13,9 @@ namespace Capstone.Identity.API.Controllers
     [Authorize(Roles = Roles.Admin)]
     public class AdminSkillsController : ControllerBase
     {
-        private readonly SkillService _skillService;
+        private readonly ISkillService _skillService;
 
-        public AdminSkillsController(SkillService skillService)
+        public AdminSkillsController(ISkillService skillService)
         {
             _skillService = skillService;
         }
@@ -35,7 +35,7 @@ namespace Capstone.Identity.API.Controllers
         }
 
         [HttpGet("disciplines/{id:int}")]
-        public async Task<IActionResult> GetDisiplineById(int id)
+        public async Task<IActionResult> GetDisciplineById(int id)
         {
             var disciplineResult = await _skillService.GetDisciplineAsync(id);
 
@@ -62,10 +62,10 @@ namespace Capstone.Identity.API.Controllers
 
             var discipline = createResult.Data;
 
-            return CreatedAtAction(nameof(GetDisciplines), new { id = discipline.DisciplineId}, discipline);
+            return CreatedAtAction(nameof(GetDisciplineById), new { id = discipline.DisciplineId}, discipline);
         }
 
-        [HttpPut("discliplines/{id:int}")]
+        [HttpPut("disciplines/{id:int}")]
         public async Task<IActionResult> UpdateDiscipline(int id, DisciplineRequestDto request)
         {
             var adminId = User.GetUserId();
@@ -111,7 +111,7 @@ namespace Capstone.Identity.API.Controllers
             return Ok(skills);
         }
 
-        [HttpGet("skill/{id:int}")]
+        [HttpGet("skills/{id:int}")]
         public async Task<IActionResult> GetSkill(int id)
         {
             var skillResult = await _skillService.GetSkillAsync(id);
@@ -144,10 +144,10 @@ namespace Capstone.Identity.API.Controllers
         }
 
         [HttpPut("skills/{id:int}")]
-        public async Task<IActionResult> UpdateSkill(int skillId, SkillRequestDto request)
+        public async Task<IActionResult> UpdateSkill(int id, SkillRequestDto request)
         {
             var adminId = User.GetUserId();
-            var updateResult = await _skillService.UpdateSkillAsync(skillId, request, adminId);
+            var updateResult = await _skillService.UpdateSkillAsync(id, request, adminId);
 
             if (!updateResult.Succeeded)
             {
