@@ -326,7 +326,7 @@ namespace Capstone.Identity.API.Services
             if (skill.IsArchived == true)
             {
                 _logger.LogWarning("The skill: {SkillName} is already archived.", skill.Name);
-                return Result<SkillDto>.Failure("Skill is already archived.", ResultErrorType.Conflict);
+                return Result<SkillDto>.Success(skill.ToSkillDto());
             }
 
             skill.IsArchived = true;
