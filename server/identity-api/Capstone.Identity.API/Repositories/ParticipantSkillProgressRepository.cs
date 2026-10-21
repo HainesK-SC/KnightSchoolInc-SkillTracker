@@ -40,5 +40,21 @@ namespace Capstone.Identity.API.Repositories
         {
             _appDbContext.ParticipantSkillProgresses.Remove(progress);
         }
+
+        public async Task<bool> AnyProgressForSkillAsync(int skillId)
+        {
+            var isProgress = await _appDbContext.ParticipantSkillProgresses.AnyAsync(p => p.SkillId == skillId);
+
+            return isProgress;
+        }
+
+        public async Task<bool> AnyProgressInDisciplineAsync(int disciplineId)
+        {
+            var isProgress = await _appDbContext.ParticipantSkillProgresses
+                .AnyAsync(p => _appDbContext.Skills
+                    .Any(s => s.SkillId == p.SkillId && s.DisciplineId == disciplineId));
+
+            return isProgress;
+        }
     }
 }
