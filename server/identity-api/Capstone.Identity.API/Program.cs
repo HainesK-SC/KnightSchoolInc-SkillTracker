@@ -135,6 +135,7 @@ namespace Capstone.Identity.API
             builder.Services.AddSingleton<IDisplayNameGenerator, DisplayNameGenerator>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
+            builder.Services.AddScoped<ISkillService, SkillService>();
 
             var app = builder.Build();
 
