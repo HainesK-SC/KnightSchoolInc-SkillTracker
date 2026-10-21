@@ -78,6 +78,11 @@ namespace Capstone.Identity.API.Data
                 .Property(p => p.Status)
                 .HasConversion<string>()
                 .HasMaxLength(20);
+
+            builder.Entity<ParticipantSkillProgress>()
+                .ToTable(t => t.HasCheckConstraint(
+                    "CK_ParticipantSkillProgresses_Status_NotLocked",
+                    "[Status] <> 'Locked'"));
         }
     }
 }
