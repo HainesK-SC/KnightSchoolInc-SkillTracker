@@ -82,5 +82,14 @@ namespace Capstone.Identity.API.Repositories
 
             return await query.AnyAsync();
         }
+
+        public void RemoveSkill(Skill skill)
+        {
+            _appDbContext.Skills.Remove(skill);
+        }
+        public void RemoveSkills(IEnumerable<Skill> skills)
+        {
+            _appDbContext.Skills.RemoveRange(skills);
+        }
     }
 }
