@@ -154,7 +154,10 @@ namespace Capstone.Identity.API.Migrations
                     b.HasIndex("UserProfileId", "SkillId")
                         .IsUnique();
 
-                    b.ToTable("ParticipantSkillProgresses");
+                    b.ToTable("ParticipantSkillProgresses", t =>
+                        {
+                            t.HasCheckConstraint("CK_ParticipantSkillProgresses_Status_NotLocked", "[Status] <> 'Locked'");
+                        });
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.Skill", b =>
