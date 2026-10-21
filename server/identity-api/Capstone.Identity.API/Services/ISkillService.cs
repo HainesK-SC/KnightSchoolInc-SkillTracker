@@ -23,5 +23,6 @@ namespace Capstone.Identity.API.Services
         Task<Result<SkillDto>> UpdateSkillAsync(int skillId, SkillRequestDto request, Guid actingAdminId);
         Task<Result<SkillDto>> ArchiveSkillAsync(int skillId, Guid actingAdminId);
         Task<Result<SkillDto>> UnarchiveSkillAsync(int skillId, Guid actingAdminId);
+        Task<Result<bool>> DeleteSkillAsync(int skillId, Guid actingAdminId);
     }
 }
