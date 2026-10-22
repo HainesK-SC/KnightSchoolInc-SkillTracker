@@ -16,6 +16,7 @@ namespace Capstone.Identity.API.Data.Seeding
 
             await SeedRolesAsync(provider, logger);
             await SeedAdminAsync(provider, logger);
+            await SeedInstructorAsync(provider, logger);
         }
 
         private static async Task SeedRolesAsync(IServiceProvider provider, ILogger logger)
@@ -83,6 +84,51 @@ namespace Capstone.Identity.API.Data.Seeding
                 }
 
                 logger.LogInformation("Granted Admin role to user {UserId}.", user.Id);
+            }
+        }
+
+        private static async Task SeedInstructorAsync(IServiceProvider provider, ILogger logger)
+        {
+            var config = provider.GetRequiredService<IConfiguration>();
+            var email = config["InstructorSeed:Email"];
+            var password = config["InstructorSeed:Password"];
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                logger.LogInformation("Instructir seed skipped: InstuctorSeed is not configured.");
+                return;
+            }
+
+            var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user is null)
+            {
+                var userService = provider.GetRequiredService<IApplicationUserService>();
+                var created = await userService.CreateUserWithProfileAsync(
+                    email,
+                    password,
+                    config["InstructorSeed:FirstName"] ?? "Instructor",
+                    config["InstructorSeed:LastName"] ?? "User");
+
+                if (!created.Succeeded)
+                {
+                    throw new InvalidOperationException($"Instructor seed failed: {created.Error}");
+                }
+
+                user = created.Data!;
+            }
+
+            if (!await userManager.IsInRoleAsync(user, Roles.Admin))
+            {
+                var result = await userManager.AddToRoleAsync(user, Roles.Admin);
+                if (!result.Succeeded)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to grant Instructor role: {string.Join(" ", result.Errors.Select(e => e.Description))}");
+                }
+
+                logger.LogInformation("Granted Instructor role to user {UserId}.", user.Id);
             }
         }
     }
