@@ -31,6 +31,8 @@ services:
       Jwt__Key: ${JWT_KEY}
       AdminSeed__Email: ${ADMIN_EMAIL}
       AdminSeed__Password: ${ADMIN_PASSWORD}
+      InstructorSeed_Email: ${INSTRUCTOR_EMAIL}
+      InstructorSeed__Password: ${INSTRUCTOR_PASSWORD}
       Database__ApplyMigrationsOnStartup: "true"
     depends_on:
       db:
