@@ -290,7 +290,7 @@ namespace Capstone.Identity.API.Services
             }
 
             // Load the profile
-            var profile = await _userProfileRepository.GetByApplicationUserIdForUpdateAsync(user.Id);
+            var profile = await _userProfileRepository.GetUserProfileByUserIdForUpdateAsync(user.Id);
             if (profile is null)
             {
                 _logger.LogError("User {UserId} has no UserProfile.", user.Id);

@@ -20,5 +20,30 @@ namespace Capstone.Identity.API.Mappings
 
             return skillDto;
         }
+
+        public static SkillTreeSkillDto ToSkillTreeSkillDto(this Skill skill, ParticipantSkillProgress? progress)
+        {
+            var skillTreeSkillDto = new SkillTreeSkillDto
+            {
+                SkillId = skill.SkillId,
+                Name = skill.Name,
+                Description = skill.Description,
+                Benefits = skill.Benefits
+            };
+            
+            if (progress != null)
+            {
+                skillTreeSkillDto.Status = progress.Status;
+                skillTreeSkillDto.UpdatedAtUtc = progress.UpdatedAtUtc;
+            }
+
+            else
+            {
+                skillTreeSkillDto.Status = Enums.SkillStatus.Locked;
+                skillTreeSkillDto.UpdatedAtUtc = null;
+            }
+
+            return skillTreeSkillDto;
+        }
     }
 }

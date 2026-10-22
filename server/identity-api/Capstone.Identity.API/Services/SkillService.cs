@@ -82,7 +82,7 @@ namespace Capstone.Identity.API.Services
 
             var discipline = new Discipline
             {
-                Name = request.Name
+                Name = name
             };
 
             _disciplineRepository.AddNewDiscipline(discipline);
@@ -93,6 +93,7 @@ namespace Capstone.Identity.API.Services
 
             return Result<DisciplineDto>.Success(discipline.ToDisciplineDto());
         }
+
         public async Task<Result<DisciplineDto>> UpdateDisciplineAsync(int disciplineId, DisciplineRequestDto request, Guid actingAdminId)
         {
             if (request == null)
@@ -178,12 +179,6 @@ namespace Capstone.Identity.API.Services
 
             var allSkills = await _skillRepository.GetAllSkillsAsync();
 
-            if (allSkills.Count() == 0)
-            {
-                _logger.LogWarning("No skills found.");
-                return Result<IReadOnlyList<DisciplineCatalogDto>>.Success(new List<DisciplineCatalogDto>());
-            }
-
             var catalogDtos = new List<DisciplineCatalogDto>();
 
             foreach (var discipline in allDisciplines)
@@ -226,19 +221,11 @@ namespace Capstone.Identity.API.Services
                     $"Discipline {request.DisciplineId} does not exist.", ResultErrorType.Validation);
             }
 
-            var name = discipline.Name.Trim();
-            
-            var disciplineIsExist = await _disciplineRepository.DisciplineExistsByName(name);
+            var skillName = request.Name.Trim();
 
-            if (disciplineIsExist == false)
+            if (await _skillRepository.ExistsByNameInDisciplineAsync((int) request.DisciplineId, skillName) == true)
             {
-                _logger.LogWarning("The discipline {DisciplineName} does not exist. ", name);
-                return Result<SkillDto>.Failure("Failed to create skill. Discipline does not exist.", ResultErrorType.NotFound);
-            }
-
-            if (await _skillRepository.ExistsByNameInDisciplineAsync((int) request.DisciplineId, name) == true)
-            {
-                _logger.LogWarning("Skill with the name {SkillName} already exists.", name);
+                _logger.LogWarning("Skill with the name {SkillName} already exists.", skillName);
                 return Result<SkillDto>.Failure("Failed to add skill. Name already in use.", ResultErrorType.Conflict);
             }
 
@@ -252,7 +239,7 @@ namespace Capstone.Identity.API.Services
 
             var skill = new Skill
             {
-                Name = name,
+                Name = skillName,
                 Description = request.Description.Trim(),
                 Benefits = benefits,
                 IsArchived = false,

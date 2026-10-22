@@ -13,7 +13,7 @@ namespace Capstone.Identity.API.Repositories
             _appDbContext = context;
         }
 
-        public async void AddNewProgressRow(ParticipantSkillProgress progress)
+        public void AddNewProgressRow(ParticipantSkillProgress progress)
         {
             _appDbContext.ParticipantSkillProgresses.Add(progress);
         }
