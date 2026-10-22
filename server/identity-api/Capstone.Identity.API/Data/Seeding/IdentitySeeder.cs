@@ -119,9 +119,9 @@ namespace Capstone.Identity.API.Data.Seeding
                 user = created.Data!;
             }
 
-            if (!await userManager.IsInRoleAsync(user, Roles.Admin))
+            if (!await userManager.IsInRoleAsync(user, Roles.Instructor))
             {
-                var result = await userManager.AddToRoleAsync(user, Roles.Admin);
+                var result = await userManager.AddToRoleAsync(user, Roles.Instructor);
                 if (!result.Succeeded)
                 {
                     throw new InvalidOperationException(
