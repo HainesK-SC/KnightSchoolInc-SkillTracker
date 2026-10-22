@@ -1,0 +1,146 @@
+.admin-skills-section {
+  margin-top: 26px;
+  padding: 0;
+  overflow: hidden;
+  border-top: 5px solid var(--color-crusades-gold);
+}
+
+.admin-skills-section .admin-panel-heading {
+  margin: 0;
+  padding: 24px 28px;
+  background:
+    linear-gradient(
+      110deg,
+      rgb(6 36 62 / 7%),
+      rgb(217 187 97 / 15%)
+    );
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-skills-section .admin-card-category {
+  margin: 0 0 5px;
+  color: var(--color-shield);
+  font-family: Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-skills-section .admin-panel-heading h2 {
+  margin: 0;
+  color: var(--color-royal-court);
+  font-size: 1.75rem;
+}
+
+.admin-skill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 78px;
+  padding: 7px 14px;
+  color: var(--color-royal-court);
+  background: rgb(217 187 97 / 28%);
+  border: 1px solid var(--color-crusades-gold);
+  border-radius: 999px;
+  font-family: Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.admin-skills-table {
+  table-layout: fixed;
+  font-family: Arial, sans-serif;
+}
+
+.admin-skills-table th {
+  padding: 14px 18px;
+  color: var(--color-royal-court);
+  background: #f5f1e7;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-skills-table th:nth-child(1) {
+  width: 18%;
+}
+
+.admin-skills-table th:nth-child(2) {
+  width: 42%;
+}
+
+.admin-skills-table th:nth-child(3) {
+  width: 14%;
+}
+
+.admin-skills-table th:nth-child(4) {
+  width: 26%;
+}
+
+.admin-skills-table td {
+  padding: 20px 18px;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.admin-skills-table td:first-child {
+  color: var(--color-royal-court);
+  font-size: 1rem;
+}
+
+.admin-skills-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-skill-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-skill-status-active {
+  color: #155724;
+  background: #d9f2df;
+  border: 1px solid #8ac79a;
+}
+
+.admin-skill-status-archived {
+  color: #5e6266;
+  background: #eceeef;
+  border: 1px solid #b8bdc2;
+}
+
+.admin-skill-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.admin-skill-actions .admin-secondary-button,
+.admin-skill-actions .admin-danger-button {
+  min-height: 40px;
+  margin: 0;
+  padding: 8px 12px;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .admin-skills-table {
+    min-width: 820px;
+  }
+
+  .admin-skill-actions {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+}
