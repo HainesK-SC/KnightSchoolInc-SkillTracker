@@ -15,10 +15,12 @@ namespace Capstone.Identity.API.Controllers
     public class ParticipantProgressController : ControllerBase
     {
         private readonly ISkillProgressService _skillProgressService;
+        private readonly ISkillTreeService _skillTreeService;
 
-        public ParticipantProgressController(ISkillProgressService skillProgressService)
+        public ParticipantProgressController(ISkillProgressService skillProgressService, ISkillTreeService skillTreeService)
         {
             _skillProgressService = skillProgressService;
+            _skillTreeService = skillTreeService;
         }
 
         [HttpPut("{userId:guid}/skills/{skillId:int}/progress")]
@@ -41,6 +43,19 @@ namespace Capstone.Identity.API.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpGet("{userId:guid}/skill-tree")]
+        public async Task<IActionResult> GetSkillTree(Guid userId)
+        {
+            var skillTree = await _skillTreeService.GetSkillTreeAsync(userId);
+
+            if (!skillTree.Succeeded)
+            {
+                return skillTree.ToProblemResult();
+            }
+            
+            return Ok(skillTree.Data);
         }
     }
 }
