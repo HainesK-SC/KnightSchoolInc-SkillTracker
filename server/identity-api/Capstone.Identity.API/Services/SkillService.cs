@@ -226,19 +226,19 @@ namespace Capstone.Identity.API.Services
                     $"Discipline {request.DisciplineId} does not exist.", ResultErrorType.Validation);
             }
 
-            var name = discipline.Name.Trim();
+            var disciplineName = discipline.Name.Trim();
             
-            var disciplineIsExist = await _disciplineRepository.DisciplineExistsByName(name);
+            var disciplineIsExist = await _disciplineRepository.DisciplineExistsByName(disciplineName);
 
             if (disciplineIsExist == false)
             {
-                _logger.LogWarning("The discipline {DisciplineName} does not exist. ", name);
+                _logger.LogWarning("The discipline {DisciplineName} does not exist. ", disciplineName);
                 return Result<SkillDto>.Failure("Failed to create skill. Discipline does not exist.", ResultErrorType.NotFound);
             }
 
-            if (await _skillRepository.ExistsByNameInDisciplineAsync((int) request.DisciplineId, name) == true)
+            if (await _skillRepository.ExistsByNameInDisciplineAsync((int) request.DisciplineId, disciplineName) == true)
             {
-                _logger.LogWarning("Skill with the name {SkillName} already exists.", name);
+                _logger.LogWarning("Skill with the name {SkillName} already exists.", disciplineName);
                 return Result<SkillDto>.Failure("Failed to add skill. Name already in use.", ResultErrorType.Conflict);
             }
 
@@ -250,9 +250,11 @@ namespace Capstone.Identity.API.Services
                 benefits = request.Benefits.Trim();
             }
 
+            var skillName = request.Name.Trim();
+
             var skill = new Skill
             {
-                Name = name,
+                Name = skillName,
                 Description = request.Description.Trim(),
                 Benefits = benefits,
                 IsArchived = false,
