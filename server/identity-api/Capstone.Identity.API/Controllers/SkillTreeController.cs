@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Capstone.Identity.API.Controllers
 {
-    [Route("api/[skills]")]
+    [Route("api/skills")]
     [ApiController]
     [Authorize]
     public class SkillTreeController : ControllerBase
@@ -30,7 +30,7 @@ namespace Capstone.Identity.API.Controllers
                 return result.ToProblemResult();
             }
 
-            return Ok(result);
+            return Ok(result.Data);
         }
     }
 }
