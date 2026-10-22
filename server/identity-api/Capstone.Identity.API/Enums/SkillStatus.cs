@@ -2,8 +2,8 @@
 {
     public enum SkillStatus
     {
+        Locked,
         InProgress,
-        Completed,
-        Locked
+        Completed
     }
 }
