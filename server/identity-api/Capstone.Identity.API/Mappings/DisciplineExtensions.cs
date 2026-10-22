@@ -28,5 +28,17 @@ namespace Capstone.Identity.API.Mappings
 
             return disciplineCatalogDto;
         }
+
+        public static SkillTreeDisciplineDto ToSkillTreeDisciplineDto(this Discipline discipline, List<SkillTreeSkillDto> skillTreeSkillDtos)
+        {
+            var skillTreeDisciplineDto = new SkillTreeDisciplineDto
+            {
+                DisciplineId = discipline.DisciplineId,
+                Name = discipline.Name,
+                Skills = skillTreeSkillDtos
+            };
+
+            return skillTreeDisciplineDto;
+        }
     }
 }
