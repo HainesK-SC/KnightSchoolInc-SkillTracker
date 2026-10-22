@@ -62,22 +62,21 @@ namespace Capstone.Identity.API.Services
 
             var progress = await _progressRepository.GetForUpdateAsync(userProfile.UserProfileId, skillId);
 
-            // Locked = undo. Allowed even on archived skills
+            // this can be used to undo progress given in error
+            // LockAsync will delete progress rows, if there are any
             if (status == SkillStatus.Locked)
             {
                 return await LockAsync(userId, skillId, progress, actingUserId);
             }
 
-            // Recording progress requires an active skill
             if (skill.IsArchived)
             {
                 return Result<ParticipantSkillProgressDto>.Failure("Progress can't be recorded on an archived skill.",
                     ResultErrorType.Validation);
             }
 
-            var now = _timeProvider.GetUtcNow().UtcDateTime;
+            var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
 
-            // No row yet: create one
             if (progress is null)
             {
                 var newProgress = new ParticipantSkillProgress
@@ -85,7 +84,7 @@ namespace Capstone.Identity.API.Services
                     UserProfileId = userProfile.UserProfileId,
                     SkillId = skillId,
                     Status = status,
-                    UpdatedAtUtc = now,
+                    UpdatedAtUtc = currentTime,
                     UpdatedById = actingUserId
                 };
 
@@ -100,7 +99,6 @@ namespace Capstone.Identity.API.Services
                     newProgress.ToParticipantSkillProgressDto(userId));
             }
 
-            // Same status: nothing to do, and the timestamp is left alone
             if (progress.Status == status)
             {
                 _logger.LogDebug(
@@ -111,11 +109,10 @@ namespace Capstone.Identity.API.Services
                     progress.ToParticipantSkillProgressDto(userId));
             }
 
-            // Different status: update the tracked row
             var oldStatus = progress.Status;
 
             progress.Status = status;
-            progress.UpdatedAtUtc = now;
+            progress.UpdatedAtUtc = currentTime;
             progress.UpdatedById = actingUserId;
 
             await _unitOfWork.SaveChangesAsync();
@@ -136,7 +133,6 @@ namespace Capstone.Identity.API.Services
         {
             var lockedDto = ParticipantSkillProgressMappings.ToLockedProgressDto(userId, skillId);
 
-            // Already Locked (no row): nothing to do
             if (progress is null)
             {
                 _logger.LogDebug(
