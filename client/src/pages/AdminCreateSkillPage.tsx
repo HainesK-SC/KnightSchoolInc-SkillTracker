@@ -47,12 +47,15 @@ function AdminCreateSkillPage() {
   }, []);
 
   async function handleSubmit(
+
+    
+    
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
     const form = new FormData(event.currentTarget);
-
+    
     const name = String(form.get("name") ?? "").trim();
     const description = String(
       form.get("description") ?? "",
@@ -63,7 +66,8 @@ function AdminCreateSkillPage() {
     const disciplineId = Number(form.get("disciplineId"));
 
     setErrorMessage("");
-
+    
+    
     if (!name || !description || !disciplineId) {
       setErrorMessage("Complete all required fields.");
       return;
@@ -178,22 +182,24 @@ function AdminCreateSkillPage() {
               </div>
 
               <div className="admin-form-group">
-                <label htmlFor="skillBenefits">
-                  Benefits
-                </label>
+             <label htmlFor="skillBenefits">
+            Therapeutic and developmental benefits
+            </label>
 
-                <textarea
-                  id="skillBenefits"
-                  name="benefits"
-                  rows={3}
-                  maxLength={150}
-                />
+            <textarea
+            id="skillBenefits"
+            name="benefits"
+            rows={4}
+            maxLength={150}
+            placeholder="Describe the therapeutic or developmental benefits of this skill."
+            />
 
-                <p className="admin-field-help">
-                  Optional. Explain what the participant gains by
-                  completing this skill.
-                </p>
-              </div>
+            <p className="admin-field-help">
+            Explain how this skill supports physical, cognitive, social, or
+            emotional development. Maximum 150 characters.
+            </p>
+            </div>
+
 
               <div className="admin-form-group">
                 <label htmlFor="skillDiscipline">

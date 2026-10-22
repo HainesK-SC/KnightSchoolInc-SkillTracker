@@ -4,7 +4,9 @@ import { Link } from "react-router";
 import { ApiError } from "../api/apiClient";
 import {
   archiveAdminSkill,
+  deleteAdminDiscipline,
   deleteAdminSkill,
+  getAdminDisciplines,
   getAdminSkillCatalog,
   unarchiveAdminSkill,
   type DisciplineCatalog,
@@ -18,11 +20,21 @@ import "./AdminSkillsPage.css";
 function AdminSkillsPage() {
   const [catalog, setCatalog] = useState<DisciplineCatalog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSkillId, setActiveSkillId] = useState<number | null>(
-    null,
-  );
+
+  const [activeSkillId, setActiveSkillId] = useState<
+    number | null
+  >(null);
+
+  const [activeDisciplineId, setActiveDisciplineId] = useState<
+    number | null
+  >(null);
+
   const [skillPendingDelete, setSkillPendingDelete] =
     useState<Skill | null>(null);
+
+  const [disciplinePendingDelete, setDisciplinePendingDelete] =
+    useState<DisciplineCatalog | null>(null);
+
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
 
@@ -31,8 +43,29 @@ function AdminSkillsPage() {
     setErrorMessage("");
 
     try {
-      const response = await getAdminSkillCatalog();
-      setCatalog(response);
+      const [catalogResponse, disciplinesResponse] =
+        await Promise.all([
+          getAdminSkillCatalog(),
+          getAdminDisciplines(),
+        ]);
+
+      const completeCatalog: DisciplineCatalog[] =
+        disciplinesResponse.map((discipline) => {
+          const matchingCatalogueDiscipline =
+            catalogResponse.find(
+              (catalogueDiscipline) =>
+                catalogueDiscipline.disciplineId ===
+                discipline.disciplineId,
+            );
+
+          return {
+            disciplineId: discipline.disciplineId,
+            name: discipline.name,
+            skills: matchingCatalogueDiscipline?.skills ?? [],
+          };
+        });
+
+      setCatalog(completeCatalog);
     } catch (error) {
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
@@ -76,7 +109,7 @@ function AdminSkillsPage() {
     }
   }
 
-  async function confirmDelete() {
+  async function confirmDeleteSkill() {
     if (!skillPendingDelete) {
       return;
     }
@@ -90,9 +123,7 @@ function AdminSkillsPage() {
     try {
       await deleteAdminSkill(skill.skillId);
 
-      setStatusMessage(`${skill.name} was deleted.`);
-      setSkillPendingDelete(null);
-
+      setStatusMessage(`${skill.name} was deleted successfully.`);
       await loadCatalog();
     } catch (error) {
       if (error instanceof ApiError) {
@@ -101,15 +132,50 @@ function AdminSkillsPage() {
         setErrorMessage("The skill could not be deleted.");
       }
     } finally {
+      setSkillPendingDelete(null);
       setActiveSkillId(null);
     }
   }
 
+  async function confirmDeleteDiscipline() {
+    if (!disciplinePendingDelete) {
+      return;
+    }
+
+    const discipline = disciplinePendingDelete;
+
+    setActiveDisciplineId(discipline.disciplineId);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      await deleteAdminDiscipline(discipline.disciplineId);
+
+      setStatusMessage(
+        `${discipline.name} was deleted successfully.`,
+      );
+
+      await loadCatalog();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("The discipline could not be deleted.");
+      }
+    } finally {
+      setDisciplinePendingDelete(null);
+      setActiveDisciplineId(null);
+    }
+  }
+
   return (
-    <div className="admin-page">
+    <div className="admin-page admin-skills-page">
       <header className="admin-header">
         <div className="admin-header-content">
-          <Link to="/admin" aria-label="Knight School dashboard">
+          <Link
+            to="/admin"
+            aria-label="Knight School dashboard"
+          >
             <img
               className="admin-logo"
               src={mainLogo}
@@ -122,21 +188,34 @@ function AdminSkillsPage() {
             aria-label="Administrator navigation"
           >
             <Link to="/admin">Dashboard</Link>
-            <Link to="/admin/skills" aria-current="page">
+
+            <Link
+              to="/admin/skills"
+              aria-current="page"
+            >
               Skills
             </Link>
+
             <Link to="/profile">My profile</Link>
           </nav>
         </div>
       </header>
 
       <main className="admin-main">
-        <Link className="admin-back-link" to="/admin">
+        <Link
+          className="admin-back-link"
+          to="/admin"
+        >
           ← Back to dashboard
         </Link>
 
-        <p className="admin-eyebrow">Training management</p>
-        <h1 className="admin-title">Skills Management</h1>
+        <p className="admin-eyebrow">
+          Training management
+        </p>
+
+        <h1 className="admin-title">
+          Skills Management
+        </h1>
 
         <p className="admin-description">
           Add, update, archive or remove Knight School skills and
@@ -154,9 +233,9 @@ function AdminSkillsPage() {
           <Link
             className="admin-secondary-button"
             to="/admin/disciplines/new"
-            >
+          >
             Add discipline
-        </Link>
+          </Link>
 
           <button
             className="admin-secondary-button"
@@ -169,141 +248,184 @@ function AdminSkillsPage() {
         </div>
 
         {errorMessage && (
-          <p className="admin-form-error" role="alert">
+          <p
+            className="admin-form-error"
+            role="alert"
+          >
             {errorMessage}
           </p>
         )}
 
         {statusMessage && (
-          <p className="admin-form-status" role="status">
+          <p
+            className="admin-form-status"
+            role="status"
+          >
             {statusMessage}
           </p>
         )}
 
         {isLoading && (
-          <section className="admin-panel" role="status">
+          <section
+            className="admin-panel"
+            role="status"
+          >
             <h2>Loading skill catalogue…</h2>
           </section>
         )}
 
         {!isLoading && catalog.length === 0 && (
           <section className="admin-panel">
-            <h2>No skills available</h2>
+            <h2>No disciplines available</h2>
+
             <p>
-              Create the first discipline and skill to begin the
-              Knight School catalogue.
+              Create the first discipline to begin the Knight
+              School catalogue.
             </p>
           </section>
         )}
 
         {!isLoading &&
-  catalog.map((discipline) => (
-    <section
-      className="admin-panel admin-skills-section"
-      key={discipline.disciplineId}
-    >
-      <div className="admin-panel-heading">
-        <div>
-          <p className="admin-card-category">
-            Discipline
-          </p>
+          catalog.map((discipline) => (
+            <section
+              className="admin-panel admin-skills-section"
+              key={discipline.disciplineId}
+            >
+              <div className="admin-panel-heading">
+                <div>
+                  <p className="admin-card-category">
+                    Discipline
+                  </p>
 
-          <h2>{discipline.name}</h2>
-        </div>
+                  <h2>{discipline.name}</h2>
+                </div>
 
-        <span className="admin-skill-count">
-          {discipline.skills.length}{" "}
-          {discipline.skills.length === 1
-            ? "skill"
-            : "skills"}
-        </span>
-      </div>
+                <div className="admin-skill-actions">
+                  <span className="admin-skill-count">
+                    {discipline.skills.length}{" "}
+                    {discipline.skills.length === 1
+                      ? "skill"
+                      : "skills"}
+                  </span>
 
-      {discipline.skills.length === 0 ? (
-        <p className="admin-skills-empty">
-          No skills have been added to this discipline.
-        </p>
-      ) : (
-        <div className="admin-table-wrapper">
-          <table className="admin-table admin-skills-table">
-            <thead>
-              <tr>
-                <th scope="col">Skill</th>
-                <th scope="col">Description</th>
-                <th scope="col">Status</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
+                  <button
+                    className="admin-danger-button"
+                    type="button"
+                    disabled={
+                      activeDisciplineId ===
+                      discipline.disciplineId
+                    }
+                    title="Delete this discipline"
+                    onClick={() =>
+                      setDisciplinePendingDelete(discipline)
+                    }
+                  >
+                    {activeDisciplineId ===
+                    discipline.disciplineId
+                      ? "Deleting…"
+                      : "Delete discipline"}
+                  </button>
+                </div>
+              </div>
 
-            <tbody>
-              {discipline.skills.map((skill) => (
-                <tr key={skill.skillId}>
-                  <td>
-                    <strong>{skill.name}</strong>
-                  </td>
+              {discipline.skills.length === 0 ? (
+                <p className="admin-skills-empty">
+                  No skills have been added to this discipline.
+                </p>
+              ) : (
+                <div className="admin-table-wrapper">
+                  <table className="admin-table admin-skills-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Skill</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Benefits</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                      </tr>
+                    </thead>
 
-                  <td>{skill.description}</td>
+                    <tbody>
+                      {discipline.skills.map((skill) => (
+                        <tr key={skill.skillId}>
+                          <td>
+                            <strong>{skill.name}</strong>
+                          </td>
 
-                  <td>
-                    <span
-                      className={`admin-skill-status ${
-                        skill.isArchived
-                          ? "admin-skill-status-archived"
-                          : "admin-skill-status-active"
-                      }`}
-                    >
-                      {skill.isArchived
-                        ? "Archived"
-                        : "Active"}
-                    </span>
-                  </td>
+                          <td>{skill.description}</td>
 
-                  <td>
-                    <div className="admin-skill-actions">
-                      <Link
-                        className="admin-secondary-button"
-                        to={`/admin/skills/${skill.skillId}/edit`}
-                      >
-                        Edit
-                      </Link>
+                          <td>
+                            {skill.benefits ||
+                              "No benefits provided"}
+                          </td>
 
-                      <button
-                        className="admin-secondary-button"
-                        type="button"
-                        disabled={
-                          activeSkillId === skill.skillId
-                        }
-                        onClick={() =>
-                          void handleArchive(skill)
-                        }
-                      >
-                        {skill.isArchived
-                          ? "Restore"
-                          : "Archive"}
-                      </button>
+                          <td>
+                            <span
+                              className={`admin-skill-status ${
+                                skill.isArchived
+                                  ? "admin-skill-status-archived"
+                                  : "admin-skill-status-active"
+                              }`}
+                            >
+                              {skill.isArchived
+                                ? "Archived"
+                                : "Active"}
+                            </span>
+                          </td>
 
-                      <button
-                        className="admin-danger-button"
-                        type="button"
-                        disabled={
-                          activeSkillId === skill.skillId
-                        }
-                        onClick={() => setSkillPendingDelete(skill)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </section>
-  ))}
+                          <td>
+                            <div className="admin-skill-actions">
+                              <Link
+                                className="admin-secondary-button"
+                                to={`/admin/skills/${skill.skillId}/edit`}
+                              >
+                                Edit
+                              </Link>
+
+                              <button
+                                className="admin-secondary-button"
+                                type="button"
+                                disabled={
+                                  activeSkillId ===
+                                  skill.skillId
+                                }
+                                onClick={() =>
+                                  void handleArchive(skill)
+                                }
+                              >
+                                {activeSkillId === skill.skillId
+                                  ? "Updating…"
+                                  : skill.isArchived
+                                    ? "Restore"
+                                    : "Archive"}
+                              </button>
+
+                              <button
+                                className="admin-danger-button"
+                                type="button"
+                                disabled={
+                                  activeSkillId ===
+                                  skill.skillId
+                                }
+                                onClick={() =>
+                                  setSkillPendingDelete(skill)
+                                }
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          ))}
       </main>
-        {skillPendingDelete && (
+
+      {skillPendingDelete && (
         <div className="admin-dialog-backdrop">
           <section
             className="admin-confirm-dialog"
@@ -322,7 +444,8 @@ function AdminSkillsPage() {
 
             <p id="delete-skill-description">
               This permanently removes the skill from the Knight
-              School catalogue. This action cannot be undone.
+              School catalogue. Skills with participant progress
+              cannot be deleted.
             </p>
 
             <div className="admin-dialog-actions">
@@ -338,7 +461,7 @@ function AdminSkillsPage() {
               <button
                 className="admin-danger-button"
                 type="button"
-                onClick={() => void confirmDelete()}
+                onClick={() => void confirmDeleteSkill()}
                 disabled={activeSkillId !== null}
               >
                 {activeSkillId !== null
@@ -350,7 +473,57 @@ function AdminSkillsPage() {
         </div>
       )}
 
+      {disciplinePendingDelete && (
+        <div className="admin-dialog-backdrop">
+          <section
+            className="admin-confirm-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-discipline-title"
+            aria-describedby="delete-discipline-description"
+          >
+            <p className="admin-card-category">
+              Permanent action
+            </p>
 
+            <h2 id="delete-discipline-title">
+              Delete {disciplinePendingDelete.name}?
+            </h2>
+
+            <p id="delete-discipline-description">
+              This permanently removes the discipline and eligible
+              skills. The operation will be rejected if participant
+              progress must be preserved.
+            </p>
+
+            <div className="admin-dialog-actions">
+              <button
+                className="admin-secondary-button"
+                type="button"
+                onClick={() =>
+                  setDisciplinePendingDelete(null)
+                }
+                disabled={activeDisciplineId !== null}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="admin-danger-button"
+                type="button"
+                onClick={() =>
+                  void confirmDeleteDiscipline()
+                }
+                disabled={activeDisciplineId !== null}
+              >
+                {activeDisciplineId !== null
+                  ? "Deleting…"
+                  : "Delete discipline"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

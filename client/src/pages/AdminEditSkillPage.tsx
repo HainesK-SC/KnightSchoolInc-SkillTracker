@@ -208,19 +208,25 @@ function AdminEditSkillPage() {
                 />
               </div>
 
-              <div className="admin-form-group">
-                <label htmlFor="editSkillBenefits">
-                  Benefits
-                </label>
+             <div className="admin-form-group">
+  <label htmlFor="editSkillBenefits">
+    Therapeutic and developmental benefits
+  </label>
 
-                <textarea
-                  id="editSkillBenefits"
-                  name="benefits"
-                  rows={3}
-                  maxLength={150}
-                  defaultValue={skill.benefits ?? ""}
-                />
-              </div>
+  <textarea
+    id="editSkillBenefits"
+    name="benefits"
+    rows={4}
+    maxLength={150}
+    defaultValue={skill.benefits ?? ""}
+    placeholder="Describe the therapeutic or developmental benefits of this skill."
+  />
+
+  <p className="admin-field-help">
+    Explain how this skill supports physical, cognitive, social, or
+    emotional development. Maximum 150 characters.
+  </p>
+</div>
 
               <div className="admin-form-group">
                 <label htmlFor="editSkillDiscipline">
