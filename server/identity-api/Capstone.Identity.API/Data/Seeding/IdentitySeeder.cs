@@ -17,6 +17,7 @@ namespace Capstone.Identity.API.Data.Seeding
             await SeedRolesAsync(provider, logger);
             await SeedAdminAsync(provider, logger);
             await SeedInstructorAsync(provider, logger);
+            await SeedRegularUsersAsync(provider, logger);
         }
 
         private static async Task SeedRolesAsync(IServiceProvider provider, ILogger logger)
@@ -130,6 +131,60 @@ namespace Capstone.Identity.API.Data.Seeding
 
                 logger.LogInformation("Granted Instructor role to user {UserId}.", user.Id);
             }
+        }
+
+        private static async Task SeedRegularUsersAsync(IServiceProvider provider, ILogger logger)
+        {
+            for (int i = 1; i <= 3; i++)
+            {
+                var userEmailString = $"User{i}Seed:Email";
+                var userPasswordString = $"User{i}Seed:Password";
+                var userFirstNameString = $"User{i}:FirstName";
+                var userLastNameString = $"User{i}:LastName";
+
+                var config = provider.GetRequiredService<IConfiguration>();
+                var email = config[userEmailString];
+                var password = config[userPasswordString];
+
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    logger.LogInformation($"User{i} seed skipped: User{i}Seed is not configured.");
+                    return;
+                }
+
+                var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+                var user = await userManager.FindByEmailAsync(email);
+
+                if (user is null)
+                {
+                    var userService = provider.GetRequiredService<IApplicationUserService>();
+                    var created = await userService.CreateUserWithProfileAsync(
+                        email,
+                        password,
+                        config[userFirstNameString] ?? "Regular",
+                        config[userLastNameString] ?? $"User{i}");
+
+                    if (!created.Succeeded)
+                    {
+                        throw new InvalidOperationException($"RegularUser{i} seed failed: {created.Error}");
+                    }
+
+                    user = created.Data!;
+                }
+
+                if (!await userManager.IsInRoleAsync(user, Roles.RegularUser))
+                {
+                    var result = await userManager.AddToRoleAsync(user, Roles.RegularUser);
+                    if (!result.Succeeded)
+                    {
+                        throw new InvalidOperationException(
+                            $"Failed to grant REGULAR_USER role: {string.Join(" ", result.Errors.Select(e => e.Description))}");
+                    }
+
+                    logger.LogInformation("Granted REGULAR_USER role to user {UserId}.", user.Id);
+                }
+            }
+
         }
     }
 }
