@@ -1,0 +1,363 @@
+.admin-progress-page .admin-search-panel {
+  margin-bottom: 24px;
+}
+
+.admin-progress-page .admin-search-form {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+}
+
+.admin-progress-page .admin-search-form .admin-form-actions {
+  margin: 0;
+}
+
+/* Selected participant */
+
+.admin-progress-participant {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin: 28px 0 20px;
+  padding: 26px 28px;
+  color: var(--color-white);
+  background:
+    linear-gradient(
+      120deg,
+      var(--color-royal-court),
+      #123f63
+    );
+  border-bottom: 5px solid var(--color-crusades-gold);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgb(6 36 62 / 14%);
+}
+
+.admin-progress-avatar {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-royal-court);
+  background: var(--color-crusades-gold);
+  border: 3px solid var(--color-white);
+  border-radius: 50%;
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.admin-progress-participant .admin-card-category {
+  margin: 0 0 5px;
+  color: var(--color-crusades-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.admin-progress-participant h2 {
+  margin: 0 0 5px;
+  color: var(--color-white);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.admin-progress-participant p:last-child {
+  margin: 0;
+  color: rgb(255 255 255 / 82%);
+}
+
+/* Progress totals */
+
+.admin-progress-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.admin-progress-summary article {
+  padding: 20px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-crusades-gold);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgb(6 36 62 / 7%);
+}
+
+.admin-progress-summary strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-royal-court);
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+}
+
+.admin-progress-summary span {
+  color: #53616b;
+  font-size: 0.9rem;
+}
+
+/* Disciplines */
+
+.admin-progress-disciplines {
+  display: grid;
+  gap: 24px;
+}
+
+.admin-progress-discipline {
+  overflow: hidden;
+  padding: 0;
+  border-top: 5px solid var(--color-crusades-gold);
+}
+
+.admin-progress-discipline-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 26px;
+  background:
+    linear-gradient(
+      115deg,
+      rgb(6 36 62 / 6%),
+      rgb(217 187 97 / 13%)
+    );
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-progress-discipline-heading .admin-card-category {
+  margin: 0 0 5px;
+  color: var(--color-shield);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.admin-progress-discipline-heading h2 {
+  margin: 0;
+  color: var(--color-royal-court);
+}
+
+.admin-progress-page .admin-skill-count {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  color: var(--color-royal-court);
+  background: rgb(217 187 97 / 22%);
+  border: 1px solid var(--color-crusades-gold);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Individual skills */
+
+.admin-progress-skill-list {
+  display: grid;
+}
+
+.admin-progress-skill {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 28px;
+  padding: 24px 26px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-progress-skill:last-child {
+  border-bottom: 0;
+}
+
+.admin-progress-skill:hover {
+  background: rgb(217 187 97 / 7%);
+}
+
+.admin-progress-skill-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.admin-progress-skill-heading h3 {
+  margin: 0;
+  color: var(--color-royal-court);
+  font-size: 1.2rem;
+}
+
+.admin-progress-skill-content > p {
+  margin: 0 0 10px;
+  color: #47545e;
+  line-height: 1.6;
+}
+
+.admin-progress-benefits {
+  padding: 11px 13px;
+  background: rgb(217 187 97 / 12%);
+  border-left: 4px solid var(--color-crusades-gold);
+  border-radius: 5px;
+}
+
+.admin-progress-skill-content .admin-progress-updated {
+  margin-bottom: 0;
+  color: #6b767e;
+  font-size: 0.82rem;
+}
+
+/* Status badges */
+
+.admin-progress-status {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-progress-status::before {
+  width: 7px;
+  height: 7px;
+  content: "";
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.admin-progress-status-completed {
+  color: #17652d;
+  background: #e1f4e6;
+  border: 1px solid #a8d9b5;
+}
+
+.admin-progress-status-in-progress {
+  color: #725200;
+  background: #fff2c4;
+  border: 1px solid #e5ca6c;
+}
+
+.admin-progress-status-locked {
+  color: #59636c;
+  background: #edf0f2;
+  border: 1px solid #cbd1d5;
+}
+
+/* Status controls */
+
+.admin-progress-controls {
+  align-self: center;
+  display: grid;
+  gap: 9px;
+  padding: 17px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+}
+
+.admin-progress-controls label {
+  color: var(--color-royal-court);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.admin-progress-controls select {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 11px;
+  color: var(--color-royal-court);
+  background: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: 7px;
+  font: inherit;
+}
+
+.admin-progress-controls select:focus {
+  border-color: var(--color-crusades-gold);
+  outline: 3px solid rgb(217 187 97 / 25%);
+}
+
+.admin-progress-controls .admin-button {
+  width: 100%;
+  margin: 0;
+}
+
+.admin-progress-controls select:disabled,
+.admin-progress-controls button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .admin-progress-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-progress-skill {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-progress-controls {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+
+  .admin-progress-controls label {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-progress-page .admin-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-progress-participant {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 23px;
+  }
+
+  .admin-progress-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-progress-discipline-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 21px;
+  }
+
+  .admin-progress-skill {
+    padding: 21px;
+  }
+
+  .admin-progress-skill-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-progress-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-progress-controls label {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .admin-progress-summary {
+    grid-template-columns: 1fr;
+  }
+}
