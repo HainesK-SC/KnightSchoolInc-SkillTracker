@@ -448,3 +448,410 @@ button.admin-secondary-button {
   cursor: not-allowed;
   opacity: 0.6;
 }
+/* =========================================================
+   USER ACCOUNT DIRECTORY
+   ========================================================= */
+
+.admin-directory-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.admin-directory-title-row .admin-description {
+  margin-bottom: 0;
+}
+
+.admin-directory-panel {
+  display: grid;
+  gap: 24px;
+}
+
+.admin-directory-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-directory-heading h2 {
+  margin: 4px 0 0;
+}
+
+.admin-directory-count {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  color: var(--color-royal-court);
+  background: rgb(217 187 97 / 20%);
+  border: 1px solid rgb(190 151 70 / 35%);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.admin-directory-filters {
+  display: grid;
+  grid-template-columns: minmax(240px, 2fr) minmax(180px, 1fr) auto;
+  align-items: end;
+  gap: 16px;
+  padding: 20px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.admin-directory-filters .admin-form-group {
+  margin: 0;
+}
+
+.admin-clear-filters {
+  min-height: 46px;
+}
+
+.admin-users-directory-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 330px), 1fr)
+  );
+  align-items: stretch;
+  gap: 20px;
+}
+
+.admin-directory-user-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-crusades-gold);
+  border-radius: 12px;
+  box-shadow: 0 7px 20px rgb(6 36 62 / 8%);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.admin-directory-user-card:hover {
+  box-shadow: 0 12px 26px rgb(6 36 62 / 13%);
+  transform: translateY(-2px);
+}
+
+.admin-directory-user-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background:
+    linear-gradient(
+      135deg,
+      rgb(6 36 62 / 7%),
+      rgb(217 187 97 / 10%)
+    );
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-directory-user-header .admin-account-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  max-width: 125px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-directory-user-header .admin-user-identity {
+  min-width: 0;
+  padding-top: 22px;
+}
+
+.admin-directory-user-header .admin-user-identity h3,
+.admin-directory-user-header .admin-user-identity p {
+  overflow-wrap: anywhere;
+}
+
+.admin-directory-user-details {
+  flex: 1;
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+
+.admin-directory-user-details > div {
+  display: grid;
+  gap: 7px;
+}
+
+.admin-directory-user-details > div > span:first-child {
+  color: var(--color-shield);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-directory-user-details strong {
+  color: var(--color-royal-court);
+}
+
+.admin-no-role {
+  color: #66717a;
+  font-style: italic;
+}
+
+.admin-directory-user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 18px 20px;
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-directory-user-actions > * {
+  flex: 1;
+}
+
+.admin-directory-state {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  padding: 34px;
+  text-align: center;
+  background: var(--color-background);
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+}
+
+.admin-directory-state h3,
+.admin-directory-state p {
+  margin: 0;
+}
+
+.admin-directory-delete {
+  margin-top: 24px;
+  padding: 24px;
+  background: #fff4f4;
+  border: 1px solid #df9b9b;
+  border-left: 5px solid #9e2828;
+  border-radius: 10px;
+}
+
+.admin-directory-delete h2 {
+  margin: 4px 0 10px;
+}
+
+.admin-directory-delete p {
+  margin-bottom: 0;
+}
+
+@media (max-width: 800px) {
+  .admin-directory-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-directory-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-clear-filters {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-directory-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-clear-filters {
+    grid-column: auto;
+  }
+
+  .admin-users-directory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-directory-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-directory-user-actions {
+    flex-direction: column;
+  }
+}
+/* =========================================================
+   USER DIRECTORY CARD VISUAL FIX
+   ========================================================= */
+
+.admin-directory-user-header {
+  position: relative;
+  min-height: 175px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 48px 20px 22px;
+  color: #fff;
+  background:
+    radial-gradient(
+      circle at 10% 20%,
+      rgb(217 187 97 / 18%),
+      transparent 190px
+    ),
+    linear-gradient(
+      135deg,
+      #092d49,
+      #14293a 60%,
+      #302631
+    );
+  border-bottom: 4px solid var(--color-crusades-gold);
+}
+
+/* Avatar */
+.admin-directory-user-header .admin-user-avatar {
+  width: 70px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  color: var(--color-royal-court);
+  background:
+    linear-gradient(
+      145deg,
+      #f2d679,
+      var(--color-crusades-gold)
+    );
+  border: 3px solid rgb(255 255 255 / 85%);
+  border-radius: 50%;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 28%);
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+/* Identity text */
+.admin-directory-user-header .admin-user-identity {
+  min-width: 0;
+  padding: 0;
+}
+
+.admin-directory-user-header .admin-user-label {
+  margin: 0 0 6px;
+  color: var(--color-crusades-gold);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-directory-user-header .admin-user-identity h3 {
+  margin: 0 0 7px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+}
+
+.admin-directory-user-header .admin-user-identity > p:last-child {
+  margin: 0;
+  color: rgb(255 255 255 / 78%);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Full status badge without cutting off the text */
+.admin-directory-user-header .admin-account-status {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  max-width: none;
+  overflow: visible;
+  padding: 6px 11px;
+  color: #195e32;
+  background: #d9f2df;
+  border: 1px solid #aad8b5;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: capitalize;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+/* Details section */
+.admin-directory-user-details {
+  padding: 22px 20px;
+}
+
+.admin-directory-user-details > div > span:first-child {
+  color: #66717a;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.admin-directory-user-details strong {
+  color: var(--color-royal-court);
+  font-size: 1rem;
+}
+
+/* Restore proper View/Edit button appearance */
+.admin-directory-user-actions .admin-action-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 15px;
+  color: #fff;
+  background: var(--color-royal-court);
+  border: 2px solid var(--color-royal-court);
+  border-radius: 7px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.admin-directory-user-actions .admin-action-link:hover {
+  color: var(--color-royal-court);
+  background: var(--color-crusades-gold);
+  border-color: var(--color-crusades-gold);
+  text-decoration: none;
+}
+
+/* Keep both action buttons aligned */
+.admin-directory-user-actions .admin-danger-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Long status text on smaller cards */
+@media (max-width: 430px) {
+  .admin-directory-user-header {
+    grid-template-columns: 1fr;
+    padding-top: 52px;
+    text-align: center;
+  }
+
+  .admin-directory-user-header .admin-user-avatar {
+    margin: 0 auto;
+  }
+
+  .admin-directory-user-header .admin-account-status {
+    right: 50%;
+    transform: translateX(50%);
+  }
+}

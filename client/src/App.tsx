@@ -15,7 +15,10 @@ import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegistrationPage from "./pages/RegistrationPage";
 import SkillTreePage from "./pages/SkillTreePage";
-
+import AdminSkillsPage from "./pages/AdminSkillsPage";
+import AdminCreateSkillPage from "./pages/AdminCreateSkillPage";
+import AdminCreateDisciplinePage from "./pages/AdminCreateDisciplinePage";
+import AdminEditSkillPage from "./pages/AdminEditSkillPage";
 function App() {
   return (
     <BrowserRouter>
@@ -54,6 +57,27 @@ function App() {
             path="/admin/progress"
             element={<AdminProgressPage />}
           />
+
+           <Route
+            path="/admin/skills"
+            element={<AdminSkillsPage />}
+          />
+
+          <Route
+          path="/admin/skills/new"
+          element={<AdminCreateSkillPage />}
+          />
+
+          <Route
+          path="/admin/disciplines/new"
+         element={<AdminCreateDisciplinePage />}
+          />
+
+          <Route
+          path="/admin/skills/:skillId/edit"
+          element={<AdminEditSkillPage />}
+          />
+
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />

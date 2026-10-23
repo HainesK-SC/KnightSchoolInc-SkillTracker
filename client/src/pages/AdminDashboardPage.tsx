@@ -111,6 +111,7 @@ function AdminDashboardPage() {
             </Link>
 
             <Link to="/profile">My profile</Link>
+            <Link to="/admin/skills">Skills</Link>
 
             <button
               className="admin-sign-out"
@@ -217,6 +218,25 @@ function AdminDashboardPage() {
               View profile
             </Link>
           </article>
+          <article className="admin-feature-card">
+  <         span className="admin-card-number" aria-hidden="true">
+            05
+          </span>
+
+          <p className="admin-card-category">
+            Training catalogue
+          </p>
+
+          <h3>Manage skills</h3>
+
+          <p>
+          Create, edit, archive and remove disciplines and skills.
+          </p>
+
+          <Link className="admin-card-link" to="/admin/skills">
+          Manage skills
+        </Link>
+        </article>
         </section>
 
        <section aria-labelledby="summary-heading">
