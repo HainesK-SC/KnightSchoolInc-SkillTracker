@@ -13,13 +13,20 @@ namespace Capstone.Identity.API.Services
         private readonly IDisciplineRepository _disciplineRepository;
         private readonly ISkillRepository _skillRepository;
         private readonly IParticipantSkillProgressRepository _participantSkillProgressRepository;
+        private readonly ILogger<SkillTreeService> _logger;
 
-        public SkillTreeService(IUserProfileRepository userProfileRepo, IDisciplineRepository disciplineRepository, ISkillRepository skillRepository, IParticipantSkillProgressRepository participantSkillProgressRepository)
+        public SkillTreeService(
+            IUserProfileRepository userProfileRepo, 
+            IDisciplineRepository disciplineRepository, 
+            ISkillRepository skillRepository, 
+            IParticipantSkillProgressRepository participantSkillProgressRepository,
+            ILogger<SkillTreeService> logger)
         {
             _userProfileRepo = userProfileRepo;
             _disciplineRepository = disciplineRepository;
             _skillRepository = skillRepository;
             _participantSkillProgressRepository = participantSkillProgressRepository;
+            _logger = logger;
         }
 
         public async Task<Result<SkillTreeDto>> GetSkillTreeAsync(Guid userId)
@@ -28,12 +35,18 @@ namespace Capstone.Identity.API.Services
 
             if (userProfile == null)
             {
-                return Result<SkillTreeDto>.Failure("Participant not found.", ResultErrorType.NotFound);
+                _logger.LogWarning("No user profile found for user: {UserId}. User doesn't exist.", userId);
+                return Result<SkillTreeDto>.Failure("User profile not found.", ResultErrorType.NotFound);
             }
 
             var allActiveSkill = await _skillRepository.GetAllActiveSkills();
             var allDisciplines = await _disciplineRepository.GetAllDisciplinesAsync();
             var userProgressRows = await _participantSkillProgressRepository.GetForUserAsync(userProfile.UserProfileId);
+
+            if (userProgressRows.Count() == 0)
+            {
+                _logger.LogInformation("User has no progress records for any skills");
+            }
 
             var progressRowsBySkillDict = new Dictionary<int, ParticipantSkillProgress>();
 
