@@ -33,6 +33,12 @@ services:
       AdminSeed__Password: ${ADMIN_PASSWORD}
       InstructorSeed__Email: ${INSTRUCTOR_EMAIL}
       InstructorSeed__Password: ${INSTRUCTOR_PASSWORD}
+      User1Seed__Email: ${USER1_EMAIL}
+      User1Seed__Password: ${USER1_PASSWORD}
+      User2Seed__Email: ${USER2_EMAIL}
+      User2Seed__Password: ${USER2_PASSWORD}
+      User3Seed__Email: ${USER3_EMAIL}
+      User3Seed__Password: ${USER3_PASSWORD}
       Database__ApplyMigrationsOnStartup: "true"
     depends_on:
       db:
