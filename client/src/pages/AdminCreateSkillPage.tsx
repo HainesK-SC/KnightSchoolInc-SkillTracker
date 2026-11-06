@@ -235,25 +235,21 @@ function AdminCreateSkillPage() {
               )}
 
               <div className="admin-form-actions">
-                <button
-                  className="admin-button"
-                  type="submit"
-                  disabled={
-                    isSubmitting || disciplines.length === 0
-                  }
-                >
-                  {isSubmitting
-                    ? "Creating skill…"
-                    : "Create skill"}
-                </button>
+  <button
+    className="site-button site-button-primary"
+    type="submit"
+    disabled={isSubmitting || disciplines.length === 0}
+  >
+    {isSubmitting ? "Creating skill…" : "Create skill"}
+  </button>
 
-                <Link
-                  className="admin-secondary-button"
-                  to="/admin/skills"
-                >
-                  Cancel
-                </Link>
-              </div>
+  <Link
+    className="site-button site-button-secondary"
+    to="/admin/skills"
+  >
+    Cancel
+  </Link>
+</div>
             </form>
           )}
         </section>

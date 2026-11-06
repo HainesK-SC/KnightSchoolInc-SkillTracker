@@ -19,6 +19,7 @@ import AdminSkillsPage from "./pages/AdminSkillsPage";
 import AdminCreateSkillPage from "./pages/AdminCreateSkillPage";
 import AdminCreateDisciplinePage from "./pages/AdminCreateDisciplinePage";
 import AdminEditSkillPage from "./pages/AdminEditSkillPage";
+import "./styles/Buttons.css";
 function App() {
   return (
     <BrowserRouter>
