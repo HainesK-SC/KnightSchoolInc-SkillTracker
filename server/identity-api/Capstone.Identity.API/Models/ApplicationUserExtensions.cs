@@ -1,4 +1,5 @@
-﻿using Capstone.Identity.API.Enums;
+﻿using Capstone.Identity.API.Dtos.Response;
+using Capstone.Identity.API.Enums;
 using Microsoft.Identity.Client;
 
 namespace Capstone.Identity.API.Models
@@ -20,6 +21,18 @@ namespace Capstone.Identity.API.Models
             }
 
             return accountStatus = AccountStatus.WalkUp;
+        }
+
+        public static ApplicationUserDto ToApplicationUserDto(ApplicationUser user)
+        {
+            var appUserDto = new ApplicationUserDto
+            {
+                UserEmail = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+
+            return appUserDto;
         }
     }
 }
