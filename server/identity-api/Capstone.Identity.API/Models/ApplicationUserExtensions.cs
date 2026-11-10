@@ -23,7 +23,7 @@ namespace Capstone.Identity.API.Models
             return accountStatus = AccountStatus.WalkUp;
         }
 
-        public static ApplicationUserDto ToApplicationUserDto(ApplicationUser user)
+        public static ApplicationUserDto ToApplicationUserDto(this ApplicationUser user)
         {
             var appUserDto = new ApplicationUserDto
             {
