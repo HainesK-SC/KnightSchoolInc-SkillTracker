@@ -3,6 +3,7 @@ using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Dtos.Admin;
 using Capstone.Identity.API.Dtos.Auth;
 using Capstone.Identity.API.Dtos.Request;
+using Capstone.Identity.API.Dtos.Response;
 using Capstone.Identity.API.Models;
 using Microsoft.AspNetCore.Identity.Data;
 
@@ -22,5 +23,6 @@ namespace Capstone.Identity.API.Services
         Task<Result<AdminUserDto>> GetUserForAdminAsync(Guid userId);
         Task<Result<AdminUserDto>> UpdateUserAsAdminAsync(Guid userId, UpdateUserRequestDto request, Guid actingAdminId);
         Task<Result<bool>> DeleteUserAsAdminAsync(Guid userId, Guid actingAdminId);
+        Task<Result<ApplicationUserDto>> GetUserByEmailAsync(string email);
     }
 }
