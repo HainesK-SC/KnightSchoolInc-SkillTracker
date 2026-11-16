@@ -27,7 +27,7 @@ namespace Capstone.Identity.API.Services
 
         public async Task<Result<EventDto>> CancelEventAsync(int eventId)
         {
-            var eventResult = await _eventRepo.GetEventByIdAsync(eventId);
+            var eventResult = await _eventRepo.GetEventByIdForUpdateAsync(eventId);
 
             if (eventResult == null)
             {
@@ -35,11 +35,12 @@ namespace Capstone.Identity.API.Services
                 return Result<EventDto>.Failure("No event found.", ResultErrorType.NotFound);
             }
 
-            var eventDto = eventResult.ToEventDto();
-
+            EventDto eventDto = new EventDto();
             if (eventResult.IsCancelled == false)
             {
                 eventResult.IsCancelled = true;
+                await _unitOfWork.SaveChangesAsync();
+                eventDto = eventResult.ToEventDto();
                 return Result<EventDto>.Success(eventDto);
             }
             else
@@ -59,6 +60,16 @@ namespace Capstone.Identity.API.Services
                 return Result<EventDto>.Failure("An error occurred. Please try again.", ResultErrorType.Unexpected);
             }
 
+            // checks to ensure the start date is BEFORE the end date
+            var eventStart = newEventDto.EventStart;
+            var eventEnd = newEventDto.EventEnd;
+            
+            if (eventStart > eventEnd)
+            {
+                _logger.LogError("The start date for the event cannot be after the end date.");
+                return Result<EventDto>.Failure("The start date must be before the end date.", ResultErrorType.Validation);
+            }
+
             // commented this out for now - I think this is a valid scenario
             // there could be multiple of the same event, planned on different dates  (recurring)
             // checking if an event with the same name exists
@@ -72,13 +83,17 @@ namespace Capstone.Identity.API.Services
             
             var newEvent = new Event
             {
-                EventName = newEventDto.EventName,
-                EventLocation = newEventDto.EventLocation,
-                Description = newEventDto.Description,
-                EventStart = newEventDto.EventStart,
-                EventEnd = newEventDto.EventEnd,
+                EventName = newEventDto.EventName.Trim(),
+                EventLocation = newEventDto.EventLocation.Trim(),
+                EventStart = newEventDto.EventStart.ToUniversalTime(),
+                EventEnd = newEventDto.EventEnd.ToUniversalTime(),
                 RegistrationType = newEventDto.RegistrationType
             };
+
+            if (newEventDto.Description == null || newEventDto.Description == string.Empty)
+            {
+                newEvent.Description = null;
+            }
 
             var addResult = await _eventRepo.AddEventAsync(newEvent);
     
@@ -137,12 +152,28 @@ namespace Capstone.Identity.API.Services
                 return Result<EventDto>.Failure("No event found.", ResultErrorType.NotFound);
             }
 
+            var descriptionUpdate = updateEventDto.Description;
+
             eventForUpdate.EventName = updateEventDto.EventName.Trim();
-            eventForUpdate.Description = updateEventDto.Description.Trim();
             eventForUpdate.EventLocation = updateEventDto.EventLocation.Trim();
             eventForUpdate.EventStart = updateEventDto.EventStart;
             eventForUpdate.EventEnd = updateEventDto.EventEnd;
             eventForUpdate.RegistrationType = updateEventDto.RegistrationType;
+
+            if (descriptionUpdate == null || descriptionUpdate == string.Empty)
+            {
+                eventForUpdate.Description = null;
+            }
+            else
+            {
+                eventForUpdate.Description = updateEventDto.Description.Trim();
+            }
+
+            if (eventForUpdate.EventStart > eventForUpdate.EventEnd)
+            {
+                _logger.LogError("Start date must be before the end date.");
+                return Result<EventDto>.Failure("The event start date must be before the end date.", ResultErrorType.Validation);
+            }
 
             await _unitOfWork.SaveChangesAsync();
 
