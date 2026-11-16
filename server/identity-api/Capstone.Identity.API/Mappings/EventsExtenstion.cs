@@ -9,6 +9,7 @@ namespace Capstone.Identity.API.Mappings
         {
             var eventDto = new EventDto
             {
+                EventId = eventToMap.EventId,
                 EventName = eventToMap.EventName,
                 EventLocation = eventToMap.EventLocation,
                 Description = eventToMap.Description,

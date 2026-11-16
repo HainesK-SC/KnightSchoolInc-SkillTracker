@@ -4,6 +4,7 @@ namespace Capstone.Identity.API.Dtos.Response
 {
     public class EventDto
     {
+        public int EventId { get; set; }
         public string EventName { get; set; } = string.Empty;
         public string EventLocation { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
