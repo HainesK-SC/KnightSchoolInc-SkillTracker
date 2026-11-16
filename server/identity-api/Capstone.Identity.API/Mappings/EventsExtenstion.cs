@@ -3,9 +3,9 @@ using Capstone.Identity.API.Models;
 
 namespace Capstone.Identity.API.Mappings
 {
-    public class EventsExtenstion
+    public static class EventsExtenstion
     {
-        public EventDto ToEventDto(Event eventToMap)
+        public static EventDto ToEventDto(this Event eventToMap)
         {
             var eventDto = new EventDto
             {
