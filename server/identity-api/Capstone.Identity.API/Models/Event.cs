@@ -8,9 +8,9 @@ namespace Capstone.Identity.API.Models
         public string EventName { get; set; } = string.Empty;
         public string EventLocation { get; set; } = string.Empty;
         public string? Description { get; set; }
-        DateTime EventStart { get; set; } = default;
-        DateTime EventEnd { get; set; } = default;
-        EventRegistrationType RegistrationType { get; set; }
+        public DateTime EventStart { get; set; } = default;
+        public DateTime EventEnd { get; set; } = default;
+        public EventRegistrationType RegistrationType { get; set; }
 
     }
 }
