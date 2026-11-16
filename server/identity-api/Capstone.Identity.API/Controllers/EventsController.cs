@@ -47,7 +47,7 @@ namespace Capstone.Identity.API.Controllers
 
             var eventDto = addEventResult.Data;
 
-            return Ok(eventDto);
+            return CreatedAtAction("GetEventById", new { id = eventDto.EventId, eventDto });
         }
 
         [HttpPut("{eventId:int}")]
