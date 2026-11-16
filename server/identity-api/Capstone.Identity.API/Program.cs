@@ -126,6 +126,7 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<IDisciplineRepository, DisciplineRepository>();
             builder.Services.AddScoped<ISkillRepository, SkillRepository>();
             builder.Services.AddScoped<IParticipantSkillProgressRepository, ParticipantSkillProgressRepository>();
+            builder.Services.AddScoped<IEventRepository, EventRepository>();
 
             // Service registrations
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -139,6 +140,7 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<ISkillProgressService, SkillProgressService>();
             builder.Services.AddSingleton(TimeProvider.System);
             builder.Services.AddScoped<ISkillTreeService, SkillTreeService>();
+            builder.Services.AddScoped<IEventService, EventService>();
 
             var app = builder.Build();
 
