@@ -10,5 +10,6 @@ namespace Capstone.Identity.API.Dtos.Request
         public DateTime EventStart { get; set; }
         public DateTime EventEnd { get; set; }
         public EventRegistrationType RegistrationType { get; set; }
+        public bool IsCancelled { get; set; } = false;
     }
 }
