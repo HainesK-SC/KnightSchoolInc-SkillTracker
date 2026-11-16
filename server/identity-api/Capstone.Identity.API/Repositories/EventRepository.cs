@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Capstone.Identity.API.Repositories
 {
-    public class EventRepository
+    public class EventRepository : IEventRepository
     {
         private readonly AppDbContext _dbContext;
 
