@@ -14,7 +14,7 @@ namespace Capstone.Identity.API.Mappings
                 Description = eventToMap.Description,
                 EventStart = eventToMap.EventStart,
                 EventEnd = eventToMap.EventEnd,
-                RegistrationType = eventToMap.RegistrationType
+                RegistrationType = eventToMap.RegistrationType,
                 IsCancelled = eventToMap.IsCancelled
     };
 
