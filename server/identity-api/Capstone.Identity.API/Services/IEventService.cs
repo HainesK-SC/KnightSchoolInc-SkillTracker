@@ -8,8 +8,8 @@ namespace Capstone.Identity.API.Services
     {
         Task<Result<EventDto>> CreateNewEventAsync(CreateEventDto newEvent);
         Task<Result<EventDto>> GetEventAsync(int eventId);
-        Task<Result<EventDto>> UpdateEventAsync(int eventId);
-        Task<Result<bool>> CancelEvent(int eventId);
+        Task<Result<EventDto>> UpdateEventAsync(int eventId, UpdateEventDto updateEventDto);
+        Task<Result<EventDto>> CancelEventAsync(int eventId);
         Task<Result<bool>> DeleteEvent(int eventId);
     }
 }
