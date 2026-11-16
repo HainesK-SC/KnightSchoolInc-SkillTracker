@@ -14,7 +14,7 @@ namespace Capstone.Identity.API.Repositories
             _dbContext = context;
         }
 
-        public async Task<Event> GetEventByIdAsync(int eventId)
+        public async Task<Event?> GetEventByIdAsync(int eventId)
         {
             // no EF tracking
             var eventById = await _dbContext.Events
@@ -23,7 +23,7 @@ namespace Capstone.Identity.API.Repositories
 
             return eventById;
         }
-        public async Task<Event> GetEventByIdForUpdateAsync(int eventId)
+        public async Task<Event?> GetEventByIdForUpdateAsync(int eventId)
         {
             // tracked by EF
             var eventForUpdate = await _dbContext.Events
@@ -42,7 +42,7 @@ namespace Capstone.Identity.API.Repositories
             _dbContext.Remove(removeEvent);
         }
 
-        public async Task<Event> GetEventByNameAsync(string eventName)
+        public async Task<Event?> GetEventByNameAsync(string eventName)
         {
            var eventByName = await _dbContext.Events
                 .AsNoTracking()
