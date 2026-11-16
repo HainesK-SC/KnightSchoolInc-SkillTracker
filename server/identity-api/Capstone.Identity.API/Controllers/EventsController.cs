@@ -39,7 +39,7 @@ namespace Capstone.Identity.API.Controllers
         public async Task<IActionResult> AddEventAsync(CreateEventDto newEventDto)
         {
             var addEventResult = await _eventService.CreateNewEventAsync(newEventDto);
-            
+
             if (addEventResult.Succeeded == false)
             {
                 return addEventResult.ToProblemResult();
@@ -66,7 +66,7 @@ namespace Capstone.Identity.API.Controllers
             return Ok(eventDto);
         }
 
-        [HttpDelete("{eventId:int")]
+        [HttpDelete("{eventId:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteEventAsync(int eventId)
         {
