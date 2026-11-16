@@ -58,6 +58,8 @@ namespace Capstone.Identity.API.Tests.Services
                 .Setup(r => r.GetForUserAsync(UserProfileId))
                 .ReturnsAsync(() => _progressRows);
 
+            _logger = new Mock<ILogger<SkillTreeService>>();
+
             _service = new SkillTreeService(
                 _userProfileRepository.Object,
                 _disciplineRepository.Object,
