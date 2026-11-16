@@ -41,5 +41,15 @@ namespace Capstone.Identity.API.Repositories
         {
             _dbContext.Remove(removeEvent);
         }
+
+        public async Task<Event> GetEventByNameAsync(string eventName)
+        {
+           var eventByName = await _dbContext.Events
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.EventName == eventName);
+
+            return eventByName;
+                
+        }
     }
 }

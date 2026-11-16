@@ -9,5 +9,6 @@ namespace Capstone.Identity.API.Repositories
         public Task<Event> GetEventByIdForUpdateAsync(int eventId); // tracked by EF
         public Task<Event> AddEventAsync(Event newEvent);
         public void RemoveEvent(Event removeEvent);
+        public Task<Event> GetEventByNameAsync(string name);
     }
 }
