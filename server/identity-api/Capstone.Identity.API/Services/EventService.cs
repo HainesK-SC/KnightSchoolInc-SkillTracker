@@ -85,10 +85,13 @@ namespace Capstone.Identity.API.Services
             {
                 EventName = newEventDto.EventName.Trim(),
                 EventLocation = newEventDto.EventLocation.Trim(),
-                EventStart = newEventDto.EventStart.ToUniversalTime(),
-                EventEnd = newEventDto.EventEnd.ToUniversalTime(),
+                EventStart = newEventDto.EventStart,
+                EventEnd = newEventDto.EventEnd,
                 RegistrationType = newEventDto.RegistrationType
             };
+
+            newEvent.EventStart = newEvent.EventStart.ToUniversalTime();
+            newEvent.EventEnd = newEvent.EventEnd.ToUniversalTime();
 
             if (newEventDto.Description == null || newEventDto.Description == string.Empty)
             {
