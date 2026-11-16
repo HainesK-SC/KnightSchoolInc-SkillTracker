@@ -7,8 +7,8 @@ namespace Capstone.Identity.API.Dtos.Request
         public string EventName { get; set; } = string.Empty;
         public string EventLocation {  get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
-        DateTime EventStart { get; set; }
-        DateTime EventEnd { get; set; }
-        EventRegistrationType RegistrationType { get; set; }
+        public DateTime EventStart { get; set; }
+        public DateTime EventEnd { get; set; }
+        public EventRegistrationType RegistrationType { get; set; }
     }
 }
