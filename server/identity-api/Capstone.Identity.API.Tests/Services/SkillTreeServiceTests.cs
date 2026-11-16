@@ -4,6 +4,7 @@ using Capstone.Identity.API.Enums;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Repositories;
 using Capstone.Identity.API.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Capstone.Identity.API.Tests.Services
@@ -21,6 +22,8 @@ namespace Capstone.Identity.API.Tests.Services
         private Mock<ISkillRepository> _skillRepository = null!;
         private Mock<IParticipantSkillProgressRepository> _progressRepository = null!;
         private SkillTreeService _service = null!;
+
+        private Mock<ILogger<SkillTreeService>> _logger = null;
 
         // What the mocked repositories return. Tests add to these before calling the service.
         private List<Discipline> _disciplines = [];
@@ -59,7 +62,8 @@ namespace Capstone.Identity.API.Tests.Services
                 _userProfileRepository.Object,
                 _disciplineRepository.Object,
                 _skillRepository.Object,
-                _progressRepository.Object);
+                _progressRepository.Object,
+                _logger.Object);
         }
 
         // ---------- Helpers ----------
