@@ -34,14 +34,16 @@ namespace Capstone.Identity.API.Services
                 return Result<EventDto>.Failure("An error occurred. Please try again.", ResultErrorType.Unexpected);
             }
 
+            // commented this out for now - I think this is a valid scenario
+            // there could be multiple of the same event, planned on different dates  (recurring)
             // checking if an event with the same name exists
-            var eventName = newEventDto.EventName.Trim().ToLower();
-            var isEventExists = _eventRepo.GetEventByNameAsync(eventName);
-            if (isEventExists != null)
-            {
-                _logger.LogInformation("An event already exists with this name.");
-                return Result<EventDto>.Failure("Naming conflict. An event with this name already exists.", ResultErrorType.Conflict);
-            }
+            //var eventName = newEventDto.EventName.Trim().ToLower();
+            //var isEventExists = _eventRepo.GetEventByNameAsync(eventName);
+            //if (isEventExists != null)
+            //{
+            //    _logger.LogInformation("An event already exists with this name.");
+            //    return Result<EventDto>.Failure("Naming conflict. An event with this name already exists.", ResultErrorType.Conflict);
+            //}
             
             var newEvent = new Event
             {
