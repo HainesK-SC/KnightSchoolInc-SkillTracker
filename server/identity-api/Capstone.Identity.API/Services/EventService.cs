@@ -177,7 +177,7 @@ namespace Capstone.Identity.API.Services
             eventForUpdate.EventEnd = eventEnd;
             eventForUpdate.RegistrationType = updateEventDto.RegistrationType.Value;
 
-            if (descriptionUpdate == null || string.IsNullOrWhiteSpace(newEventDto.Description)
+            if (descriptionUpdate == null || string.IsNullOrWhiteSpace(updateEventDto.Description))
             {
                 eventForUpdate.Description = null;
             }
