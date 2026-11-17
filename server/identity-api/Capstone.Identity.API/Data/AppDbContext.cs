@@ -90,6 +90,14 @@ namespace Capstone.Identity.API.Data
                 .Property(e => e.RegistrationType)
                 .HasConversion<string>()
                 .HasMaxLength(20);
+
+            builder.Entity<EventStaffAssignment>()
+                .HasOne<Event>().WithMany().HasForeignKey(a => a.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<EventStaffAssignment>()
+                .HasOne<ApplicationUser>().WithMany().HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
