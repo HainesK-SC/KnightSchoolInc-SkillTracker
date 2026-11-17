@@ -17,6 +17,7 @@ namespace Capstone.Identity.API.Data
         public DbSet<ParticipantSkillProgress> ParticipantSkillProgresses { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventStaffAssignment> EventsStaffAssignments { get; set; } 
+        public DbSet<EventSkill> EventSkills { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -97,6 +98,18 @@ namespace Capstone.Identity.API.Data
 
             builder.Entity<EventStaffAssignment>()
                 .HasOne<ApplicationUser>().WithMany().HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<EventSkill>()
+                .HasOne<Event>()
+                .WithMany()
+                .HasForeignKey(es => es.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<EventSkill>()
+                .HasOne<Skill>()
+                .WithMany()
+                .HasForeignKey(es => es.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
