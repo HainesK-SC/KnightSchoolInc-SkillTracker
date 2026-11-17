@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Capstone.Identity.API.Dtos.Request;
+using Capstone.Identity.API.Models;
 
 namespace Capstone.Identity.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin, Instructor")]
+    [Authorize(Roles = Roles.Admin + "," + Roles.Instructor)]
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;
@@ -20,7 +21,7 @@ namespace Capstone.Identity.API.Controllers
         }
 
         [HttpGet("{eventId:int}")]
-        public async Task<IActionResult> GetEventByIdAsync(int eventId)
+        public async Task<IActionResult> GetEventById(int eventId)
         {
             var eventResult = await _eventService.GetEventAsync(eventId);
 
@@ -35,8 +36,8 @@ namespace Capstone.Identity.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddEventAsync(CreateEventDto newEventDto)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> AddEvent(CreateEventDto newEventDto)
         {
             var addEventResult = await _eventService.CreateNewEventAsync(newEventDto);
 
@@ -47,12 +48,12 @@ namespace Capstone.Identity.API.Controllers
 
             var eventDto = addEventResult.Data;
 
-            return CreatedAtAction("GetEventById", new { id = eventDto.EventId, eventDto });
+            return CreatedAtAction(nameof(GetEventById), new { eventId = eventDto.EventId }, eventDto);
         }
 
         [HttpPut("{eventId:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateEventAsync(int eventId, UpdateEventDto updateEventDto)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> UpdateEvent(int eventId, UpdateEventDto updateEventDto)
         {
             var updateResult = await _eventService.UpdateEventAsync(eventId, updateEventDto);
 
@@ -67,8 +68,8 @@ namespace Capstone.Identity.API.Controllers
         }
 
         [HttpDelete("{eventId:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteEventAsync(int eventId)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> DeleteEvent(int eventId)
         {
             var deleteResult = await _eventService.DeleteEvent(eventId);
 
@@ -81,8 +82,8 @@ namespace Capstone.Identity.API.Controllers
         }
 
         [HttpPut("{eventId:int}/cancel")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CancelEventAsync(int eventId)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> CancelEvent(int eventId)
         {
             var cancelResult = await _eventService.CancelEventAsync(eventId);
 
