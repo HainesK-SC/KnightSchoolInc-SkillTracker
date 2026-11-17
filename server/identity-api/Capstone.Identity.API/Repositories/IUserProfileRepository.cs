@@ -7,5 +7,6 @@ namespace Capstone.Identity.API.Repositories
         Task<UserProfile?> GetUserProfileByUserIdAsync(Guid applicationUserId);
         void AddUserProfile(UserProfile profile);
         Task<UserProfile?> GetUserProfileByUserIdForUpdateAsync(Guid applicationUserId);
+        Task<UserProfile?> GetUserProfileByProfileIdAsync(int userProfileId);
     }
 }
