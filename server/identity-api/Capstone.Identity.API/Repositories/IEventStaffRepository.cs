@@ -6,8 +6,8 @@ namespace Capstone.Identity.API.Repositories
     {
         public Task<EventStaffAssignment> AddStaffAssignmentAsync(EventStaffAssignment staffAssignment);
         public void RemoveStaffAssignment(EventStaffAssignment staffAssignment);
-        public Task<IReadOnlyList<EventStaffAssignment>> GetEventStaffForEventAsync(int eventId);
-        public Task<List<EventStaffAssignment>> GetEventStaffAssignmentForUpdateAsync(int eventId);
-        public Task<bool> IsAssignedAsync(int eventId, int profileId);
+        public Task<List<EventStaffAssignment>> GetEventStaffForEventAsync(int eventId);
+        public Task<EventStaffAssignment> GetEventStaffAssignmentForUpdateAsync(int eventId, Guid userId);
+        public Task<bool> IsAssignedAsync(int eventId, Guid userId);
     }
 }

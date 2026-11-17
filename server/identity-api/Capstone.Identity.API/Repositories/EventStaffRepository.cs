@@ -20,16 +20,16 @@ namespace Capstone.Identity.API.Repositories
             return staffAssignment;
         }
 
-        public async Task<List<EventStaffAssignment>> GetEventStaffAssignmentForUpdateAsync(int eventId)
+        public async Task<EventStaffAssignment> GetEventStaffAssignmentForUpdateAsync(int eventId, Guid userId)
         {
             var eventStaffForUpdate = await _context.EventsStaffAssignments
-                .Where(a => a.EventId == eventId)
-                .ToListAsync();
+                .Where(a => a.EventId == eventId && a.UserId == userId)
+                .SingleOrDefaultAsync();
 
             return eventStaffForUpdate;
         }
 
-        public async Task<IReadOnlyList<EventStaffAssignment>> GetEventStaffForEventAsync(int eventId)
+        public async Task<List<EventStaffAssignment>> GetEventStaffForEventAsync(int eventId)
         {
             var eventStaff = await _context.EventsStaffAssignments
                 .Where(a => a.EventId == eventId)
@@ -39,13 +39,13 @@ namespace Capstone.Identity.API.Repositories
             return eventStaff;
         }
 
-        public async Task<bool> IsAssignedAsync(int eventId, int profileId)
+        public async Task<bool> IsAssignedAsync(int eventId, Guid userId)
         {
             var isAssigned = false;
 
             foreach (var e in _context.EventsStaffAssignments)
             {
-                if (e.EventId == eventId && e.UserProfileId == profileId)
+                if (e.EventId == eventId && e.UserId == userId)
                 {
                     isAssigned = true;
                 }

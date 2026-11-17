@@ -10,5 +10,12 @@ namespace Capstone.Identity.API.Repositories
         public Task<Event> AddEventAsync(Event newEvent);
         public void RemoveEvent(Event removeEvent);
         public Task<Event> GetEventByNameAsync(string name);
+        Task<IReadOnlyList<Event>> SearchEventsAsync(
+            string? search,
+            DateTime? fromUtc,
+            DateTime? toUtc,
+            bool includeCancelled,
+            Guid? staffUserId,
+            int maxResults);
     }
 }

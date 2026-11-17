@@ -14,15 +14,18 @@ namespace Capstone.Identity.API.Services
         private readonly IEventRepository _eventRepo;
         private readonly ILogger<EventService> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserProfileRepository _userProfileRepository;
 
         public EventService(
             IEventRepository eventRepository, 
             ILogger<EventService> logger,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IUserProfileRepository userProfileRepository)
         {
             _eventRepo = eventRepository;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _userProfileRepository = userProfileRepository;
         }
 
         public async Task<Result<EventDto>> CancelEventAsync(int eventId)
@@ -197,6 +200,62 @@ namespace Capstone.Identity.API.Services
             var eventDto = eventForUpdate.ToEventDto();
 
             return Result<EventDto>.Success(eventDto);
+        }
+
+        private const int MaxSearchResults = 50;
+        public async Task<Result<IReadOnlyList<EventDto>>> SearchEventsAsync(
+            EventSearchRequestDto request,
+            Guid callerUserId,
+            bool callerIsAdmin)
+        {
+            // Blank search box = no text filter
+            string? search = null;
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                search = request.Search.Trim();
+            }
+
+            DateTime? fromUtc = null;
+            if (request.From is not null)
+            {
+                fromUtc = request.From.Value.ToUniversalTime();
+            }
+
+            DateTime? toUtc = null;
+            if (request.To is not null)
+            {
+                toUtc = request.To.Value.ToUniversalTime();
+            }
+
+            if (fromUtc is not null && toUtc is not null && fromUtc > toUtc)
+            {
+                return Result<IReadOnlyList<EventDto>>.Failure(
+                    "The 'from' date must be before the 'to' date.", ResultErrorType.Validation);
+            }
+
+            // Admins see every event; instructors only see events they're assigned to
+            Guid? staffUserId = null;
+            if (!callerIsAdmin)
+            {
+                var profile = await _userProfileRepository.GetUserProfileByUserIdAsync(callerUserId);
+
+                if (profile is null)
+                {
+                    _logger.LogWarning("Event search by user {UserId} with no profile.", callerUserId);
+                    return Result<IReadOnlyList<EventDto>>.Success(new List<EventDto>());
+                }
+            }
+
+            var events = await _eventRepo.SearchEventsAsync(
+                search, fromUtc, toUtc, request.IncludeCancelled, staffUserId, MaxSearchResults);
+
+            var eventDtos = new List<EventDto>();
+            foreach (var foundEvent in events)
+            {
+                eventDtos.Add(foundEvent.ToEventDto());
+            }
+
+            return Result<IReadOnlyList<EventDto>>.Success(eventDtos);
         }
     }
 }

@@ -5,8 +5,8 @@ namespace Capstone.Identity.API.Services
 {
     public interface IEventStaffService
     {
-        Task<Result<EventStaffDto>> AssignStaffAsync(int eventId, int userProfileId, Guid actingAdminId);
-        Task<Result<EventStaffDto>> UnassignStaffAsync(int eventId, int userProfileId, Guid actingAdminId);
-        Task<Result<IReadOnlyList<EventStaffDto>>> GetEventStaffAsync(int eventId);
+        Task<Result<List<EventStaffDto>>> AssignStaffAsync(int eventId, Guid userId, Guid actingAdminId);
+        Task<Result<List<EventStaffDto>>> UnassignStaffAsync(int eventId, Guid userId, Guid actingAdminId);
+        Task<Result<List<EventStaffDto>>> GetEventStaffAsync(int eventId);
     }
 }

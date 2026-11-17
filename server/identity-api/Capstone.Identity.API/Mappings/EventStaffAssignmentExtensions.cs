@@ -11,7 +11,7 @@ namespace Capstone.Identity.API.Mappings
             {
                 Id = eventStaffAssignment.Id,
                 EventId = eventStaffAssignment.Id,
-                UserProfileId = eventStaffAssignment.UserProfileId,
+                UserId = eventStaffAssignment.UserId,
                 AssignedAtUtc = eventStaffAssignment.AssignedAtUtc,
                 AssignedBy = eventStaffAssignment.AssignedBy
             };

@@ -11,5 +11,9 @@ namespace Capstone.Identity.API.Services
         Task<Result<EventDto>> UpdateEventAsync(int eventId, UpdateEventDto updateEventDto);
         Task<Result<EventDto>> CancelEventAsync(int eventId);
         Task<Result<bool>> DeleteEvent(int eventId);
+        Task<Result<IReadOnlyList<EventDto>>> SearchEventsAsync(
+            EventSearchRequestDto request,
+            Guid callerUserId,
+            bool callerIsAdmin);
     }
 }

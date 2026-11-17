@@ -1,10 +1,11 @@
-﻿using Capstone.Identity.API.Services;
+﻿using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Common;
+using Capstone.Identity.API.Dtos.Request;
+using Capstone.Identity.API.Models;
+using Capstone.Identity.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Capstone.Identity.API.Dtos.Request;
-using Capstone.Identity.API.Models;
 
 namespace Capstone.Identity.API.Controllers
 {
@@ -95,6 +96,22 @@ namespace Capstone.Identity.API.Controllers
             var eventDto = cancelResult.Data;
 
             return Ok(eventDto);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchEvents([FromQuery] EventSearchRequestDto request)
+        {
+            var callerUserId = User.GetUserId();
+            var callerIsAdmin = User.IsInRole(Roles.Admin);
+
+            var result = await _eventService.SearchEventsAsync(request, callerUserId, callerIsAdmin);
+
+            if (!result.Succeeded)
+            {
+                return result.ToProblemResult();
+            }
+
+            return Ok(result.Data);
         }
     }
 }
