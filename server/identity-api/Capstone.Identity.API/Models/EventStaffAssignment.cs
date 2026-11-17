@@ -9,7 +9,7 @@ namespace Capstone.Identity.API.Models
         public int Id { get; set; }
         public int EventId { get; set; } = default;
         public Guid UserId { get; set; } = default;
-        public DateTime AssignedAtUtc = default;
-        public Guid AssignedBy = default;
+        public DateTime AssignedAtUtc { get; set; } = default;
+        public Guid AssignedBy { get; set; } = default;
     }
 }
