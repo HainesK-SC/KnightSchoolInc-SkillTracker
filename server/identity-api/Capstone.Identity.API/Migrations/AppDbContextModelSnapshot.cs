@@ -160,6 +160,30 @@ namespace Capstone.Identity.API.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventSkill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkillId");
+
+                    b.HasIndex("EventId", "SkillId")
+                        .IsUnique();
+
+                    b.ToTable("EventSkills");
+                });
+
             modelBuilder.Entity("Capstone.Identity.API.Models.EventStaffAssignment", b =>
                 {
                     b.Property<int>("Id")
@@ -432,6 +456,21 @@ namespace Capstone.Identity.API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventSkill", b =>
+                {
+                    b.HasOne("Capstone.Identity.API.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Capstone.Identity.API.Models.Skill", null)
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.EventStaffAssignment", b =>
