@@ -168,15 +168,23 @@ namespace Capstone.Identity.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("AssignedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("AssignedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserProfileId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId", "UserProfileId")
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("EventId", "UserId")
                         .IsUnique();
 
                     b.ToTable("EventsStaffAssignments");
@@ -424,6 +432,21 @@ namespace Capstone.Identity.API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventStaffAssignment", b =>
+                {
+                    b.HasOne("Capstone.Identity.API.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Capstone.Identity.API.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
