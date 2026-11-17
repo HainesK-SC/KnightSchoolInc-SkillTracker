@@ -160,6 +160,28 @@ namespace Capstone.Identity.API.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventStaffAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId", "UserProfileId")
+                        .IsUnique();
+
+                    b.ToTable("EventsStaffAssignments");
+                });
+
             modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
                 {
                     b.Property<int>("ParticipantSkillProgressId")
