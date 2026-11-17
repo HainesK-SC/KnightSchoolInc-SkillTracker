@@ -15,5 +15,6 @@ namespace Capstone.Identity.API.Repositories
         public Task<bool> ExistsByNameInDisciplineAsync(int disciplineId, string name, int? excludingId = null);
         public void RemoveSkill(Skill skill);
         public void RemoveSkills(IEnumerable<Skill> skills);
+        Task<IReadOnlyList<Skill>> GetSkillsByIdsAsync(IReadOnlyCollection<int> skillIds);
     }
 }
