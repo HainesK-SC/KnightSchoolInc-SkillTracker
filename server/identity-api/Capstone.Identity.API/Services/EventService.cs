@@ -46,7 +46,7 @@ namespace Capstone.Identity.API.Services
             else
             {
                 _logger.LogInformation("Event is already cancelled. No changes were made.");
-                return Result<EventDto>.Success(eventDto); // if it is already cancelled, the request should still return the DTO
+                return Result<EventDto>.Success(eventResult.ToEventDto()); // if it is already cancelled, the request should still return the DTO
             }
         }
 
@@ -64,7 +64,7 @@ namespace Capstone.Identity.API.Services
             var eventStart = newEventDto.EventStart!.Value.ToUniversalTime();
             var eventEnd = newEventDto.EventEnd.Value.ToUniversalTime();
             
-            if (eventStart > eventEnd)
+            if (eventStart >= eventEnd)
             {
                 _logger.LogError("The start date for the event cannot be after the end date.");
                 return Result<EventDto>.Failure("The start date must be before the end date.", ResultErrorType.Validation);
@@ -93,9 +93,13 @@ namespace Capstone.Identity.API.Services
             newEvent.EventStart = newEvent.EventStart.ToUniversalTime();
             newEvent.EventEnd = newEvent.EventEnd.ToUniversalTime();
 
-            if (newEventDto.Description == null || newEventDto.Description == string.Empty)
+            if (newEventDto.Description == null || string.IsNullOrWhiteSpace(newEventDto.Description))
             {
                 newEvent.Description = null;
+            }
+            else
+            {
+                newEvent.Description = newEventDto.Description.Trim();
             }
 
             var addResult = await _eventRepo.AddEventAsync(newEvent);
@@ -157,13 +161,23 @@ namespace Capstone.Identity.API.Services
 
             var descriptionUpdate = updateEventDto.Description;
 
+            // checks to ensure the start date is BEFORE the end date
+            var eventStart = updateEventDto.EventStart!.Value.ToUniversalTime();
+            var eventEnd = updateEventDto.EventEnd.Value.ToUniversalTime();
+
+            if (eventStart >= eventEnd)
+            {
+                _logger.LogError("The start date for the event cannot be after the end date.");
+                return Result<EventDto>.Failure("The start date must be before the end date.", ResultErrorType.Validation);
+            }
+
             eventForUpdate.EventName = updateEventDto.EventName.Trim();
             eventForUpdate.EventLocation = updateEventDto.EventLocation.Trim();
-            eventForUpdate.EventStart = updateEventDto.EventStart;
-            eventForUpdate.EventEnd = updateEventDto.EventEnd;
-            eventForUpdate.RegistrationType = updateEventDto.RegistrationType;
+            eventForUpdate.EventStart = eventStart;
+            eventForUpdate.EventEnd = eventEnd;
+            eventForUpdate.RegistrationType = updateEventDto.RegistrationType.Value;
 
-            if (descriptionUpdate == null || descriptionUpdate == string.Empty)
+            if (descriptionUpdate == null || string.IsNullOrWhiteSpace(newEventDto.Description)
             {
                 eventForUpdate.Description = null;
             }
