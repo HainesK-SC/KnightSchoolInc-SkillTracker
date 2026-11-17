@@ -122,6 +122,44 @@ namespace Capstone.Identity.API.Migrations
                     b.ToTable("Disciplines");
                 });
 
+            modelBuilder.Entity("Capstone.Identity.API.Models.Event", b =>
+                {
+                    b.Property<int>("EventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EventEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EventLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EventStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RegistrationType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("EventId");
+
+                    b.ToTable("Events");
+                });
+
             modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
                 {
                     b.Property<int>("ParticipantSkillProgressId")
