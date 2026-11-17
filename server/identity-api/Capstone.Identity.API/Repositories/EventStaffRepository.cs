@@ -1,5 +1,6 @@
 ﻿using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Models;
+using Capstone.Identity.API.Models.ReadModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Capstone.Identity.API.Repositories
@@ -29,14 +30,26 @@ namespace Capstone.Identity.API.Repositories
             return eventStaffForUpdate;
         }
 
-        public async Task<List<EventStaffAssignment>> GetEventStaffForEventAsync(int eventId)
+        public async Task<List<EventStaffMember>> GetEventStaffForEventAsync(int eventId)
         {
-            var eventStaff = await _context.EventsStaffAssignments
-                .Where(a => a.EventId == eventId)
-                .AsNoTracking()
-                .ToListAsync();
+            var staff =
+           from assignment in _context.EventsStaffAssignments
+           join user in _context.Users
+               on assignment.UserId equals user.Id
+           where assignment.EventId == eventId
+           orderby user.LastName, user.FirstName
+           select new EventStaffMember
+       {
+           Id = assignment.Id,
+           EventId = assignment.EventId,
+           UserId = assignment.UserId,
+           FirstName = user.FirstName,
+           LastName = user.LastName,
+           AssignedAtUtc = assignment.AssignedAtUtc,
+           AssignedBy = assignment.AssignedBy
+       };
 
-            return eventStaff;
+            return await staff.AsNoTracking().ToListAsync();
         }
 
         public async Task<bool> IsAssignedAsync(int eventId, Guid userId)
@@ -57,6 +70,11 @@ namespace Capstone.Identity.API.Repositories
         public void RemoveStaffAssignment(EventStaffAssignment staffAssignment)
         {
             _context.Remove(staffAssignment);
+        }
+
+        public Task<bool> AnyForEventAsync(int eventId)
+        {
+            return _context.EventsStaffAssignments.AnyAsync(a => a.EventId == eventId);
         }
     }
 }

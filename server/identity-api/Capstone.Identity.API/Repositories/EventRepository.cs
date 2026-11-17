@@ -98,6 +98,9 @@ namespace Capstone.Identity.API.Repositories
                     from assignment in _dbContext.EventsStaffAssignments
                     join user in _dbContext.ApplicationUsers
                         on assignment.UserId equals user.Id
+                    where user.FirstName.Contains(term)
+                        || user.LastName.Contains(term)
+                        || (user.FirstName + " " + user.LastName).Contains(term)
                     select assignment.EventId;
 
                 query = query.Where(e =>
