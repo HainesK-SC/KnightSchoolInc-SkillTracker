@@ -37,6 +37,12 @@ namespace Capstone.Identity.API.Services
 
         public async Task<Result<List<EventStaffDto>>> AssignStaffAsync(int eventId, Guid userId, Guid actingAdminId)
         {
+            var isAssigned = await _eventStaffRepo.IsAssignedAsync(eventId, userId);
+            if (isAssigned == true)
+            {
+                return await GetEventStaffAsync(eventId);
+            }
+
             var eventForUdpate = await _eventRepository.GetEventByIdAsync(eventId);
 
             if (eventForUdpate == null)
@@ -46,7 +52,7 @@ namespace Capstone.Identity.API.Services
             }
             
 
-            if (_userManager.FindByIdAsync(userId.ToString()) == null)
+            if (await _userManager.FindByIdAsync(userId.ToString()) == null)
             {
                 _logger.LogInformation("No user found with ID: {UserId}", userId);
                 return Result<List<EventStaffDto>>.Failure("The instructor being passed cannot be found.", ResultErrorType.NotFound);
@@ -103,17 +109,23 @@ namespace Capstone.Identity.API.Services
 
             var assignmentToRemove = await _eventStaffRepo.GetEventStaffAssignmentForUpdateAsync(eventId, userId);
 
-            _eventStaffRepo.RemoveStaffAssignment(assignmentToRemove);
+            if (assignmentToRemove != null)
+            {
+                _eventStaffRepo.RemoveStaffAssignment(assignmentToRemove);
+                await _unitOfWork.SaveChangesAsync();
+            }
 
-            await _unitOfWork.SaveChangesAsync();
-
-            var eventStaffDtos = await GetEventStaffAsync(eventId);
-
-            return Result<List<EventStaffDto>>.Success(eventStaffDtos.Data);
+            return await GetEventStaffAsync(eventId);
         }
 
         public async Task<Result<List<EventStaffDto>>> GetEventStaffAsync(int eventId)
         {
+            var existingEvent = await _eventRepository.GetEventByIdAsync(eventId);
+            if (existingEvent == null)
+            {
+                return Result<List<EventStaffDto>>.Failure("No event found.", ResultErrorType.NotFound);
+            }
+
             var eventStaff = await _eventStaffRepo.GetEventStaffForEventAsync(eventId);
             var eventStaffDtos = new List<EventStaffDto>();
             foreach (var e in eventStaff)

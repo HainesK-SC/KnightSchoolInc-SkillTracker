@@ -14,18 +14,18 @@ namespace Capstone.Identity.API.Services
         private readonly IEventRepository _eventRepo;
         private readonly ILogger<EventService> _logger;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUserProfileRepository _userProfileRepository;
+        private readonly IEventStaffRepository _eventStaffRepo;
 
         public EventService(
             IEventRepository eventRepository, 
             ILogger<EventService> logger,
             IUnitOfWork unitOfWork,
-            IUserProfileRepository userProfileRepository)
+            IEventStaffRepository eventStaffRepository)
         {
             _eventRepo = eventRepository;
             _logger = logger;
             _unitOfWork = unitOfWork;
-            _userProfileRepository = userProfileRepository;
+            _eventStaffRepo = eventStaffRepository;
         }
 
         public async Task<Result<EventDto>> CancelEventAsync(int eventId)
@@ -124,6 +124,13 @@ namespace Capstone.Identity.API.Services
             {
                 _logger.LogInformation("No Event found with ID: {EventId}", eventId);
                 return Result<bool>.Failure("No event found.", ResultErrorType.NotFound);
+            }
+
+            if (await _eventStaffRepo.AnyForEventAsync(eventId))
+            {
+                return Result<bool>.Failure(
+                    "This event has staff assigned. Cancel it instead, or unassign its staff first.",
+                    ResultErrorType.Conflict);
             }
 
             _eventRepo.RemoveEvent(eventResult);
@@ -237,13 +244,7 @@ namespace Capstone.Identity.API.Services
             Guid? staffUserId = null;
             if (!callerIsAdmin)
             {
-                var profile = await _userProfileRepository.GetUserProfileByUserIdAsync(callerUserId);
-
-                if (profile is null)
-                {
-                    _logger.LogWarning("Event search by user {UserId} with no profile.", callerUserId);
-                    return Result<IReadOnlyList<EventDto>>.Success(new List<EventDto>());
-                }
+                staffUserId = callerUserId;
             }
 
             var events = await _eventRepo.SearchEventsAsync(
