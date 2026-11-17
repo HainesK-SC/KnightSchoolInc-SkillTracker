@@ -61,8 +61,8 @@ namespace Capstone.Identity.API.Services
             }
 
             // checks to ensure the start date is BEFORE the end date
-            var eventStart = newEventDto.EventStart;
-            var eventEnd = newEventDto.EventEnd;
+            var eventStart = newEventDto.EventStart!.Value.ToUniversalTime();
+            var eventEnd = newEventDto.EventEnd.Value.ToUniversalTime();
             
             if (eventStart > eventEnd)
             {
@@ -85,9 +85,9 @@ namespace Capstone.Identity.API.Services
             {
                 EventName = newEventDto.EventName.Trim(),
                 EventLocation = newEventDto.EventLocation.Trim(),
-                EventStart = newEventDto.EventStart,
-                EventEnd = newEventDto.EventEnd,
-                RegistrationType = newEventDto.RegistrationType
+                EventStart = eventStart,
+                EventEnd = eventEnd,
+                RegistrationType = newEventDto.RegistrationType.Value
             };
 
             newEvent.EventStart = newEvent.EventStart.ToUniversalTime();

@@ -12,9 +12,9 @@ namespace Capstone.Identity.API.Dtos.Request
         public string EventLocation {  get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
         [Required]
-        public DateTime EventStart { get; set; }
+        public DateTime? EventStart { get; set; }
         [Required]
-        public DateTime EventEnd { get; set; }
-        public EventRegistrationType RegistrationType { get; set; }
+        public DateTime? EventEnd { get; set; }
+        public EventRegistrationType? RegistrationType { get; set; }
     }
 }
