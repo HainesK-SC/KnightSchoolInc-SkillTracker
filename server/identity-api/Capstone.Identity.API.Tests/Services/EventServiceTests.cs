@@ -29,22 +29,38 @@ namespace Capstone.Identity.API.Tests.Services
         private static readonly DateTime OriginalStartUtc = new(2026, 11, 1, 14, 0, 0, DateTimeKind.Utc);
         private static readonly DateTime OriginalEndUtc = new(2026, 11, 1, 20, 0, 0, DateTimeKind.Utc);
 
+        private static readonly Guid CallerUserId = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc");
+
         private Mock<IEventRepository> _eventRepository = null!;
+        private Mock<IEventStaffRepository> _staffRepository = null!;
         private Mock<IUnitOfWork> _unitOfWork = null!;
         private EventService _service = null!;
 
         private Event? _addedEvent;
+        private List<Event> _searchResults = [];
 
         [TestInitialize]
         public void TestInitialize()
         {
             _addedEvent = null;
+            _searchResults = [];
 
             _eventRepository = new Mock<IEventRepository>();
             _eventRepository
                 .Setup(r => r.AddEventAsync(It.IsAny<Event>()))
                 .Callback<Event>(e => _addedEvent = e)
                 .ReturnsAsync((Event e) => e);
+            _eventRepository
+                .Setup(r => r.SearchEventsAsync(
+                    It.IsAny<string?>(), It.IsAny<DateTime?>(), It.IsAny<DateTime?>(),
+                    It.IsAny<bool>(), It.IsAny<Guid?>(), It.IsAny<int>()))
+                .ReturnsAsync(() => _searchResults);
+
+            // Default: no staff assigned to any event
+            _staffRepository = new Mock<IEventStaffRepository>();
+            _staffRepository
+                .Setup(r => r.AnyForEventAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
 
             _unitOfWork = new Mock<IUnitOfWork>();
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
@@ -52,7 +68,20 @@ namespace Capstone.Identity.API.Tests.Services
             _service = new EventService(
                 _eventRepository.Object,
                 NullLogger<EventService>.Instance,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                _staffRepository.Object);
+        }
+
+        // Verifies the arguments the service passed to the repository's search
+        private void VerifySearchedWith(
+            string? search = null,
+            DateTime? fromUtc = null,
+            DateTime? toUtc = null,
+            bool includeCancelled = false,
+            Guid? staffUserId = null)
+        {
+            _eventRepository.Verify(r => r.SearchEventsAsync(
+                search, fromUtc, toUtc, includeCancelled, staffUserId, It.IsAny<int>()), Times.Once);
         }
 
         // ---------- Helpers ----------
@@ -490,6 +519,151 @@ namespace Capstone.Identity.API.Tests.Services
             Assert.IsTrue(result.Succeeded);
             _eventRepository.Verify(r => r.RemoveEvent(existing), Times.Once);
             VerifySavedOnce();
+        }
+
+        [TestMethod]
+        public async Task Delete_EventHasStaff_ReturnsConflict_AndRemovesNothing()
+        {
+            GivenEvent();
+            _staffRepository.Setup(r => r.AnyForEventAsync(EventId)).ReturnsAsync(true);
+
+            var result = await _service.DeleteEvent(EventId);
+
+            Assert.IsFalse(result.Succeeded);
+            Assert.AreEqual(ResultErrorType.Conflict, result.ErrorType);
+            _eventRepository.Verify(r => r.RemoveEvent(It.IsAny<Event>()), Times.Never);
+            VerifyNeverSaved();
+        }
+
+        [TestMethod]
+        public async Task Delete_ChecksStaff_ForThatEvent()
+        {
+            GivenEvent();
+
+            await _service.DeleteEvent(EventId);
+
+            _staffRepository.Verify(r => r.AnyForEventAsync(EventId), Times.Once);
+        }
+
+        // =====================================================================
+        // Search
+        // =====================================================================
+
+        [TestMethod]
+        public async Task Search_Admin_SeesAllEvents_NoStaffFilter()
+        {
+            await _service.SearchEventsAsync(new EventSearchRequestDto(), CallerUserId, callerIsAdmin: true);
+
+            VerifySearchedWith(staffUserId: null);
+        }
+
+        [TestMethod]
+        public async Task Search_Instructor_IsLimitedToTheirOwnAssignments()
+        {
+            // Regression: the staff filter was never set, so instructors saw every event
+            await _service.SearchEventsAsync(new EventSearchRequestDto(), CallerUserId, callerIsAdmin: false);
+
+            VerifySearchedWith(staffUserId: CallerUserId);
+        }
+
+        [TestMethod]
+        public async Task Search_TrimsSearchText()
+        {
+            await _service.SearchEventsAsync(
+                new EventSearchRequestDto { Search = "  toronto  " }, CallerUserId, callerIsAdmin: true);
+
+            VerifySearchedWith(search: "toronto");
+        }
+
+        [TestMethod]
+        [DataRow((string?)null)]
+        [DataRow("")]
+        [DataRow("   ")]
+        public async Task Search_BlankSearchText_MeansNoTextFilter(string? search)
+        {
+            await _service.SearchEventsAsync(
+                new EventSearchRequestDto { Search = search }, CallerUserId, callerIsAdmin: true);
+
+            VerifySearchedWith(search: null);
+        }
+
+        [TestMethod]
+        public async Task Search_ConvertsDatesToUtc()
+        {
+            await _service.SearchEventsAsync(
+                new EventSearchRequestDto { From = StartFromOffset, To = EndFromOffset }, CallerUserId, callerIsAdmin: true);
+
+            VerifySearchedWith(fromUtc: ExpectedStartUtc, toUtc: ExpectedEndUtc);
+        }
+
+        [TestMethod]
+        public async Task Search_FromAfterTo_ReturnsValidation_AndDoesNotQuery()
+        {
+            var result = await _service.SearchEventsAsync(
+                new EventSearchRequestDto { From = ExpectedEndUtc, To = ExpectedStartUtc }, CallerUserId, callerIsAdmin: true);
+
+            Assert.IsFalse(result.Succeeded);
+            Assert.AreEqual(ResultErrorType.Validation, result.ErrorType);
+            _eventRepository.Verify(r => r.SearchEventsAsync(
+                It.IsAny<string?>(), It.IsAny<DateTime?>(), It.IsAny<DateTime?>(),
+                It.IsAny<bool>(), It.IsAny<Guid?>(), It.IsAny<int>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task Search_OnlyOneDate_IsAllowed()
+        {
+            var result = await _service.SearchEventsAsync(
+                new EventSearchRequestDto { From = ExpectedStartUtc }, CallerUserId, callerIsAdmin: true);
+
+            Assert.IsTrue(result.Succeeded);
+            VerifySearchedWith(fromUtc: ExpectedStartUtc, toUtc: null);
+        }
+
+        [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public async Task Search_PassesIncludeCancelled(bool includeCancelled)
+        {
+            await _service.SearchEventsAsync(
+                new EventSearchRequestDto { IncludeCancelled = includeCancelled }, CallerUserId, callerIsAdmin: true);
+
+            VerifySearchedWith(includeCancelled: includeCancelled);
+        }
+
+        [TestMethod]
+        public async Task Search_AlwaysPassesAResultCap()
+        {
+            await _service.SearchEventsAsync(new EventSearchRequestDto(), CallerUserId, callerIsAdmin: true);
+
+            _eventRepository.Verify(r => r.SearchEventsAsync(
+                It.IsAny<string?>(), It.IsAny<DateTime?>(), It.IsAny<DateTime?>(),
+                It.IsAny<bool>(), It.IsAny<Guid?>(), It.Is<int>(max => max > 0)), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task Search_MapsResults()
+        {
+            _searchResults =
+            [
+                new Event { EventId = 1, EventName = "Spring Tournament", EventLocation = "Toronto", EventStart = OriginalStartUtc, EventEnd = OriginalEndUtc },
+                new Event { EventId = 2, EventName = "Fall Tournament", EventLocation = "Hamilton", EventStart = OriginalStartUtc, EventEnd = OriginalEndUtc }
+            ];
+
+            var result = await _service.SearchEventsAsync(new EventSearchRequestDto(), CallerUserId, callerIsAdmin: true);
+
+            Assert.IsTrue(result.Succeeded);
+            Assert.AreEqual(2, result.Data!.Count);
+            Assert.AreEqual(1, result.Data[0].EventId);
+            Assert.AreEqual("Fall Tournament", result.Data[1].EventName);
+        }
+
+        [TestMethod]
+        public async Task Search_NoResults_ReturnsSuccess_WithEmptyList()
+        {
+            var result = await _service.SearchEventsAsync(new EventSearchRequestDto(), CallerUserId, callerIsAdmin: false);
+
+            Assert.IsTrue(result.Succeeded);
+            Assert.AreEqual(0, result.Data!.Count);
         }
     }
 }
