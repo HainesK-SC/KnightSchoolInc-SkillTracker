@@ -12,5 +12,6 @@ namespace Capstone.Identity.API.Repositories
         Task<bool> AnyForEventAsync(int eventId);
         Task<bool> HasOverlappingEnrollmentAsync(int userProfileId, DateTime startUtc, DateTime endUtc, int excludingEventId);
         Task<IReadOnlyList<RosterEntry>> GetRosterAsync(int eventId, string? search, int maxResults);
+        Task<List<EventEnrollment>> GetForProfileForUpdateAsync(int userProfileId);
     }
 }

@@ -103,5 +103,13 @@ namespace Capstone.Identity.API.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        public Task<List<EventEnrollment>> GetForProfileForUpdateAsync(int userProfileId)
+        {
+            // Tracked: the merge moves or removes these rows
+            return _context.EventEnrollments
+                .Where(e => e.UserProfileId == userProfileId)
+                .ToListAsync();
+        }
     }
 }
