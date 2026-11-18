@@ -14,10 +14,12 @@ namespace Capstone.Identity.API.Controllers
     public class EventParticipantsController : ControllerBase
     {
         private readonly IEventEnrollmentService _enrollmentService;
+        private readonly IEventSkillProgressService _eventSkillProgressService;
 
-        public EventParticipantsController(IEventEnrollmentService enrollmentService)
+        public EventParticipantsController(IEventEnrollmentService enrollmentService, IEventSkillProgressService eventSkillProgressService)
         {
             _enrollmentService = enrollmentService;
+            _eventSkillProgressService = eventSkillProgressService;
         }
 
         // GET /api/events/{eventId}/participants?search=kyle
@@ -93,6 +95,37 @@ namespace Capstone.Identity.API.Controllers
             }
 
             return NoContent();
+        }
+
+        // GET /api/events/{eventId}/participants/{userId}/skills
+        [HttpGet("{userId:guid}/skills")]
+        public async Task<IActionResult> GetParticipantEventSkills(int eventId, Guid userId)
+        {
+            var result = await _eventSkillProgressService.GetParticipantEventSkillsAsync(
+                eventId, userId, User.GetUserId(), User.IsInRole(Roles.Admin));
+
+            if (!result.Succeeded)
+            {
+                return result.ToProblemResult();
+            }
+
+            return Ok(result.Data);
+        }
+
+        // PUT /api/events/{eventId}/participants/{userId}/skills/progress
+        [HttpPut("{userId:guid}/skills/progress")]
+        public async Task<IActionResult> SetEventSkillStatuses(
+            int eventId, Guid userId, SetEventSkillStatusesRequestDto request)
+        {
+            var result = await _eventSkillProgressService.SetEventSkillStatusesAsync(
+                eventId, userId, request, User.GetUserId(), User.IsInRole(Roles.Admin));
+
+            if (!result.Succeeded)
+            {
+                return result.ToProblemResult();
+            }
+
+            return Ok(result.Data);
         }
     }
 }
