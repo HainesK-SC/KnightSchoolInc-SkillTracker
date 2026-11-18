@@ -40,17 +40,15 @@ namespace Capstone.Identity.API.Services
             SetEventSkillsRequestDto request,
             Guid actingAdminId)
         {
-            // 1. The event must exist
             var existingEvent = await _eventRepository.GetEventByIdAsync(eventId);
             if (existingEvent == null)
             {
                 return Result<List<DisciplineCatalogDto>>.Failure("No event found.", ResultErrorType.NotFound);
             }
 
-            // 2. Ignore duplicate IDs in the request
             var requestedIds = request.SkillIds!.Distinct().ToList();
 
-            // 3. Every requested skill must exist and be active
+            // Every requested skill must exist and be active
             var requestedSkills = await _skillRepository.GetSkillsByIdsAsync(requestedIds);
 
             var foundIds = requestedSkills.Select(s => s.SkillId).ToList();
@@ -70,7 +68,7 @@ namespace Capstone.Identity.API.Services
                     ResultErrorType.Validation);
             }
 
-            // 4. Wipe the current list, then add the requested one, in one transaction
+            // Wipe the current list, then add the requested one, in one transaction
             var currentRows = await _eventSkillRepository.GetEventSkillsForUpdateAsync(eventId);
 
             var newRows = new List<EventSkill>();
@@ -94,7 +92,6 @@ namespace Capstone.Identity.API.Services
                 "Event {EventId} skills set to {SkillCount} skills (was {PreviousCount}) by admin {AdminId}",
                 eventId, newRows.Count, currentRows.Count, actingAdminId);
 
-            // 5. Return the updated list, read the same way the GET endpoint does
             return await GetEventSkillsAsync(eventId, actingAdminId, callerIsAdmin: true);
         }
 
@@ -103,14 +100,13 @@ namespace Capstone.Identity.API.Services
             Guid callerUserId,
             bool callerIsAdmin)
         {
-            // 1. The event must exist
             var existingEvent = await _eventRepository.GetEventByIdAsync(eventId);
             if (existingEvent == null)
             {
                 return Result<List<DisciplineCatalogDto>>.Failure("No event found.", ResultErrorType.NotFound);
             }
 
-            // 2. Instructors can only see events they're assigned to (404, so they can't probe others)
+            // Instructors can only see events they're assigned to
             if (!callerIsAdmin)
             {
                 var isAssigned = await _eventStaffRepository.IsAssignedAsync(eventId, callerUserId);
@@ -120,11 +116,11 @@ namespace Capstone.Identity.API.Services
                 }
             }
 
-            // 3. The event's active skills, plus all disciplines for their names
+            // The event's active skills, plus all disciplines for their names
             var eventSkills = await _eventSkillRepository.GetActiveSkillsForEventAsync(eventId);
             var allDisciplines = await _disciplineRepository.GetAllDisciplinesAsync();
 
-            // 4. Group the skills by discipline (same pattern as the skill tree)
+            // Group the skills by discipline (same pattern as the skill tree)
             var skillsByDisciplineId = eventSkills
                 .GroupBy(s => s.DisciplineId)
                 .ToDictionary(group => group.Key, group => group.ToList());
