@@ -36,7 +36,7 @@ namespace Capstone.Identity.API.Controllers
             return Ok(result.Data);
         }
 
-        [HttpPost("{userId:guid}")]
+        [HttpPost("staff/{userId:guid}")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> AssignStaff(int eventId, Guid userId)
         {
@@ -50,7 +50,7 @@ namespace Capstone.Identity.API.Controllers
             return Ok(result.Data);
         }
 
-        [HttpDelete("{userId:guid}")]
+        [HttpDelete("staff/{userId:guid}")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UnassignStaff(int eventId, Guid userId)
         {
@@ -64,7 +64,7 @@ namespace Capstone.Identity.API.Controllers
             return Ok(result.Data);
         }
 
-        [HttpGet("skills}")]
+        [HttpGet("{skills}")]
         public async Task<IActionResult> GetEventSkills(int eventId)
         {
             var adminId = User.GetUserId();
