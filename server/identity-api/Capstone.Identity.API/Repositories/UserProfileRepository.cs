@@ -15,11 +15,11 @@ namespace Capstone.Identity.API.Repositories
 
         public async Task<UserProfile?> GetUserProfileByUserIdAsync(Guid applicationUserId)
         {
-            var userProfile = _context.UserProfiles
+            var userProfile = await _context.UserProfiles
                 .AsNoTracking()
                 .SingleOrDefaultAsync(p => p.ApplicationUserId == applicationUserId);
 
-            return userProfile.Result;
+            return userProfile;
         }
 
         public void AddUserProfile(UserProfile profile)
@@ -27,10 +27,17 @@ namespace Capstone.Identity.API.Repositories
             _context.UserProfiles.Add(profile);
         }
 
-        public Task<UserProfile?> GetByApplicationUserIdForUpdateAsync(Guid applicationUserId)
+        public async Task<UserProfile?> GetUserProfileByUserIdForUpdateAsync(Guid applicationUserId)
         {
-            return _context.UserProfiles
+            return await _context.UserProfiles
                 .SingleOrDefaultAsync(p => p.ApplicationUserId == applicationUserId);
+        }
+
+        public async Task<UserProfile?> GetUserProfileByProfileIdAsync(int userProfileId)
+        {
+            var userProfile = await _context.UserProfiles.SingleOrDefaultAsync(p => p.UserProfileId == userProfileId);
+
+            return userProfile;
         }
     }
 }

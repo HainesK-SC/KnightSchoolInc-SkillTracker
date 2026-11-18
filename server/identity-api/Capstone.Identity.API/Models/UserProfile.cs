@@ -13,9 +13,6 @@ namespace Capstone.Identity.API.Models
         public DisplayNameSalutations DisplayNameSalutation { get; set; }
         public DisplayNameModifiers DisplayNameModifier { get; set; }
 
-        // Props to add later 
-        // ICollection<ParticipantSkillProgress> - navigational
-
         // FK Reference
         public Guid ApplicationUserId { get; set; }
     }

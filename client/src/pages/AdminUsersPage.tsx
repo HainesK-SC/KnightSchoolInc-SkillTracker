@@ -1,5 +1,10 @@
-import { useState, type FormEvent } from "react";
-import { Link } from "react-router";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Link, useNavigate } from "react-router";
 
 import { ApiError } from "../api/apiClient";
 import {
@@ -11,82 +16,159 @@ import mainLogo from "../assets/branding/main-logo.svg";
 import "./AdminDashboardPage.css";
 import "./AdminManagementPage.css";
 
+function formatRole(role: string) {
+  if (role === "REGULAR_USER") {
+    return "Participant";
+  }
+
+  return role
+    .toLowerCase()
+    .split("_")
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join(" ");
+}
+
+function formatAccountStatus(status: string | number) {
+  if (typeof status === "number") {
+    return `Status ${status}`;
+  }
+
+  return status
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replaceAll("_", " ");
+}
+
+function getInitials(user: AdminUser) {
+  return `${user.firstName.charAt(0)}${user.lastName.charAt(
+    0,
+  )}`.toUpperCase();
+}
+
 function AdminUsersPage() {
-  const [email, setEmail] = useState("");
-  const [selectedUser, setSelectedUser] =
+  const navigate = useNavigate();
+
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+  const [deleteTarget, setDeleteTarget] =
     useState<AdminUser | null>(null);
-  const [statusMessage, setStatusMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isConfirmingDelete, setIsConfirmingDelete] =
-    useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
 
-  async function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const normalizedEmail = email.trim().toLowerCase();
-
-    setSelectedUser(null);
-    setStatusMessage("");
+  const loadUsers = useCallback(async () => {
+    setIsLoading(true);
     setErrorMessage("");
-    setIsConfirmingDelete(false);
-    setHasSearched(true);
-    setIsSearching(true);
 
     try {
-      const users = await getAdminUsers();
+      const response = await getAdminUsers();
 
-      const matchingUser = users.find(
-        (user) =>
-          user.email?.trim().toLowerCase() === normalizedEmail,
+      const sortedUsers = [...response].sort((first, second) =>
+        first.displayName.localeCompare(second.displayName),
       );
 
-      if (!matchingUser) {
-        setStatusMessage(
-          "No user account was found with that email address.",
-        );
+      setUsers(sortedUsers);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        navigate("/login", { replace: true });
         return;
       }
 
-      setSelectedUser(matchingUser);
-      setStatusMessage("User account found.");
-    } catch (error) {
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
       } else {
         setErrorMessage(
-          "The user search could not be completed. Please try again.",
+          "The user directory could not be loaded. Please try again.",
         );
       }
     } finally {
-      setIsSearching(false);
+      setIsLoading(false);
     }
+  }, [navigate]);
+
+  useEffect(() => {
+    void loadUsers();
+  }, [loadUsers]);
+
+  const filteredUsers = useMemo(() => {
+    const normalizedSearch = searchTerm
+      .trim()
+      .toLowerCase();
+
+    return users.filter((user) => {
+      const matchesSearch =
+        normalizedSearch.length === 0 ||
+        user.displayName
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        user.firstName
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        user.lastName
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        user.email
+          ?.toLowerCase()
+          .includes(normalizedSearch);
+
+      const matchesRole =
+        roleFilter === "ALL" ||
+        user.roles.includes(roleFilter);
+
+      return matchesSearch && matchesRole;
+    });
+  }, [roleFilter, searchTerm, users]);
+
+  function clearFilters() {
+    setSearchTerm("");
+    setRoleFilter("ALL");
+    setErrorMessage("");
+    setStatusMessage("");
+  }
+
+  function beginDelete(user: AdminUser) {
+    setDeleteTarget(user);
+    setErrorMessage("");
+    setStatusMessage("");
   }
 
   async function handleDeleteUser() {
-    if (!selectedUser) {
+    if (!deleteTarget) {
       return;
     }
 
-    const deletedDisplayName = selectedUser.displayName;
+    const deletedUserId = deleteTarget.id;
+    const deletedDisplayName = deleteTarget.displayName;
 
+    setIsDeleting(true);
     setErrorMessage("");
     setStatusMessage("");
-    setIsDeleting(true);
 
     try {
-      await deleteAdminUser(selectedUser.id);
+      await deleteAdminUser(deletedUserId);
 
-      setSelectedUser(null);
-      setEmail("");
-      setHasSearched(false);
-      setIsConfirmingDelete(false);
+      setUsers((currentUsers) =>
+        currentUsers.filter(
+          (user) => user.id !== deletedUserId,
+        ),
+      );
+
+      setDeleteTarget(null);
+
       setStatusMessage(
         `${deletedDisplayName} was deleted successfully.`,
       );
     } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
       } else {
@@ -99,20 +181,14 @@ function AdminUsersPage() {
     }
   }
 
-  function clearSearch() {
-    setEmail("");
-    setSelectedUser(null);
-    setStatusMessage("");
-    setErrorMessage("");
-    setIsConfirmingDelete(false);
-    setHasSearched(false);
-  }
-
   return (
     <div className="admin-page">
       <header className="admin-header">
         <div className="admin-header-content">
-          <Link to="/admin" aria-label="Knight School admin dashboard">
+          <Link
+            to="/admin"
+            aria-label="Knight School admin dashboard"
+          >
             <img
               className="admin-logo"
               src={mainLogo}
@@ -120,7 +196,10 @@ function AdminUsersPage() {
             />
           </Link>
 
-          <nav className="admin-navigation" aria-label="Admin navigation">
+          <nav
+            className="admin-navigation"
+            aria-label="Admin navigation"
+          >
             <Link to="/admin">Dashboard</Link>
             <Link to="/admin/users/new">Create user</Link>
             <Link to="/profile">My profile</Link>
@@ -133,227 +212,321 @@ function AdminUsersPage() {
           ← Back to dashboard
         </Link>
 
-        <p className="admin-eyebrow">User management</p>
-        <h1 className="admin-title">Manage Existing Users</h1>
+        <div className="admin-directory-title-row">
+          <div>
+            <p className="admin-eyebrow">User management</p>
 
-        <p className="admin-description">
-          Search for a user by email address to view, edit or delete their
-          account.
-        </p>
+            <h1 className="admin-title">
+              Manage Existing Users
+            </h1>
+
+            <p className="admin-description">
+              View, search, edit, or delete Knight School
+              accounts.
+            </p>
+          </div>
+
+          <Link
+            className="admin-button admin-action-link"
+            to="/admin/users/new"
+          >
+            Create user
+          </Link>
+        </div>
+
+        {errorMessage && (
+          <p className="admin-form-error" role="alert">
+            {errorMessage}
+          </p>
+        )}
+
+        {statusMessage && (
+          <p className="admin-form-status" role="status">
+            {statusMessage}
+          </p>
+        )}
 
         <section
-          className="admin-panel admin-search-panel"
-          aria-labelledby="search-user-heading"
+          className="admin-panel admin-directory-panel"
+          aria-labelledby="user-directory-heading"
         >
-          <h2 id="search-user-heading">Search for a user</h2>
+          <div className="admin-directory-heading">
+            <div>
+              <p className="admin-card-category">
+                Account directory
+              </p>
 
-          <form className="admin-search-form" onSubmit={handleSearch}>
+              <h2 id="user-directory-heading">All users</h2>
+            </div>
+
+            <span className="admin-directory-count">
+              {filteredUsers.length} of {users.length} shown
+            </span>
+          </div>
+
+          <div className="admin-directory-filters">
             <div className="admin-form-group">
-              <label htmlFor="userSearchEmail">Email address</label>
+              <label htmlFor="userDirectorySearch">
+                Search accounts
+              </label>
 
               <input
-                id="userSearchEmail"
-                name="email"
-                type="email"
+                id="userDirectorySearch"
+                name="search"
+                type="search"
                 autoComplete="off"
-                maxLength={256}
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
+                placeholder="Search by name or email"
+                value={searchTerm}
+                onChange={(event) =>
+                  setSearchTerm(event.target.value)
+                }
               />
             </div>
 
-            <div className="admin-form-actions">
-              <button
-                className="admin-button"
-                type="submit"
-                disabled={isSearching || isDeleting}
-              >
-                {isSearching ? "Searching…" : "Search"}
-              </button>
+            <div className="admin-form-group">
+              <label htmlFor="userRoleFilter">
+                Account role
+              </label>
 
-              <button
-                className="admin-secondary-button"
-                type="button"
-                onClick={clearSearch}
-                disabled={isDeleting}
+              <select
+                id="userRoleFilter"
+                value={roleFilter}
+                onChange={(event) =>
+                  setRoleFilter(event.target.value)
+                }
               >
-                Clear
-              </button>
+                <option value="ALL">All roles</option>
+                <option value="REGULAR_USER">
+                  Participants
+                </option>
+                <option value="INSTRUCTOR">
+                  Instructors
+                </option>
+                <option value="ADMINISTRATOR">
+                  Administrators
+                </option>
+              </select>
             </div>
-          </form>
 
-          {errorMessage && (
-            <p className="admin-form-error" role="alert">
-              {errorMessage}
-            </p>
+            <button
+              className="admin-secondary-button admin-clear-filters"
+              type="button"
+              onClick={clearFilters}
+              disabled={
+                !searchTerm && roleFilter === "ALL"
+              }
+            >
+              Clear filters
+            </button>
+          </div>
+
+          {isLoading && (
+            <div
+              className="admin-directory-state"
+              role="status"
+            >
+              <span
+                className="admin-empty-icon"
+                aria-hidden="true"
+              >
+                KS
+              </span>
+
+              <h3>Loading user accounts…</h3>
+
+              <p>
+                Please wait while the account directory is
+                retrieved.
+              </p>
+            </div>
           )}
 
-          {statusMessage && (
-            <p className="admin-form-status" role="status">
-              {statusMessage}
-            </p>
+          {!isLoading && users.length === 0 && (
+            <div className="admin-directory-state">
+              <span
+                className="admin-empty-icon"
+                aria-hidden="true"
+              >
+                0
+              </span>
+
+              <h3>No user accounts available</h3>
+
+              <p>
+                New accounts will appear here after they are
+                created.
+              </p>
+
+              <Link
+                className="admin-button admin-action-link"
+                to="/admin/users/new"
+              >
+                Create the first user
+              </Link>
+            </div>
           )}
-        </section>
 
-        <section
-          className="admin-panel admin-user-result"
-          aria-labelledby="user-result-heading"
-        >
-          <h2 id="user-result-heading">User account</h2>
-
-          {selectedUser ? (
-            <article className="admin-user-card">
-              <header className="admin-user-card-header">
-                <div
-                  className="admin-user-avatar"
+          {!isLoading &&
+            users.length > 0 &&
+            filteredUsers.length === 0 && (
+              <div className="admin-directory-state">
+                <span
+                  className="admin-empty-icon"
                   aria-hidden="true"
                 >
-                  {selectedUser.firstName.charAt(0)}
-                  {selectedUser.lastName.charAt(0)}
-                </div>
-
-                <div className="admin-user-identity">
-                  <p className="admin-user-label">
-                    Knight School account
-                  </p>
-
-                  <h3>{selectedUser.displayName}</h3>
-
-                  <p>
-                    {selectedUser.email ?? "No email provided"}
-                  </p>
-                </div>
-
-                <span className="admin-account-status">
-                  {String(selectedUser.status)}
+                  ?
                 </span>
-              </header>
 
-              <div className="admin-user-information">
-                <div className="admin-user-information-item">
-                  <span className="admin-user-information-label">
-                    First name
-                  </span>
+                <h3>No matching accounts</h3>
 
-                  <strong>{selectedUser.firstName}</strong>
-                </div>
+                <p>
+                  Try changing the search text or selected role.
+                </p>
 
-                <div className="admin-user-information-item">
-                  <span className="admin-user-information-label">
-                    Last name
-                  </span>
-
-                  <strong>{selectedUser.lastName}</strong>
-                </div>
-
-                <div className="admin-user-information-item admin-user-role-item">
-                  <span className="admin-user-information-label">
-                    Assigned roles
-                  </span>
-
-                  <div className="admin-role-badges">
-                    {selectedUser.roles.length > 0 ? (
-                      selectedUser.roles.map((role) => (
-                        <span
-                          className="admin-role-badge"
-                          key={role}
-                        >
-                          {role.replaceAll("_", " ")}
-                        </span>
-                      ))
-                    ) : (
-                      <span>No roles assigned</span>
-                    )}
-                  </div>
-                </div>
+                <button
+                  className="admin-secondary-button"
+                  type="button"
+                  onClick={clearFilters}
+                >
+                  Clear filters
+                </button>
               </div>
+            )}
 
-              <footer className="admin-user-card-footer">
-                {!isConfirmingDelete ? (
-                  <div className="admin-form-actions">
+          {!isLoading && filteredUsers.length > 0 && (
+            <div className="admin-users-directory-grid">
+              {filteredUsers.map((user) => (
+                <article
+                  className="admin-directory-user-card"
+                  key={user.id}
+                >
+                  <header className="admin-directory-user-header">
+                    <div
+                      className="admin-user-avatar"
+                      aria-hidden="true"
+                    >
+                      {getInitials(user)}
+                    </div>
+
+                    <div className="admin-user-identity">
+                      <p className="admin-user-label">
+                        Knight School account
+                      </p>
+
+                      <h3>{user.displayName}</h3>
+
+                      <p>
+                        {user.email ?? "No email provided"}
+                      </p>
+                    </div>
+
+                    <span className="admin-account-status">
+                      {formatAccountStatus(user.status)}
+                    </span>
+                  </header>
+
+                  <div className="admin-directory-user-details">
+                    <div>
+                      <span>Legal name</span>
+
+                      <strong>
+                        {user.firstName} {user.lastName}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>Assigned roles</span>
+
+                      <div className="admin-role-badges">
+                        {user.roles.length > 0 ? (
+                          user.roles.map((role) => (
+                            <span
+                              className="admin-role-badge"
+                              key={role}
+                            >
+                              {formatRole(role)}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="admin-no-role">
+                            No roles assigned
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <footer className="admin-directory-user-actions">
                     <Link
                       className="admin-button admin-action-link"
-                      to={`/admin/users/${selectedUser.id}/edit`}
+                      to={`/admin/users/${user.id}/edit`}
                     >
-                      Edit user
+                      View / edit
                     </Link>
 
                     <button
                       className="admin-danger-button"
                       type="button"
-                      onClick={() => setIsConfirmingDelete(true)}
+                      onClick={() => beginDelete(user)}
+                      disabled={isDeleting}
                     >
-                      Delete user
+                      Delete
                     </button>
-                  </div>
-                ) : (
-                  <div
-                    className="admin-delete-confirmation"
-                    role="alertdialog"
-                    aria-labelledby="delete-confirmation-heading"
-                    aria-describedby="delete-confirmation-description"
-                  >
-                    <div>
-                      <h3 id="delete-confirmation-heading">
-                        Delete this account?
-                      </h3>
-
-                      <p id="delete-confirmation-description">
-                        This will permanently delete{" "}
-                        <strong>{selectedUser.displayName}</strong>{" "}
-                        and all associated account data. This action
-                        cannot be undone.
-                      </p>
-                    </div>
-
-                    <div className="admin-form-actions">
-                      <button
-                        className="admin-danger-confirm-button"
-                        type="button"
-                        onClick={() => void handleDeleteUser()}
-                        disabled={isDeleting}
-                      >
-                        {isDeleting
-                          ? "Deleting account…"
-                          : "Confirm deletion"}
-                      </button>
-
-                      <button
-                        className="admin-secondary-button"
-                        type="button"
-                        onClick={() =>
-                          setIsConfirmingDelete(false)
-                        }
-                        disabled={isDeleting}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </footer>
-            </article>
-          ) : (
-            <div className="admin-empty-result">
-              <span className="admin-empty-icon" aria-hidden="true">
-                ?
-              </span>
-
-              <h3>
-                {hasSearched
-                  ? "No matching user"
-                  : "No user selected"}
-              </h3>
-
-              <p>
-                {hasSearched
-                  ? "Check the email address and try searching again."
-                  : "A user’s account information and account actions will appear here after a successful search."}
-              </p>
+                  </footer>
+                </article>
+              ))}
             </div>
           )}
         </section>
+
+        {deleteTarget && (
+          <section
+            className="admin-delete-confirmation admin-directory-delete"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-confirmation-heading"
+            aria-describedby="delete-confirmation-description"
+          >
+            <div>
+              <p className="admin-card-category">
+                Permanent action
+              </p>
+
+              <h2 id="delete-confirmation-heading">
+                Delete this account?
+              </h2>
+
+              <p id="delete-confirmation-description">
+                This will permanently delete{" "}
+                <strong>{deleteTarget.displayName}</strong> and
+                all associated account data. This action cannot
+                be undone.
+              </p>
+            </div>
+
+            <div className="admin-form-actions">
+              <button
+                className="admin-danger-confirm-button"
+                type="button"
+                onClick={() => void handleDeleteUser()}
+                disabled={isDeleting}
+              >
+                {isDeleting
+                  ? "Deleting account…"
+                  : "Confirm deletion"}
+              </button>
+
+              <button
+                className="admin-secondary-button"
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

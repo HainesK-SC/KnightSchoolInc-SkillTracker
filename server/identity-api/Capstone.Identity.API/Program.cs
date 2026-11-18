@@ -123,6 +123,12 @@ namespace Capstone.Identity.API
             // Repository registrations
             builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+            builder.Services.AddScoped<IDisciplineRepository, DisciplineRepository>();
+            builder.Services.AddScoped<ISkillRepository, SkillRepository>();
+            builder.Services.AddScoped<IParticipantSkillProgressRepository, ParticipantSkillProgressRepository>();
+            builder.Services.AddScoped<IEventRepository, EventRepository>();
+            builder.Services.AddScoped<IEventStaffRepository, EventStaffRepository>();
+            builder.Services.AddScoped<IEventSkillRepository, EventSkillRepository>();
 
             // Service registrations
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -132,12 +138,18 @@ namespace Capstone.Identity.API
             builder.Services.AddSingleton<IDisplayNameGenerator, DisplayNameGenerator>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
+            builder.Services.AddScoped<ISkillService, SkillService>();
+            builder.Services.AddScoped<ISkillProgressService, SkillProgressService>();
+            builder.Services.AddSingleton(TimeProvider.System);
+            builder.Services.AddScoped<ISkillTreeService, SkillTreeService>();
+            builder.Services.AddScoped<IEventService, EventService>();
+            builder.Services.AddScoped<IEventStaffService, EventStaffService>();
+            builder.Services.AddScoped<IEventSkillService, EventSkillService>();
 
             var app = builder.Build();
 
             // Applying database migrations
             await DatabaseMigrator.MigrateIfEnabledAsync(app);
-            await IdentitySeeder.SeedAsync(app.Services);
 
             // Identity Seeding
             await IdentitySeeder.SeedAsync(app.Services);

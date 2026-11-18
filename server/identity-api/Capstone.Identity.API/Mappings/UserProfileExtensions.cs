@@ -1,7 +1,8 @@
 ﻿using Capstone.Identity.API.Dtos.Admin;
+using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Models.ReadModels;
 
-namespace Capstone.Identity.API.Models
+namespace Capstone.Identity.API.Mappings
 {
     public static class UserProfileExtensions
     {

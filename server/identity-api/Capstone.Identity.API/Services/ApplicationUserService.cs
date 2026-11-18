@@ -3,6 +3,9 @@ using Capstone.Identity.API.Common;
 using Capstone.Identity.API.Data;
 using Capstone.Identity.API.Dtos.Admin;
 using Capstone.Identity.API.Dtos.Auth;
+using Capstone.Identity.API.Dtos.Request;
+using Capstone.Identity.API.Dtos.Response;
+using Capstone.Identity.API.Mappings;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -288,7 +291,7 @@ namespace Capstone.Identity.API.Services
             }
 
             // Load the profile
-            var profile = await _userProfileRepository.GetByApplicationUserIdForUpdateAsync(user.Id);
+            var profile = await _userProfileRepository.GetUserProfileByUserIdForUpdateAsync(user.Id);
             if (profile is null)
             {
                 _logger.LogError("User {UserId} has no UserProfile.", user.Id);
@@ -401,6 +404,21 @@ namespace Capstone.Identity.API.Services
             _logger.LogInformation("Admin {AdminId} deleted user {UserId}.", actingAdminId, user.Id);
 
             return Result<bool>.Success(true);
+        }
+
+        public async Task<Result<ApplicationUserDto>> GetUserByEmailAsync(string email)
+        {
+            var appUser =await _userManager.FindByEmailAsync(email);
+
+            if (appUser == null)
+            {
+                _logger.LogInformation("No user found with email: {UserEmail}", email);
+                return Result<ApplicationUserDto>.Failure("User not found.", ResultErrorType.NotFound);
+            }
+
+            var appUserDto = appUser.ToApplicationUserDto();
+
+            return Result<ApplicationUserDto>.Success(appUserDto);
         }
 
         // HELPER METHODS

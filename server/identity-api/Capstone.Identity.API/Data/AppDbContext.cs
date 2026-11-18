@@ -3,6 +3,7 @@ using Capstone.Identity.API.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace Capstone.Identity.API.Data
 {
@@ -11,6 +12,12 @@ namespace Capstone.Identity.API.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Discipline> Disciplines { get; set; }
+        public DbSet<Skill> Skills { get; set; }
+        public DbSet<ParticipantSkillProgress> ParticipantSkillProgresses { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<EventStaffAssignment> EventsStaffAssignments { get; set; } 
+        public DbSet<EventSkill> EventSkills { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -39,6 +46,71 @@ namespace Capstone.Identity.API.Data
                 .HasDatabaseName("EmailIndex")
                 .IsUnique()
                 .HasFilter("[NormalizedEmail] IS NOT NULL");
+
+            // Discipline and Skill related configurations
+            
+            // Defined in the model - leaving for reference
+            //builder.Entity<Discipline>()
+            //    .HasIndex(d => d.Name)
+            //    .IsUnique();
+
+            builder.Entity<Skill>()
+                .HasOne<Discipline>()
+                .WithMany()
+                .HasForeignKey(d => d.DisciplineId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ParticipantSkillProgress>()
+                .HasOne<UserProfile>()
+                .WithMany()
+                .HasForeignKey(p => p.UserProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ParticipantSkillProgress>()
+                .HasOne<Skill>()
+                .WithMany()
+                .HasForeignKey(k => k.SkillId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            // Defined in the model, leaving for reference
+            //builder.Entity<ParticipantSkillProgress>()
+            //    .HasIndex(p => new { p.UserProfileId, p.SkillId })
+            //    .IsUnique();
+
+            builder.Entity<ParticipantSkillProgress>()
+                .Property(p => p.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            builder.Entity<ParticipantSkillProgress>()
+                .ToTable(t => t.HasCheckConstraint(
+                    "CK_ParticipantSkillProgresses_Status_NotLocked",
+                    "[Status] <> 'Locked'"));
+
+            builder.Entity<Event>()
+                .Property(e => e.RegistrationType)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            builder.Entity<EventStaffAssignment>()
+                .HasOne<Event>().WithMany().HasForeignKey(a => a.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<EventStaffAssignment>()
+                .HasOne<ApplicationUser>().WithMany().HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<EventSkill>()
+                .HasOne<Event>()
+                .WithMany()
+                .HasForeignKey(es => es.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<EventSkill>()
+                .HasOne<Skill>()
+                .WithMany()
+                .HasForeignKey(es => es.SkillId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
