@@ -160,6 +160,36 @@ namespace Capstone.Identity.API.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventEnrollment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EnrolledAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EnrolledById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.HasIndex("EventId", "UserProfileId")
+                        .IsUnique();
+
+                    b.ToTable("EventEnrollments");
+                });
+
             modelBuilder.Entity("Capstone.Identity.API.Models.EventSkill", b =>
                 {
                     b.Property<int>("Id")
@@ -456,6 +486,21 @@ namespace Capstone.Identity.API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventEnrollment", b =>
+                {
+                    b.HasOne("Capstone.Identity.API.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Capstone.Identity.API.Models.UserProfile", null)
+                        .WithMany()
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Capstone.Identity.API.Models.EventSkill", b =>
