@@ -1,5 +1,7 @@
 ﻿namespace Capstone.Identity.API.Models.ReadModels
 {
+    // largely facilitates account status derivation
+    // allows staff to see which participants still need an activation email
     public class RosterEntry
     {
         public Guid UserId { get; set; }
