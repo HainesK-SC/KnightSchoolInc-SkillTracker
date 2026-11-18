@@ -146,6 +146,7 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<IEventService, EventService>();
             builder.Services.AddScoped<IEventStaffService, EventStaffService>();
             builder.Services.AddScoped<IEventSkillService, EventSkillService>();
+            builder.Services.AddScoped<IEventEnrollmentService, EventEnrollmentService>();
 
             var app = builder.Build();
 
