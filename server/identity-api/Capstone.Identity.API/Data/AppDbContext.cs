@@ -23,6 +23,12 @@ namespace Capstone.Identity.API.Data
         {
             base.OnModelCreating(builder);
 
+            // Emails must be unique, but walk-ups without one (null) are allowed
+            builder.Entity<ApplicationUser>()
+                .HasIndex(u => u.NormalizedEmail)
+                .IsUnique()
+                .HasFilter("[NormalizedEmail] IS NOT NULL");
+
             builder.Entity<UserProfile>()
                 .Property(p => p.DisplayName).HasMaxLength(100);
 
