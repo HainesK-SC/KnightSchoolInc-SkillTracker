@@ -18,6 +18,7 @@ namespace Capstone.Identity.API.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<EventStaffAssignment> EventsStaffAssignments { get; set; } 
         public DbSet<EventSkill> EventSkills { get; set; }
+        public DbSet<EventEnrollment> EventEnrollments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
