@@ -252,6 +252,9 @@ namespace Capstone.Identity.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParticipantSkillProgressId"));
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SkillId")
                         .HasColumnType("int");
 
@@ -270,6 +273,8 @@ namespace Capstone.Identity.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ParticipantSkillProgressId");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("SkillId");
 
@@ -535,6 +540,11 @@ namespace Capstone.Identity.API.Migrations
 
             modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
                 {
+                    b.HasOne("Capstone.Identity.API.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Capstone.Identity.API.Models.Skill", null)
                         .WithMany()
                         .HasForeignKey("SkillId")
