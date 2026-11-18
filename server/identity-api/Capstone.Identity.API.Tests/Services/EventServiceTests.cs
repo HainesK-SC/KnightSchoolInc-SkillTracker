@@ -38,12 +38,14 @@ namespace Capstone.Identity.API.Tests.Services
 
         private Event? _addedEvent;
         private List<Event> _searchResults = [];
+        private Mock<IEventEnrollmentRepository> _eventEnrollmentRepository;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _addedEvent = null;
             _searchResults = [];
+            _eventEnrollmentRepository = new Mock<IEventEnrollmentRepository>();
 
             _eventRepository = new Mock<IEventRepository>();
             _eventRepository
@@ -69,7 +71,8 @@ namespace Capstone.Identity.API.Tests.Services
                 _eventRepository.Object,
                 NullLogger<EventService>.Instance,
                 _unitOfWork.Object,
-                _staffRepository.Object);
+                _staffRepository.Object,
+                _eventEnrollmentRepository.Object);
         }
 
         // Verifies the arguments the service passed to the repository's search
