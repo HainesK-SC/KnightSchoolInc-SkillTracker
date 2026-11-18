@@ -121,6 +121,19 @@ namespace Capstone.Identity.API.Data
                 .WithMany()
                 .HasForeignKey(es => es.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // EventEnrollmet Conditions
+            builder.Entity<EventEnrollment>()
+                .HasOne<Event>().WithMany().HasForeignKey(e => e.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<EventEnrollment>()
+                .HasOne<UserProfile>().WithMany().HasForeignKey(e => e.UserProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<EventEnrollment>()
+                .HasIndex(e => new { e.EventId, e.UserProfileId })
+                .IsUnique();
         }
     }
 }
