@@ -24,6 +24,7 @@ namespace Capstone.Identity.API.Controllers
         }
 
         [HttpPut("{userId:guid}/skills/{skillId:int}/progress")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> SetSkillStatus(
             Guid userId,
             int skillId,
