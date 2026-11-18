@@ -91,5 +91,15 @@ namespace Capstone.Identity.API.Repositories
         {
             _appDbContext.Skills.RemoveRange(skills);
         }
+
+        public async Task<IReadOnlyList<Skill>> GetSkillsByIdsAsync(IReadOnlyCollection<int> skillIds)
+        {
+            var skills = await _appDbContext.Skills
+                .AsNoTracking()
+                .Where(s => skillIds.Contains(s.SkillId))
+                .ToListAsync();
+
+            return skills;
+        }
     }
 }

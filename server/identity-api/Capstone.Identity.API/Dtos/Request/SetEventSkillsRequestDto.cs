@@ -2,7 +2,7 @@
 
 namespace Capstone.Identity.API.Dtos.Request
 {
-    public class SetEventSkillRequestDto
+    public class SetEventSkillsRequestDto
     {
         [Required]
         public List<int>? SkillIds { get; set; }

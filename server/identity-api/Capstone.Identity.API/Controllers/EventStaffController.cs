@@ -1,5 +1,7 @@
-﻿using Capstone.Identity.API.Auth;
+﻿using Azure.Core;
+using Capstone.Identity.API.Auth;
 using Capstone.Identity.API.Common;
+using Capstone.Identity.API.Dtos.Request;
 using Capstone.Identity.API.Models;
 using Capstone.Identity.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,19 +9,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Capstone.Identity.API.Controllers
 {
-    [Route("api/events/{eventId:int}/staff")]
+    [Route("api/events/{eventId:int}")]
     [ApiController]
     [Authorize(Roles = Roles.Admin + "," + Roles.Instructor)]
     public class EventStaffController : ControllerBase
     {
         private readonly IEventStaffService _eventStaffService;
+        private readonly IEventSkillService _eventSkillService;
 
-        public EventStaffController(IEventStaffService eventStaffService)
+        public EventStaffController(IEventStaffService eventStaffService, IEventSkillService eventSkillService)
         {
             _eventStaffService = eventStaffService;
+            _eventSkillService = eventSkillService;
         }
 
-        [HttpGet]
+        [HttpGet("staff")]
         public async Task<IActionResult> GetEventStaff(int eventId)
         {
             var result = await _eventStaffService.GetEventStaffAsync(eventId);
@@ -51,6 +55,36 @@ namespace Capstone.Identity.API.Controllers
         public async Task<IActionResult> UnassignStaff(int eventId, Guid userId)
         {
             var result = await _eventStaffService.UnassignStaffAsync(eventId, userId, User.GetUserId());
+
+            if (!result.Succeeded)
+            {
+                return result.ToProblemResult();
+            }
+
+            return Ok(result.Data);
+        }
+
+        [HttpGet("skills}")]
+        public async Task<IActionResult> GetEventSkills(int eventId)
+        {
+            var adminId = User.GetUserId();
+            var callerIsAdmin = User.IsInRole(Roles.Admin);
+
+            var skillsResult = await _eventSkillService.GetEventSkillsAsync(eventId, adminId, callerIsAdmin);
+
+            if (skillsResult.Succeeded != true)
+            {
+                return skillsResult.ToProblemResult();
+            }
+
+            return Ok(skillsResult.Data);
+        }
+
+        [HttpPut("{skills}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> SetEventSkills(int eventId, SetEventSkillsRequestDto setSkillRequestDto)
+        {
+            var result = await _eventSkillService.SetEventSkillsAsync(eventId, setSkillRequestDto, User.GetUserId());
 
             if (!result.Succeeded)
             {
