@@ -82,7 +82,11 @@ namespace Capstone.Identity.API.Data
                 .WithMany()
                 .HasForeignKey(k => k.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
+            builder.Entity<ParticipantSkillProgress>()
+                .HasOne<Event>().WithMany().HasForeignKey(p => p.EventId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Defined in the model, leaving for reference
             //builder.Entity<ParticipantSkillProgress>()
             //    .HasIndex(p => new { p.UserProfileId, p.SkillId })
