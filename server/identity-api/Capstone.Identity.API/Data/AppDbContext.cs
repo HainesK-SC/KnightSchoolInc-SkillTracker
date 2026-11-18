@@ -24,6 +24,10 @@ namespace Capstone.Identity.API.Data
             base.OnModelCreating(builder);
 
             // Emails must be unique, but walk-ups without one (null) are allowed
+            // This is done because Identity has a RequireUniqueEmail option that would break the
+            // functionality of walk-up registrants (who don't provide an email address)
+            // placeholder account is created without email (null), which would break the requirement
+            // for a unique email address and break walkup functionality almost entirely
             builder.Entity<ApplicationUser>()
                 .HasIndex(u => u.NormalizedEmail)
                 .IsUnique()
