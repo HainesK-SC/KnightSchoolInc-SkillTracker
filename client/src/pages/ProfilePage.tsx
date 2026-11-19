@@ -103,25 +103,29 @@ function ProfilePage() {
           </Link>
 
           <nav className="profile-navigation" aria-label="Main navigation">
-            {user?.roles.includes("ADMINISTRATOR") && (
-              <Link to="/admin">Admin dashboard</Link>
-            )}
+  {user?.roles.includes("ADMINISTRATOR") && (
+    <Link to="/admin">Admin dashboard</Link>
+  )}
 
-            <Link to="/profile" aria-current="page">
-              My profile
-            </Link>
+  {user?.roles.includes("INSTRUCTOR") && (
+    <Link to="/instructor/events">My Events</Link>
+  )}
 
-            <Link to="/skill-tree">Skill tree</Link>
+  <Link to="/profile" aria-current="page">
+    My profile
+  </Link>
 
-            <button
-              className="profile-sign-out"
-              type="button"
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-            >
-              {isSigningOut ? "Signing out..." : "Sign out"}
-            </button>
-          </nav>
+  <Link to="/skill-tree">Skill tree</Link>
+
+  <button
+    className="profile-sign-out"
+    type="button"
+    onClick={handleSignOut}
+    disabled={isSigningOut}
+  >
+    {isSigningOut ? "Signing out..." : "Sign out"}
+  </button>
+</nav>
         </div>
       </header>
 

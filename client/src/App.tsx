@@ -20,6 +20,13 @@ import AdminCreateSkillPage from "./pages/AdminCreateSkillPage";
 import AdminCreateDisciplinePage from "./pages/AdminCreateDisciplinePage";
 import AdminEditSkillPage from "./pages/AdminEditSkillPage";
 import "./styles/Buttons.css";
+import AdminEventsPage from "./pages/AdminEventsPage";
+import AdminCreateEventPage from "./pages/AdminCreateEventPage";
+import AdminEventDetailsPage from "./pages/AdminEventDetailsPage";
+import InstructorEventsPage from "./pages/InstructorEventsPage";
+import InstructorEventDetailsPage from "./pages/InstructorEventDetailsPage";
+import AdminLinkParticipantPage from "./pages/AdminLinkParticipantPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -79,7 +86,27 @@ function App() {
           element={<AdminEditSkillPage />}
           />
 
+
+                    <Route path="/admin/events" element={<AdminEventsPage />} />
+          <Route path="/admin/events/new" element={<AdminCreateEventPage />} />
+          <Route
+            path="/admin/events/:eventId"
+            element={<AdminEventDetailsPage />}
+          />
         </Route>
+
+        <Route element={<ProtectedRoute requiredRole="INSTRUCTOR" />}>
+          <Route path="/instructor/events" element={<InstructorEventsPage />} />
+          <Route
+            path="/instructor/events/:eventId"
+            element={<InstructorEventDetailsPage />}
+          />
+        </Route>
+
+        <Route
+        path="/admin/participants/link"
+          element={<AdminLinkParticipantPage />}
+        />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

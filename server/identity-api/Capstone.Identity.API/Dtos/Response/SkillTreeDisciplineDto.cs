@@ -3,7 +3,9 @@
     public class SkillTreeDisciplineDto
     {
         public int DisciplineId { get; set; }
-        public string Name { get; set; }
-        public List<SkillTreeSkillDto> Skills = new();
+
+        public string Name { get; set; } = default!;
+
+        public List<SkillTreeSkillDto> Skills { get; set; } = new();
     }
 }
