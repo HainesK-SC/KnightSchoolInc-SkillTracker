@@ -31,8 +31,12 @@ services:
       Jwt__Key: ${JWT_KEY}
       AdminSeed__Email: ${ADMIN_EMAIL}
       AdminSeed__Password: ${ADMIN_PASSWORD}
-      InstructorSeed__Email: ${INSTRUCTOR_EMAIL}
-      InstructorSeed__Password: ${INSTRUCTOR_PASSWORD}
+      Instructor1Seed__Email: ${INSTRUCTOR1_EMAIL}
+      Instructor1Seed__Password: ${INSTRUCTOR1_PASSWORD}
+      Instructor2Seed__Email: ${INSTRUCTOR2_EMAIL}
+      Instructor2Seed__Password: ${INSTRUCTOR2_PASSWORD}
+      Instructor3Seed__Email: ${INSTRUCTOR3_EMAIL}
+      Instructor3Seed__Password: ${INSTRUCTOR3_PASSWORD}
       User1Seed__Email: ${USER1_EMAIL}
       User1Seed__Password: ${USER1_PASSWORD}
       User2Seed__Email: ${USER2_EMAIL}

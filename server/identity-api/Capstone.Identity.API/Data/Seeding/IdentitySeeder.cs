@@ -91,45 +91,49 @@ namespace Capstone.Identity.API.Data.Seeding
         private static async Task SeedInstructorAsync(IServiceProvider provider, ILogger logger)
         {
             var config = provider.GetRequiredService<IConfiguration>();
-            var email = config["InstructorSeed:Email"];
-            var password = config["InstructorSeed:Password"];
 
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            for (int i = 1; i <= 3; i++)
             {
-                logger.LogInformation("Instructir seed skipped: InstuctorSeed is not configured.");
-                return;
-            }
+                var email = config[$"Instructor{i}Seed:Email"];
+                var password = config[$"Instructor{i}Seed:Password"];
 
-            var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
-            var user = await userManager.FindByEmailAsync(email);
-
-            if (user is null)
-            {
-                var userService = provider.GetRequiredService<IApplicationUserService>();
-                var created = await userService.CreateUserWithProfileAsync(
-                    email,
-                    password,
-                    config["InstructorSeed:FirstName"] ?? "Instructor",
-                    config["InstructorSeed:LastName"] ?? "User");
-
-                if (!created.Succeeded)
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
                 {
-                    throw new InvalidOperationException($"Instructor seed failed: {created.Error}");
+                    logger.LogInformation($"Instructor{i} seed skipped: Instuctor{i}Seed is not configured.");
+                    return;
                 }
 
-                user = created.Data!;
-            }
+                var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+                var user = await userManager.FindByEmailAsync(email);
 
-            if (!await userManager.IsInRoleAsync(user, Roles.Instructor))
-            {
-                var result = await userManager.AddToRoleAsync(user, Roles.Instructor);
-                if (!result.Succeeded)
+                if (user is null)
                 {
-                    throw new InvalidOperationException(
-                        $"Failed to grant Instructor role: {string.Join(" ", result.Errors.Select(e => e.Description))}");
+                    var userService = provider.GetRequiredService<IApplicationUserService>();
+                    var created = await userService.CreateUserWithProfileAsync(
+                        email,
+                        password,
+                        config[$"Instructor{i}Seed:FirstName"] ?? $"Instructor{i}",
+                        config[$"Instructor{i}Seed:LastName"] ?? "User");
+
+                    if (!created.Succeeded)
+                    {
+                        throw new InvalidOperationException($"Instructor{i} seed failed: {created.Error}");
+                    }
+
+                    user = created.Data!;
                 }
 
-                logger.LogInformation("Granted Instructor role to user {UserId}.", user.Id);
+                if (!await userManager.IsInRoleAsync(user, Roles.Instructor))
+                {
+                    var result = await userManager.AddToRoleAsync(user, Roles.Instructor);
+                    if (!result.Succeeded)
+                    {
+                        throw new InvalidOperationException(
+                            $"Failed to grant Instructor{i} role: {string.Join(" ", result.Errors.Select(e => e.Description))}");
+                    }
+
+                    logger.LogInformation($"Granted Instructor role to user {user.Id}.");
+                }
             }
         }
 
