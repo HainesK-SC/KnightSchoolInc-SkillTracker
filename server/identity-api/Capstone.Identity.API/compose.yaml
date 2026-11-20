@@ -29,8 +29,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: "Server=db,1433;Database=KnightSchool;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
       Jwt__Key: ${JWT_KEY}
-      AdminSeed__Email: ${ADMIN_EMAIL}
-      AdminSeed__Password: ${ADMIN_PASSWORD}
+      Admin1Seed__Email: ${ADMIN_EMAIL}
+      Admin1Seed__Password: ${ADMIN_PASSWORD}
+      Admin2Seed__Email: ${ADMIN2_EMAIL}
+      Admin2Seed__Password: ${ADMIN2_PASSWORD}
+      Admin3Seed__Email: ${ADMIN_EMAIL}
+      Admin3Seed__Password: ${ADMIN3_PASSWORD}
       Instructor1Seed__Email: ${INSTRUCTOR1_EMAIL}
       Instructor1Seed__Password: ${INSTRUCTOR1_PASSWORD}
       Instructor2Seed__Email: ${INSTRUCTOR2_EMAIL}

@@ -46,45 +46,49 @@ namespace Capstone.Identity.API.Data.Seeding
         private static async Task SeedAdminAsync(IServiceProvider provider, ILogger logger)
         {
             var config = provider.GetRequiredService<IConfiguration>();
-            var email = config["AdminSeed:Email"];
-            var password = config["AdminSeed:Password"];
 
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            for (int i = 1; i <= 3; i++)
             {
-                logger.LogInformation("Admin seed skipped: AdminSeed is not configured.");
-                return;
-            }
+                var email = config[$"Admin{i}Seed:Email"];
+                var password = config[$"Admin{i}Seed:Password"];
 
-            var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
-            var user = await userManager.FindByEmailAsync(email);
-
-            if (user is null)
-            {
-                var userService = provider.GetRequiredService<IApplicationUserService>();
-                var created = await userService.CreateUserWithProfileAsync(
-                    email,
-                    password,
-                    config["AdminSeed:FirstName"] ?? "Admin",
-                    config["AdminSeed:LastName"] ?? "User");
-
-                if (!created.Succeeded)
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
                 {
-                    throw new InvalidOperationException($"Admin seed failed: {created.Error}");
+                    logger.LogInformation($"Admin{i} seed skipped: Admin{i}Seed is not configured.");
+                    return;
                 }
 
-                user = created.Data!;
-            }
+                var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+                var user = await userManager.FindByEmailAsync(email);
 
-            if (!await userManager.IsInRoleAsync(user, Roles.Admin))
-            {
-                var result = await userManager.AddToRoleAsync(user, Roles.Admin);
-                if (!result.Succeeded)
+                if (user is null)
                 {
-                    throw new InvalidOperationException(
-                        $"Failed to grant Admin role: {string.Join(" ", result.Errors.Select(e => e.Description))}");
+                    var userService = provider.GetRequiredService<IApplicationUserService>();
+                    var created = await userService.CreateUserWithProfileAsync(
+                        email,
+                        password,
+                        config[$"Admin{i}Seed:FirstName"] ?? $"Admin{i}",
+                        config[$"Admin{i}Seed:LastName"] ?? "User");
+
+                    if (!created.Succeeded)
+                    {
+                        throw new InvalidOperationException($"Admin{i} seed failed: {created.Error}");
+                    }
+
+                    user = created.Data!;
                 }
 
-                logger.LogInformation("Granted Admin role to user {UserId}.", user.Id);
+                if (!await userManager.IsInRoleAsync(user, Roles.Admin))
+                {
+                    var result = await userManager.AddToRoleAsync(user, Roles.Admin);
+                    if (!result.Succeeded)
+                    {
+                        throw new InvalidOperationException(
+                            $"Failed to grant Admin role: {string.Join(" ", result.Errors.Select(e => e.Description))}");
+                    }
+
+                    logger.LogInformation("Granted Admin role to user {UserId}.", user.Id);
+                }
             }
         }
 
