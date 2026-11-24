@@ -9,6 +9,7 @@ namespace Capstone.Identity.API.Models
         public int DisciplineId { get; set; } = default;
         [MaxLength(50)]
         public string Name { get; set; } = default!;
-
+        [MaxLength(100)]
+        public string Description { get; set; } = default!;
     }
 }
