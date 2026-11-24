@@ -219,24 +219,50 @@ function AdminDashboardPage() {
             </Link>
           </article>
           <article className="admin-feature-card">
-  <         span className="admin-card-number" aria-hidden="true">
-            05
-          </span>
+  <span className="admin-card-number" aria-hidden="true">
+    05
+  </span>
 
-          <p className="admin-card-category">
-            Training catalogue
-          </p>
+  <p className="admin-card-category">Training catalogue</p>
+  <h3>Manage skills</h3>
 
-          <h3>Manage skills</h3>
+  <p>Create, edit, archive and remove disciplines and skills.</p>
 
-          <p>
-          Create, edit, archive and remove disciplines and skills.
-          </p>
+  <Link className="admin-card-link" to="/admin/skills">
+    Manage skills
+  </Link>
+</article>
 
-          <Link className="admin-card-link" to="/admin/skills">
-          Manage skills
-        </Link>
-        </article>
+<article className="admin-feature-card">
+  <span className="admin-card-number" aria-hidden="true">
+    06
+  </span>
+
+  <p className="admin-card-category">Event management</p>
+  <h3>Manage events</h3>
+
+  <p>Create events, search the event list, and view event details.</p>
+
+  <Link className="admin-card-link" to="/admin/events">
+    Manage events
+  </Link>
+</article>
+
+
+<article className="admin-feature-card">
+  <span className="admin-card-number" aria-hidden="true">
+    07
+  </span>
+
+  <p className="admin-card-category">Participant management</p>
+  <h3>Link participant profile</h3>
+  <p>Review and transfer a walk-up profile’s history to the same person’s full account.</p>
+
+  <Link className="admin-card-link" to="/admin/participants/link">
+    Link participant profile
+  </Link>
+</article>
+
         </section>
 
        <section aria-labelledby="summary-heading">

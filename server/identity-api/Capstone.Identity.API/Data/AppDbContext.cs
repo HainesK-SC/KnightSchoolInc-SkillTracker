@@ -18,10 +18,21 @@ namespace Capstone.Identity.API.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<EventStaffAssignment> EventsStaffAssignments { get; set; } 
         public DbSet<EventSkill> EventSkills { get; set; }
+        public DbSet<EventEnrollment> EventEnrollments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Emails must be unique, but walk-ups without one (null) are allowed
+            // This is done because Identity has a RequireUniqueEmail option that would break the
+            // functionality of walk-up registrants (who don't provide an email address)
+            // placeholder account is created without email (null), which would break the requirement
+            // for a unique email address and break walkup functionality almost entirely
+            builder.Entity<ApplicationUser>()
+                .HasIndex(u => u.NormalizedEmail)
+                .IsUnique()
+                .HasFilter("[NormalizedEmail] IS NOT NULL");
 
             builder.Entity<UserProfile>()
                 .Property(p => p.DisplayName).HasMaxLength(100);
@@ -71,7 +82,11 @@ namespace Capstone.Identity.API.Data
                 .WithMany()
                 .HasForeignKey(k => k.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
+            builder.Entity<ParticipantSkillProgress>()
+                .HasOne<Event>().WithMany().HasForeignKey(p => p.EventId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Defined in the model, leaving for reference
             //builder.Entity<ParticipantSkillProgress>()
             //    .HasIndex(p => new { p.UserProfileId, p.SkillId })
@@ -111,6 +126,19 @@ namespace Capstone.Identity.API.Data
                 .WithMany()
                 .HasForeignKey(es => es.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // EventEnrollmet Conditions
+            builder.Entity<EventEnrollment>()
+                .HasOne<Event>().WithMany().HasForeignKey(e => e.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<EventEnrollment>()
+                .HasOne<UserProfile>().WithMany().HasForeignKey(e => e.UserProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<EventEnrollment>()
+                .HasIndex(e => new { e.EventId, e.UserProfileId })
+                .IsUnique();
         }
     }
 }

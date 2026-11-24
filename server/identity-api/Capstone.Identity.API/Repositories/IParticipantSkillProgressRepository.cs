@@ -12,5 +12,6 @@ namespace Capstone.Identity.API.Repositories
         public void RemoveProgressRow(ParticipantSkillProgress progress);
         public Task<bool> AnyProgressForSkillAsync(int skillId);
         public Task<bool> AnyProgressInDisciplineAsync(int disciplineId);
+        public Task<List<ParticipantSkillProgress>> GetForUserForUpdateAsync(int userProfileId);
     }
 }

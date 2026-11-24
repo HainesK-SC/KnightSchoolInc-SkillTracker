@@ -1,0 +1,204 @@
+.admin-events {
+  --events-navy: var(--color-royal-court, #06243e);
+  --events-gold: var(--color-crusades-gold, #d9bb61);
+  --events-border: var(--color-border, #d8dfe5);
+  --events-muted: #4c5966;
+}
+
+.admin-events .admin-back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.admin-events-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border-bottom: 4px solid var(--events-gold);
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(120deg, var(--events-navy), #173650);
+}
+
+.admin-events-hero h1 {
+  margin: 0.2rem 0 0.5rem;
+  color: #fff;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.1;
+}
+
+.admin-events-eyebrow {
+  margin: 0;
+  color: var(--events-gold);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-events-intro {
+  max-width: 37rem;
+  margin: 0;
+  color: #edf2f7;
+  line-height: 1.5;
+}
+
+.admin-events .admin-events-create {
+  flex-shrink: 0;
+  border-color: var(--events-gold);
+  color: var(--events-navy);
+  background: var(--events-gold);
+}
+
+.admin-events .admin-events-create:hover {
+  border-color: #f1d788;
+  color: var(--events-navy);
+  background: #f1d788;
+}
+
+.admin-events .admin-events-create:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.admin-events-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 1rem;
+}
+
+.admin-events-search-form input {
+  width: 100%;
+  min-height: 46px;
+  box-sizing: border-box;
+}
+
+.admin-events-search-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-events-results {
+  margin-top: 1.75rem;
+}
+
+.admin-events-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.admin-events-list-heading h2 {
+  margin: 0;
+}
+
+.admin-events-list-heading span {
+  color: var(--events-muted);
+}
+
+.admin-events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-event-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--events-border);
+  border-top: 4px solid var(--events-gold);
+  border-radius: 12px;
+  background: var(--color-white, #fff);
+  box-shadow: 0 6px 18px rgb(6 36 62 / 7%);
+  overflow-wrap: anywhere;
+}
+
+.admin-event-card:focus-within {
+  border-color: var(--events-navy);
+  border-top-color: var(--events-gold);
+}
+
+.admin-event-card h3 {
+  margin: 0;
+  color: var(--events-navy);
+  font-size: 1.35rem;
+}
+
+.admin-event-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-event-badge {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  color: #183a56;
+  background: #eaf1f8;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.admin-event-badge-cancelled {
+  color: #842223;
+  background: #fce9e9;
+}
+
+.admin-event-card-details {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 0 0.25rem;
+}
+
+.admin-event-card-details dt {
+  color: var(--events-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-event-card-details dd {
+  margin: 0.15rem 0 0;
+}
+
+.admin-event-card-link {
+  margin-top: auto;
+}
+
+.admin-events-empty {
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.admin-events-empty h3 {
+  margin: 0 0 0.5rem;
+}
+
+.admin-events-empty p {
+  margin: 0 0 1rem;
+  color: var(--events-muted);
+}
+
+@media (max-width: 600px) {
+  .admin-events-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-events-search-form {
+    grid-template-columns: 1fr;
+  }
+}

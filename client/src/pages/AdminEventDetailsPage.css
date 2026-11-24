@@ -1,0 +1,111 @@
+.admin-event-details .admin-events-hero h1 {
+  overflow-wrap: anywhere;
+}
+
+.admin-event-details .admin-event-card-badges {
+  flex-shrink: 0;
+}
+
+.admin-event-jump-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-event-jump-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--events-border);
+  border-radius: 999px;
+  color: var(--events-navy);
+  background: var(--color-white, #fff);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-event-jump-links a:hover {
+  border-color: var(--events-navy);
+  background: #fbf4df;
+}
+
+.admin-event-jump-links a:focus-visible {
+  outline: 3px solid var(--events-navy);
+  outline-offset: 3px;
+}
+
+.admin-event-sections {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.admin-event-sections > [id] {
+  min-width: 0;
+  scroll-margin-top: 1.25rem;
+}
+
+.admin-event-sections .admin-panel {
+  border-top: 4px solid var(--events-gold);
+}
+
+.admin-event-sections .admin-panel > h2 {
+  margin: 0 0 1rem;
+  color: var(--events-navy);
+}
+
+.admin-event-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.admin-event-facts > div {
+  min-width: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--events-border);
+  border-radius: 10px;
+  background: #f5f7fa;
+}
+
+.admin-event-facts dt {
+  color: var(--events-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-event-facts dd {
+  margin: 0.25rem 0 0;
+  color: var(--events-navy);
+  overflow-wrap: anywhere;
+}
+
+.admin-event-description {
+  margin-top: 1.25rem;
+}
+
+.admin-event-description h3 {
+  margin: 0 0 0.35rem;
+  color: var(--events-navy);
+}
+
+.admin-event-description p {
+  margin: 0;
+  color: var(--events-muted);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .admin-event-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-event-jump-links a {
+    padding-inline: 0.75rem;
+  }
+}

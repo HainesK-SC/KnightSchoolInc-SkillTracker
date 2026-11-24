@@ -56,5 +56,12 @@ namespace Capstone.Identity.API.Repositories
 
             return isProgress;
         }
+
+        public Task<List<ParticipantSkillProgress>> GetForUserForUpdateAsync(int userProfileId)
+        {
+            return _appDbContext.ParticipantSkillProgresses
+                .Where(p => p.UserProfileId == userProfileId)
+                .ToListAsync();
+        }
     }
 }

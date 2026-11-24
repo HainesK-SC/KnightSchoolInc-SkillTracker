@@ -160,6 +160,36 @@ namespace Capstone.Identity.API.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventEnrollment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EnrolledAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EnrolledById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.HasIndex("EventId", "UserProfileId")
+                        .IsUnique();
+
+                    b.ToTable("EventEnrollments");
+                });
+
             modelBuilder.Entity("Capstone.Identity.API.Models.EventSkill", b =>
                 {
                     b.Property<int>("Id")
@@ -222,6 +252,9 @@ namespace Capstone.Identity.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParticipantSkillProgressId"));
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SkillId")
                         .HasColumnType("int");
 
@@ -240,6 +273,8 @@ namespace Capstone.Identity.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ParticipantSkillProgressId");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("SkillId");
 
@@ -458,6 +493,21 @@ namespace Capstone.Identity.API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Capstone.Identity.API.Models.EventEnrollment", b =>
+                {
+                    b.HasOne("Capstone.Identity.API.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Capstone.Identity.API.Models.UserProfile", null)
+                        .WithMany()
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Capstone.Identity.API.Models.EventSkill", b =>
                 {
                     b.HasOne("Capstone.Identity.API.Models.Event", null)
@@ -490,6 +540,11 @@ namespace Capstone.Identity.API.Migrations
 
             modelBuilder.Entity("Capstone.Identity.API.Models.ParticipantSkillProgress", b =>
                 {
+                    b.HasOne("Capstone.Identity.API.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Capstone.Identity.API.Models.Skill", null)
                         .WithMany()
                         .HasForeignKey("SkillId")

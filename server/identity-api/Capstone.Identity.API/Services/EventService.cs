@@ -15,17 +15,20 @@ namespace Capstone.Identity.API.Services
         private readonly ILogger<EventService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEventStaffRepository _eventStaffRepo;
+        private readonly IEventEnrollmentRepository _eventEnrollmentRepo;
 
         public EventService(
             IEventRepository eventRepository, 
             ILogger<EventService> logger,
             IUnitOfWork unitOfWork,
-            IEventStaffRepository eventStaffRepository)
+            IEventStaffRepository eventStaffRepository,
+            IEventEnrollmentRepository eventEnrollmentRepo)
         {
             _eventRepo = eventRepository;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _eventStaffRepo = eventStaffRepository;
+            _eventEnrollmentRepo = eventEnrollmentRepo;
         }
 
         public async Task<Result<EventDto>> CancelEventAsync(int eventId)
@@ -130,6 +133,13 @@ namespace Capstone.Identity.API.Services
             {
                 return Result<bool>.Failure(
                     "This event has staff assigned. Cancel it instead, or unassign its staff first.",
+                    ResultErrorType.Conflict);
+            }
+
+            if (await _eventEnrollmentRepo.AnyForEventAsync(eventId))
+            {
+                return Result<bool>.Failure(
+                    "This event has participants enrolled. Cancel it instead.",
                     ResultErrorType.Conflict);
             }
 

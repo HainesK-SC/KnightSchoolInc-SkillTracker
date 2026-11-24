@@ -129,6 +129,7 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<IEventRepository, EventRepository>();
             builder.Services.AddScoped<IEventStaffRepository, EventStaffRepository>();
             builder.Services.AddScoped<IEventSkillRepository, EventSkillRepository>();
+            builder.Services.AddScoped<IEventEnrollmentRepository, EventEnrollmentRepository>();
 
             // Service registrations
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -145,6 +146,9 @@ namespace Capstone.Identity.API
             builder.Services.AddScoped<IEventService, EventService>();
             builder.Services.AddScoped<IEventStaffService, EventStaffService>();
             builder.Services.AddScoped<IEventSkillService, EventSkillService>();
+            builder.Services.AddScoped<IEventEnrollmentService, EventEnrollmentService>();
+            builder.Services.AddScoped<IEventSkillProgressService, EventSkillProgressService>();
+            builder.Services.AddScoped<IPlaceholderService, PlaceholderService>();
 
             var app = builder.Build();
 
