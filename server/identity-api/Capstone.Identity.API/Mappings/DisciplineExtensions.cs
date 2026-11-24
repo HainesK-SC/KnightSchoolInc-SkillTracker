@@ -11,7 +11,8 @@ namespace Capstone.Identity.API.Mappings
             var disciplineDto = new DisciplineDto
             {
                 DisciplineId = discipline.DisciplineId,
-                Name = discipline.Name
+                Name = discipline.Name,
+                Description = discipline.Description,
             };
 
             return disciplineDto;
