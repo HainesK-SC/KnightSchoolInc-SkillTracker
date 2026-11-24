@@ -107,12 +107,13 @@ namespace Capstone.Identity.API.Services
             }
 
             // Instructors can only see events they're assigned to
+            // This should almost never be an issue - shouldn't get to this point if not assigned
             if (!callerIsAdmin)
             {
                 var isAssigned = await _eventStaffRepository.IsAssignedAsync(eventId, callerUserId);
                 if (!isAssigned)
                 {
-                    return Result<List<DisciplineCatalogDto>>.Failure("No event found.", ResultErrorType.NotFound);
+                    return Result<List<DisciplineCatalogDto>>.Failure("Instructors can only view events they are assigned to.", ResultErrorType.NotFound);
                 }
             }
 
@@ -120,7 +121,7 @@ namespace Capstone.Identity.API.Services
             var eventSkills = await _eventSkillRepository.GetActiveSkillsForEventAsync(eventId);
             var allDisciplines = await _disciplineRepository.GetAllDisciplinesAsync();
 
-            // Group the skills by discipline (same pattern as the skill tree)
+            // Group the skills by discipline to create structure for DisciplineCatalog
             var skillsByDisciplineId = eventSkills
                 .GroupBy(s => s.DisciplineId)
                 .ToDictionary(group => group.Key, group => group.ToList());
