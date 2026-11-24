@@ -61,6 +61,7 @@ namespace Capstone.Identity.API.Services
         public async Task<Result<DisciplineDto>> CreateDisciplineAsync(DisciplineRequestDto request, Guid actingAdminId)
         {
             var name = request.Name.Trim();
+            var description = request.Description.Trim();
 
             if (request == null)
             {
@@ -68,10 +69,16 @@ namespace Capstone.Identity.API.Services
                 return Result<DisciplineDto>.Failure("Failed to retrieve values. Try again.", ResultErrorType.Validation); // if this happens, something on the client side is broken
             }
 
-            if (name == "")
+            if (string.IsNullOrEmpty(name))
             {
                 _logger.LogWarning("[SkillService]: Discipline Name is empty.");
                 return Result<DisciplineDto>.Failure("Discipline Name is empty", ResultErrorType.Validation);
+            }
+
+            if (string.IsNullOrEmpty(description))
+            {
+                _logger.LogWarning("[SkillService]: Discipline Description is empty.");
+                return Result<DisciplineDto>.Failure("Discipline Description is empty.", ResultErrorType.Validation);
             }
 
             if (await _disciplineRepository.DisciplineExistsByName(name) == true )
@@ -82,7 +89,8 @@ namespace Capstone.Identity.API.Services
 
             var discipline = new Discipline
             {
-                Name = name
+                Name = name,
+                Description = description
             };
 
             _disciplineRepository.AddNewDiscipline(discipline);
@@ -103,11 +111,18 @@ namespace Capstone.Identity.API.Services
             }
 
             var newName = request.Name.Trim();
+            var newDescription = request.Description.Trim();
 
-            if (newName == "")
+            if (string.IsNullOrEmpty(newName))
             {
                 _logger.LogWarning("[SkillService]: Discipline Name is empty.");
                 return Result<DisciplineDto>.Failure("Discipline Name is empty", ResultErrorType.Validation);
+            }
+
+            if (string.IsNullOrEmpty(newDescription))
+            {
+                _logger.LogWarning("[SkillService]: Discipline Description is empty.");
+                return Result<DisciplineDto>.Failure("Discipline Description is empty", ResultErrorType.Validation);
             }
 
             if (await _disciplineRepository.DisciplineExistsByName(newName, disciplineId) == true)
@@ -125,8 +140,10 @@ namespace Capstone.Identity.API.Services
             }
 
             var oldName = disciplineUpdate.Name;
+            var oldDescription = disciplineUpdate.Description;
 
             disciplineUpdate.Name = newName;
+            disciplineUpdate.Description = newDescription;
 
             await _unitOfWork.SaveChangesAsync();
 
