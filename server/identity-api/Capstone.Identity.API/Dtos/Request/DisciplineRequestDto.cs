@@ -11,5 +11,8 @@ namespace Capstone.Identity.API.Dtos.Request
         [Required]
         [MaxLength(50)]
         public string Name { get; init; } = default!;
+        [Required]
+        [MaxLength(100)]
+        public string Description { get; init; } = default!;
     }
 }

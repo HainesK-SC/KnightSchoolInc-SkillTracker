@@ -14,6 +14,8 @@ namespace Capstone.Identity.API.Dtos.Request
         public int DisciplineId { get; init; }
         [MaxLength(50)]
         public string Name { get; init; } = default!;
+        [MaxLength(100)]
+        public string Description { get; init; } = default!;
         public List<SkillDto> Skills { get; init; } = new();
     }
 }
